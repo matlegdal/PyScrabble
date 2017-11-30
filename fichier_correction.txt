@@ -1,0 +1,160 @@
+﻿**************************
+Fichier de correction TP4
+**************************
+
+Nous avons utilisé la solution publiée du TP3 (oui, non, partiellement):
+
+Nous pensons que notre TP4 est un bon candidat au prix Pierre-Ardoin (oui, non):
+
+
+Prénom et Nom 1:
+Prénom et nom 2:
+
+Numéro de dossier (NI) 1:
+Numéro de dossier (NI) 2:
+
+Temps de réalisation 1 :
+Temps de réalisation 2 :
+
+
+Fonctionnalités obligatoires (70%)
+-----------------------------------
+
+/6 : Le plateau est bien dessiné
+     Commentaires :
+
+/6 : Le joueur actif voit son chevalet
+     Commentaires :
+
+/6 : Les jetons peuvent être déplacés du chevalet vers le plateau
+     Commentaires :
+
+/6 : Le jeton sélectionné est facilement identifiable
+     Commentaires :
+
+/6 : Le tour des joueurs est alterné correctement
+     Commentaires :
+
+/4 : Les déplacements invalides ne sont pas acceptés
+     Commentaires :	
+
+/4 : On peut changer d'idée de jeton en le redéposant à une place vide du chevalet
+     Commentaires :
+
+/4 : La fin de la partie est détectée et affichée
+     Commentaires :
+
+/4 : On peut sauvegarder une partie via un bouton
+     Commentaires :
+
+/4 : On peut charger une partie via un bouton
+     Commentaires :
+
+/4 : On peut démarrer une nouvelle partie
+     Commentaires :
+
+/4 :Les informations de partie sont affichées (points des joueurs et nom du joueur courant)
+     Commentaires :
+
+/4 : Qualité des messages d'erreur donnés à l'utilisateur
+     Commentaires :
+
+/4 : Utilisation de la gestion des exceptions
+     Commentaires :
+
+/4 : Qualité du code
+     Commentaires :
+
+Total: /70
+
+
+Fonctionnalités facultatives (30% max)
+
+INDIQUEZ PAR OUI/NON SI LA FONCTIONNALITÉ EST IMPLANTÉE
+-------------------------------------------------------
+
+
+IMPLANTÉE: 
+/5 : Option de lire les règlements du jeu
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Permettre de choisir la langue du jeu
+     Commentaires :
+
+IMPLANTÉE:
+/15 :  Supporter au moins 15 langues
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Affichage de la liste des mots sur le plateau
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Permettre d'annuler le dernier mouvement
+     Commentaires :
+
+IMPLANTÉE:
+/5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
+     Commentaires :	
+
+IMPLANTÉE:
+/10 :  Jouer contre l'ordinateur
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Permettre de changer le thème (couleurs, style, etc.)
+     Commentaires :
+
+IMPLANTÉE:
+/5 : "Drag-and-drop" de jetons
+     Commentaires :
+
+IMPLANTÉE:
+/10 : Afficher un compteur de temps de jeu pour chaque joueur
+     Commentaires :
+
+IMPLANTÉE:
+/10 : Assister le joueur en lui proposant des mots
+     Commentaires :
+
+IMPLANTÉE:
+/20 : Donner une dimension 3D à votre jeu
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Demander si on veut sauvegarder avant de quitter/charger
+     Commentaires :
+
+IMPLANTÉE:
+/5 : Fenêtre de bienvenue, avec explications du jeu et sélection d'options
+     Commentaires :
+
+IMPLANTÉE:
+/30 : Implémenter toutes les règles offcielles d'une version du scrabble
+     Source: [À PRÉCISER]
+     Commentaires :
+
+IMPLANTÉE:
+/30 : Jouer contre l'ordinateur en implémentant une intelligence artificielle
+     (l'ordinateur intelligent devra toujours jouer les meilleurs coups et gagner chaque partie)
+     Commentaires :
+
+
+
+Total: /30
+
+
+
+Pénalités pour non-respect des consignes
+----------------------------------------
+
+
+
+Autres commentaires du correcteur
+---------------------------------
+no. du correcteur:
+
+
+Total: /100
+
