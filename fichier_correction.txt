@@ -2,16 +2,16 @@
 Fichier de correction TP4
 **************************
 
-Nous avons utilisé la solution publiée du TP3 (oui, non, partiellement):
+Nous avons utilisé la solution publiée du TP3 (oui, non, partiellement): non
 
-Nous pensons que notre TP4 est un bon candidat au prix Pierre-Ardoin (oui, non):
+Nous pensons que notre TP4 est un bon candidat au prix Pierre-Ardoin (oui, non): oui
 
 
-Prénom et Nom 1:
-Prénom et nom 2:
+Prénom et Nom 1: Mathieu Léger-Dalcourt
+Prénom et nom 2: Pablo V. Torreblanca Alarie
 
-Numéro de dossier (NI) 1:
-Numéro de dossier (NI) 2:
+Numéro de dossier (NI) 1: 909167214
+Numéro de dossier (NI) 2: 111073072
 
 Temps de réalisation 1 :
 Temps de réalisation 2 :
