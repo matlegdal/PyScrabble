@@ -3,9 +3,10 @@ from random import randint, shuffle, seed
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
+from tkinter import Tk, NSEW
 
 
-class Scrabble:
+class Scrabble(Tk):
     """
     Classe Scrabble qui implémente aussi une partie de la logique de jeu.
 
@@ -33,9 +34,17 @@ class Scrabble:
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
+        super().__init__()
+        self.title("Scrabble")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
         assert langue.upper() in ['FR', 'EN'], 'Langue non supportée.'
         assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
-        self.plateau = Plateau()
+
+        self.plateau = Plateau(self, 60)
+        self.plateau.grid(row=0, column=0, sticky=NSEW)
+
         self.joueur_actif = None
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
         if langue.upper() == 'FR':
@@ -353,6 +362,11 @@ class Scrabble:
         return objet
 
 if __name__ == '__main__':
+
+    gui = Scrabble(2)
+    gui.mainloop()
+
+    exit()
     scrabble = Scrabble(4)
 
 # mot_permis()

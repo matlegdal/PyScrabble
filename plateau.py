@@ -1,7 +1,8 @@
 from case import Case
+from tkinter import Canvas, CENTER
 
 
-class Plateau:
+class Plateau(Canvas):
     """
     Cette classe représente un plateau de scrabble.
     Une partie de la logique du jeu sera implémentée ici donc lisez bien les spécifications de chaque méthode.
@@ -63,13 +64,17 @@ class Plateau:
     """
     DIMENSION = 15
 
-    def __init__(self):
+    def __init__(self, parent, pixels_par_case):
         """ *** Vous n'avez pas à coder cette méthode ***
         Constructeur d'un plateau.
         Pour compléter cette méthode vous devez vous référer à la configuration réelle d'un plateau de scrabble.
         Vous pouvez commencer par créer l'attribut cases en considérant qu'aucune case n'est spéciale.
         Regardez ensuite sur un vrai plateau de scrabble quelles positions sont spéciales, créer ces cases spéciales et remplacez les anciennes cases.
         """
+        super().__init__(parent, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
+        self.parent = parent
+        self.pixels_par_case = pixels_par_case
+
         self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
         for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
             self.cases[i][j] = Case(3, 'M')
@@ -88,6 +93,40 @@ class Plateau:
             self.cases[7 + i][7 + j] = Case(2, 'L')
         self.cases[7][7] = Case(2, 'M')
 
+        self.dessiner()
+        self.bind('<Configure>', self.redimensionner)
+
+    def dessiner(self):
+        self.delete('case')
+        self.delete('lettre')
+        for colonne in range(Plateau.DIMENSION):
+            for ligne in range(Plateau.DIMENSION):
+                x1 = colonne*self.pixels_par_case
+                y1 = ligne*self.pixels_par_case
+                x2 = x1 + self.pixels_par_case
+                y2 = y1 + self.pixels_par_case
+
+                self.create_rectangle(x1, y1, x2, y2, fill=self.cases[colonne][ligne].code_couleur,
+                                      tags="case")
+                delta = int(self.pixels_par_case/2)
+
+                if colonne == ligne and colonne == 7:
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605',
+                                     font=("Times", delta), tags='case')
+
+                else:
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER,
+                                     text=self.cases[colonne][ligne].text_case,# todo: faire afficher correctement le texte
+                                     font=("Times", int(delta/2)), tags='case')
+                    print(self.cases[colonne][ligne].text_case)
+                    # todo: faire afficher correctement le texte
+
+    def redimensionner(self, event):
+        new_dim = min(event.width, event.height)
+        self.pixels_par_case = new_dim//Plateau.DIMENSION
+        self.delete('case')
+        self.delete('lettre')
+        self.dessiner()
 
     @staticmethod
     def code_position_est_valide(code):

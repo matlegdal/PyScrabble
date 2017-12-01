@@ -69,7 +69,6 @@ class Case:
 
         return self.jeton_occupant.valeur
 
-
     def lettre_jeton(self):
         """
         Permet de trouver la lettre inscrite sur le jeton dans la case.
@@ -87,15 +86,35 @@ class Case:
         :return: int, code de couleur de la case.
         """
         if self.type == "M" and self.multiplicateur == 2:
-            return 43
+            return '#ffaccb'
         elif self.type == "M" and self.multiplicateur == 3:
-            return 41
+            return '#ff0000'
         elif self.type == "L" and self.multiplicateur == 2:
-            return 46
+            return '#00c9ff'
         elif self.type == "L" and self.multiplicateur == 3:
-            return 44
+            return '#0051ff'
         else:
-            return 0
+            return '#f5ebdc'
+
+    def text_case(self):
+        """
+        Méthode permettant de trouver le texte associé à une case donnée.
+        :return: str, chaine de caractère
+        """
+        if self.type == 'M' and self.multiplicateur == 2:
+            return 'Mot\nDouble'
+
+        elif self.type == 'M' and self.multiplicateur == 3:
+            return 'Mot\nTriple'
+
+        elif self.type == 'L' and self.multiplicateur == 2:
+            return 'Lettre\nDouble'
+
+        elif self.type == 'L' and self.multiplicateur == 3:
+            return 'Lettre\nTriple'
+
+        else:
+            return ''
 
     def __str__(self):
         """  *** Vous n'avez pas à coder cette méthode ***
