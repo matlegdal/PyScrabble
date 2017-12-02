@@ -116,10 +116,8 @@ class Plateau(Canvas):
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
-                                     text=self.cases[colonne][ligne].text_case,# todo: faire afficher correctement le texte
+                                     text="{}".format(self.cases[colonne][ligne]),
                                      font=("Times", int(delta/2)), tags='case')
-                    print(self.cases[colonne][ligne].text_case)
-                    # todo: faire afficher correctement le texte
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)

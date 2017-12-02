@@ -121,5 +121,8 @@ class Case:
         Formatage d'une case. Cette méthode est appelée lorsque vous faites str(v) où v est un case
         :return: str, correspondant au formatage de la case.
         """
-        s = "" if self.est_vide() else str(self.jeton_occupant)
-        return "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.code_couleur, s)
+        #s = "" if self.est_vide() else str(self.jeton_occupant)
+        #return "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.code_couleur, s)
+
+        # changement de code pour quelque chose de plus simple et compatible avec le canvas
+        return Case.text_case(self)
