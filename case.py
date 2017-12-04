@@ -1,4 +1,5 @@
 from exception import *
+# import tkinter as tk
 
 
 class Case:
@@ -34,6 +35,11 @@ class Case:
         self.multiplicateur = multiplicateur
         self.type = type
         self.jeton_occupant = None
+
+    #
+    # def dessiner_case(self, master, x1, y1, x2, y2):
+    #     master.create_rectangle(master, x1, y1, x2, y2, fill=self.code_couleur, tags="case")
+
 
     def est_vide(self):
         """
@@ -125,13 +131,13 @@ class Case:
         else:
             return ''
 
-    def __str__(self):
-        """  *** Vous n'avez pas à coder cette méthode ***
-        Formatage d'une case. Cette méthode est appelée lorsque vous faites str(v) où v est un case
-        :return: str, correspondant au formatage de la case.
-        """
-        #s = "" if self.est_vide() else str(self.jeton_occupant)
-        #return "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.code_couleur, s)
-
-        # changement de code pour quelque chose de plus simple et compatible avec le canvas
-        return Case.text_case(self)
+    # def __str__(self):
+    #     """
+    #     Formatage d'une case. Cette méthode est appelée lorsque vous faites str(v) où v est un case
+    #     :return: str, correspondant au formatage de la case.
+    #     """
+    #     #s = "" if self.est_vide() else str(self.jeton_occupant)
+    #     #return "\x1b[0;30;{}m{:^4s}\x1b[0m".format(self.code_couleur, s)
+    #
+    #     # changement de code pour quelque chose de plus simple et compatible avec le canvas
+    #     return Case.text_case(self)

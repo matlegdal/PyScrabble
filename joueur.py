@@ -156,6 +156,8 @@ class Joueur:
         s += "            " + "".join(["{:<3s}".format(str(x)) if x else '  ' for x in self.__chevalet])
         s += "\nChevalet: \_" + "__".join([chr(0x2080 + i + 1) for i in range(self.TAILLE_CHEVALET)]) + '_/\n'
         return s
+
+
 class Chevalet(Canvas):
     pass
     # TODO: Faire le canvas du chevalet pour le joueur actif

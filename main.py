@@ -1,4 +1,5 @@
 from scrabble import *
+from math import floor
 
 
 class Window(Tk):
@@ -101,9 +102,21 @@ class Window(Tk):
         # apparition du plateau
         self.plateau = Plateau(self, 60)
         self.plateau.grid(row=0, column=0, sticky=NSEW)
+        self.plateau.tag_bind('case', '<Button-1>', self.click_case)
 
 
-        # self.current
+    def click_case(self, event):
+        ligne = floor(event.y/self.plateau.pixels_par_case)
+        col = floor(event.x/self.plateau.pixels_par_case)
+
+        print(event.x, event.y)
+        print(ligne)
+        print(col)
+        print(self.plateau.cases[ligne][col])
+
+
+
+
 
 
 

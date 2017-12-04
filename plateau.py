@@ -67,7 +67,8 @@ class Plateau(Canvas):
 
     def __init__(self, master, pixels_par_case):
         """Constructeur d'un plateau.
-        :param master:
+        :param master: Fenêtre principale, de type Tk
+        :param pixels_par_case: Taille des cases en pixels
         """
         super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
@@ -97,6 +98,7 @@ class Plateau(Canvas):
     def dessiner(self):
         self.delete('case')
         self.delete('lettre')
+
         for colonne in range(Plateau.DIMENSION):
             for ligne in range(Plateau.DIMENSION):
                 x1 = colonne*self.pixels_par_case
@@ -104,17 +106,15 @@ class Plateau(Canvas):
                 x2 = x1 + self.pixels_par_case
                 y2 = y1 + self.pixels_par_case
 
-                self.create_rectangle(x1, y1, x2, y2, fill=self.cases[colonne][ligne].code_couleur,
-                                      tags="case")
+                self.create_rectangle(x1, y1, x2, y2, fill=self.cases[colonne][ligne].code_couleur, tags="case")
                 delta = int(self.pixels_par_case/2)
 
                 if colonne == ligne and colonne == 7:
-                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605',
-                                     font=("Times", delta), tags='case')
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
-                                     text="{}".format(self.cases[colonne][ligne]),
+                                     text="{}".format(self.cases[colonne][ligne].text_case()),
                                      font=("Times", int(delta/2)), tags='case')
 
     def redimensionner(self, event):
@@ -123,6 +123,8 @@ class Plateau(Canvas):
         self.delete('case')
         self.delete('lettre')
         self.dessiner()
+
+
 
     @staticmethod
     def code_position_est_valide(code):
