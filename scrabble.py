@@ -6,7 +6,7 @@ from plateau import Plateau
 from tkinter import *
 
 
-class Scrabble(Tk):
+class Scrabble(Frame):
     """
     Classe Scrabble qui implémente aussi une partie de la logique de jeu.
 
@@ -19,7 +19,7 @@ class Scrabble(Tk):
     - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
-    def __init__(self, nb_joueurs, langue='fr'):
+    def __init__(self, master, nb_joueurs, langue='fr'):
         """ *** Vous n'avez pas à coder cette méthode ***
         Étant donnés un nombre de joueurs et une langue. Le constructeur crée une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -34,87 +34,9 @@ class Scrabble(Tk):
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        super().__init__()
-
-        # fenetre d'acceuil
-        self.title("Scrabble")
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        #menu déroulant
-
-        barre_menu = Menu(self)
-        menu1 = Menu(barre_menu, tearoff=0)
-        menu1.add_command(label="Nouvelle partie", state=DISABLED)  # TODO: commande de retourner à la fenêtre d'acceuil
-        menu1.add_command(label="Charger une partie", state=NORMAL) # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
-        menu1.add_separator()
-        menu1.add_command(label="Quitter", command=self.quit)
-        barre_menu.add_cascade(label="Fichier", menu=menu1)
-
-        menu2 = Menu(barre_menu, tearoff=0)
-        menu2.add_command(label="Règlements")  # TODO: faire apparaître une fenêtre avec les règlements
-        barre_menu.add_cascade(label="Aide", menu=menu2)
-
-        self.config(menu=barre_menu)
-
-        # variable de pad
-        label_padx = 10
-        label_pady = 10
-
-        # message de bienvenue
-        Label(self, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24),
-              padx=label_padx, pady=label_pady).grid(row=0)
-        # label de la langue
-        Label(self, text="Choisissez la langue du jeu:", font=("Times", 16),
-              padx=label_padx, pady=label_pady).grid(row=1)
-
-        # frame des choix de langues
-        cadre_choix_langue = Frame(self)
-        cadre_choix_langue.grid(row=2)
-
-        # radio button des langues dispo
-
-        self.radio_bouton_fr = Radiobutton(cadre_choix_langue, text='FR')
-        self.radio_bouton_en = Radiobutton(cadre_choix_langue, text='EN')
-
-        self.radio_bouton_fr.grid(column=0, row=0)
-        self.radio_bouton_en.grid(column=1, row=0)
-        self.radio_bouton_fr.flash()
-        self.radio_bouton_en.deselect()
-        #todo: faire apparaître les boutons déselectionnés
-
-        # radio button pour le nb de joueurs
-
-        Label(self, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3)
-        # frame des choix de joueurs
-        cadre_choix_joueur = Frame(self)
-        cadre_choix_joueur.grid(row=4)
-
-        # radio button des choix du nb de joueurs
-
-        self.radio_bouton_2 = Radiobutton(cadre_choix_joueur, text='2 joueurs')
-        self.radio_bouton_3 = Radiobutton(cadre_choix_joueur, text='3 joueurs')
-        self.radio_bouton_4 = Radiobutton(cadre_choix_joueur, text='4 joueurs')
-        self.radio_bouton_computer = Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur')
-        self.radio_bouton_2.grid(column=0, row=0)
-        self.radio_bouton_3.grid(column=1, row=0)
-        self.radio_bouton_4.grid(column=2, row=0)
-        self.radio_bouton_computer.grid(column=3, row=0)
-        # todo: faire apparaître les boutons déselectionnés
-
-        #frame du bouton commencer
-        cadre_bouton_commencer = Frame(self, padx=label_padx, pady=label_pady)
-        cadre_bouton_commencer.grid(row=5)
-        # bouton de commencer la partie
-
-        self.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie",
-                                       padx=label_padx, pady=label_pady)
-        self.bouton_commencer.grid(row=0)
-
-        # TODO cliquer sur commencer décolle Scrabble avec nb de joueurs sélectionnés et langue. ouvre aussi le plateau.
-
-
-
+        super().__init__(self, master)
+        assert isinstance(master, Tk)
+        self.master=master
 
         self.liste_langue = ['FR', 'EN']
 
@@ -122,8 +44,8 @@ class Scrabble(Tk):
         assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
 
         # appartition du plateau
-        #self.plateau = Plateau(self, 60)
-        #self.plateau.grid(row=0, column=0, sticky=NSEW)
+        self.plateau = Plateau(self, 60)
+        self.plateau.grid(row=0, column=0, sticky=NSEW)
 
         self.joueur_actif = None
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
@@ -443,11 +365,10 @@ class Scrabble(Tk):
 
 if __name__ == '__main__':
 
-    gui = Scrabble(2)
-    gui.mainloop()
+    root = Tk()
+    scrabble = Scrabble(root, 2)
 
-    exit()
-    scrabble = Scrabble(4)
+    root.mainloop()
 
 # mot_permis()
     assert scrabble.mot_permis('car')
@@ -514,48 +435,3 @@ if __name__ == '__main__':
     # assert scrabble.joueur_actif.nb_a_tirer == 0
     # assert scrabble.joueur_actif.chevalet != ancien_chevalet
     # assert len(scrabble.jetons_libres) == nbr_jetons_libres
-
-
-    #############################################################################################
-    # Programme principal. Vous n'avez pas à coder cela. Vous pouvez le changer selon vos besoins,
-    # mais remettez votre TP avec la version originale fournie.
-    #############################################################################################
-    # seed(42)  # Pour vous aider à avoir quelque chose de prévisible histoire de faciliter vos tests.
-    # print("*"*80)
-    # print("{:^80}".format("Bienvenue dans IFT-1004 Scrabble"))
-    # print("*"*80)
-    #
-    # choix = ''
-    # while choix not in ['n', 'o']:
-    #     choix = input("Entrez (n) pour commencer une nouvelle partie \n"
-    #                   "ou (o) pour ouvrir une partie déja existante: ").strip().lower()
-    # if choix == 'n':
-    #     valide = False
-    #     while not valide:
-    #         try:
-    #             nb_joueurs = int(input("Veuillez entrer le nombre de joueurs (min=2, max=4): "))
-    #             if 2 <= nb_joueurs <= 4:
-    #                 valide = True
-    #         except:
-    #             print("Vous devez entrer un entier.")
-    #
-    #     valide = False
-    #     while not valide:
-    #         langue= input("Veuillez sélectionner la langue(français=fr, anglais=en): ")
-    #         if langue in ['en', 'fr']:
-    #             valide = True
-    #         else:
-    #             print("Nous n'avons pas pu détecter la langue.")
-    #
-    #     scrabble = Scrabble(nb_joueurs, langue)
-    #     scrabble.jouer()
-    # else:
-    #     valide = False
-    #     while not valide:
-    #         try:
-    #             fichier = input("Entrez le nom du fichier à ouvrir: ")
-    #             scrabble = Scrabble.charger_partie(fichier)
-    #             valide = True
-    #         except:
-    #             valide = False
-    #     scrabble.jouer()
