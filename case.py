@@ -1,3 +1,6 @@
+from exception import *
+
+
 class Case:
     """
     Cette classe représente une case sur un tableau de scrabble.
@@ -22,8 +25,11 @@ class Case:
         :exception: Levez une exception avec assert si le multiplicateur ne respecte pas
         la condition suivante 1 <= multiplicateur <= 3 ou si le type n'est ni None, ni 'M', ni 'L'.
         """
-        assert 1 <= multiplicateur <= 3, "Le multiplicateur de la case est inférieur à 1 ou supérieur à 3"
-        assert type in [None, 'M', 'L'], "La case est d'un type différent de None, 'M' ou 'L'"
+        if not 1 <= multiplicateur <= 3:
+            raise CaseMultiException("Le multiplicateur de la case est inférieur à 1 ou supérieur à 3")
+
+        if type not in [None, 'M', 'L']:
+            raise CaseTypeException("La case est d'un type différent de None, 'M' ou 'L'")
 
         self.multiplicateur = multiplicateur
         self.type = type
@@ -43,7 +49,8 @@ class Case:
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si la case est déjà occupée.
         """
-        assert self.est_vide(), "La case est déjà occupée."
+        if not self.est_vide():
+            raise CaseOccupeeException("La case est déjà occupée.")
         self.jeton_occupant = jeton
 
     def retirer_jeton(self):
@@ -52,7 +59,8 @@ class Case:
         :return: Le jeton retiré.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "La case est déjà vide"
+        if self.est_vide():
+            raise CaseVideException("La case est déjà vide")
 
         jeton_retire = self.jeton_occupant
         self.jeton_occupant = None
@@ -65,7 +73,8 @@ class Case:
         :return: int, valeur du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "La case est vide"
+        if self.est_vide():
+            raise CaseVideException("La case est vide")
 
         return self.jeton_occupant.valeur
 
@@ -75,8 +84,8 @@ class Case:
         :return: str, lettre du jeton occupant.
         :exception: Levez une exception avec assert si la case est vide.
         """
-        assert not self.est_vide(), "La case est vide"
-
+        if self.est_vide():
+            raise CaseVideException("La case est vide")
         return self.jeton_occupant.lettre
 
     @property

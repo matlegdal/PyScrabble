@@ -6,25 +6,44 @@ Fichier python contenant les classes d'exeption. J'ai pensé à les mettres dans
 
 class PositionInvalideException(Exception):
     pass
-    # TODO
 
 
 class MotNonPermisException(Exception):
     pass
-    # TODO
 
 
 class CaseOccupeeException(Exception):
     pass
-    # TODO
 
 
 class CaseVideException(Exception):
     pass
-    # TODO
+
+
+class CaseMultiException(Exception):
+    pass
+
+
+class CaseTypeException(Exception):
+    pass
+
+
+class NomInvalideException(Exception):
+    pass
+
+
+class PositionChevaletException(Exception):
+    pass
+
+
+class JetonLettreException(Exception):
+    pass
+
+
+class JetonValeurException(Exception):
+    pass
 
 
 class AutreExeption(Exception):
     pass
-    # TODO
 

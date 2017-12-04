@@ -1,5 +1,6 @@
 from random import shuffle
-
+from exception import *
+from tkinter import Canvas
 
 class Joueur:
     """
@@ -27,7 +28,8 @@ class Joueur:
         :return: Ne retourne rien.
         :exception: Levez une exception si le nom est une chaine vide.
         """
-        assert nom != '' and not nom.isspace(), "Entrez un nom valide. Minimum 1 caractère."
+        if nom == '' and nom.isspace():
+            raise NomInvalideException("Entrez un nom valide. Minimum 1 caractère.")
 
         self.nom = nom
         self.__points = 0
@@ -69,7 +71,9 @@ class Joueur:
         :return: True si la position est vide et False sinon.
         :exception: Levez une exception avec assert si la position n'est pas valide. Pensez à réutiliser Joueur.position_est_valide.
         """
-        assert Joueur.position_est_valide(pos), "La position du chevalet n'est pas valide"
+        if not Joueur.position_est_valide(pos):
+            raise PositionChevaletException("La position du chevalet n'est pas valide")
+
         return self.__chevalet[pos] is None
 
     def ajouter_jeton(self, jeton, pos=None):
@@ -88,11 +92,13 @@ class Joueur:
         """
         # Si la position est spécifiée, on place le jeton à cette position
         if pos is not None:
-            assert self.position_est_vide(pos), "La position du chevalet n'est pas vide"
+            if not self.position_est_vide(pos):
+                raise PositionChevaletException("La position du chevalet n'est pas vide")
             self.__chevalet[pos] = jeton
         # Sinon, on la place au premier index disponible. On lève une exception s'il n'y a pas de place disponible
         else:
-            assert None in self.__chevalet, "Il n'y a pas de place vide dans le chevalet"
+            if None not in self.__chevalet:
+                raise PositionChevaletException("Il n'y a pas de place vide dans le chevalet")
             self.__chevalet[self.__chevalet.index(None)] = jeton
 
     def retirer_jeton(self, pos):
@@ -104,7 +110,8 @@ class Joueur:
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide.
                     Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        assert not self.position_est_vide(pos), "La position du chevalet indiquée est vide."
+        if self.position_est_vide(pos):
+            raise PositionChevaletException("La position du chevalet indiquée est vide.")
         jeton_retire = self.__chevalet[pos]
         self.__chevalet[pos] = None
         return jeton_retire
@@ -118,7 +125,8 @@ class Joueur:
         :exception: Levez une exception avec assert si la position spécifiée n'est pas valide ou si elle est vide.
                     Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
         """
-        assert not self.position_est_vide(pos), "La position du chevalet indiquée est vide."
+        if self.position_est_vide(pos):
+            raise PositionChevaletException("La position du chevalet indiquée est vide.")
         return self.__chevalet[pos]
 
     def ajouter_points(self, points):
@@ -148,6 +156,9 @@ class Joueur:
         s += "            " + "".join(["{:<3s}".format(str(x)) if x else '  ' for x in self.__chevalet])
         s += "\nChevalet: \_" + "__".join([chr(0x2080 + i + 1) for i in range(self.TAILLE_CHEVALET)]) + '_/\n'
         return s
+class Chevalet(Canvas):
+    pass
+    # TODO: Faire le canvas du chevalet pour le joueur actif
 
 
 # Tests

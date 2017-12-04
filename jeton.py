@@ -1,3 +1,6 @@
+from exception import *
+
+
 class Jeton:
     """
     Cette classe représente un jeton.
@@ -15,8 +18,10 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        assert 0 <= valeur <= 20, "La valeur est inférieur à 0 ou supérieure à 20."
-        assert len(lettre) == 1 and lettre.isupper() and lettre.isalpha(), "Lettre incorrecte."
+        if not 0 <= valeur <= 20:
+            raise JetonValeurException("La valeur est inférieur à 0 ou supérieure à 20.")
+        if len(lettre) != 1 and not lettre.isupper() and not lettre.isalpha():
+            raise JetonLettreException("Lettre incorrecte.")
 
         self.lettre = lettre
         self.valeur = valeur

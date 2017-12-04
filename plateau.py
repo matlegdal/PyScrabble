@@ -1,5 +1,6 @@
 from case import Case
-from tkinter import Canvas, CENTER
+from tkinter import Canvas, CENTER, Tk, NSEW
+from exception import *
 
 
 class Plateau(Canvas):
@@ -153,7 +154,8 @@ class Plateau(Canvas):
         :return: tuple (int, int), l'index de la ligne et l'index de la colonne associés au code.
         :exception: Levez une exception avec assert si le code de la position est invalide. Pensez à utiliser Plateau.code_position_est_valide.
         """
-        assert Plateau.code_position_est_valide(code), "La position de la case n'est pas valide."
+        if not Plateau.code_position_est_valide(code):
+            raise PositionInvalideException("La position de la case n'est pas valide.")
 
         # Le premier charactère est converti en ordinal et sa position par rapport à 'A' est trouvée. Il s'agit de l'index de la ligne.
         # Les autres caractères sont convertis en integer et on soustrait 1 pour avoir l'index de la colonne.
@@ -167,7 +169,8 @@ class Plateau(Canvas):
         :return: True si la case est vide, False sinon. Rappelez-vous qu'il existe une méthode est_vide disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide.
         """
-        assert Plateau.code_position_est_valide(position_code), "La positon de la case n'est pas valide."
+        if not Plateau.code_position_est_valide(position_code):
+            raise PositionInvalideException("La position de la case n'est pas valide.")
 
         ligne, col = Plateau.decode_position(position_code)
         return self.cases[ligne][col].est_vide()
@@ -187,7 +190,8 @@ class Plateau(Canvas):
         :return: Ne retourne rien.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide.
         """
-        assert self.case_est_vide(position_code), "La case est déjà occupée"
+        if not self.case_est_vide(position_code):
+            raise CaseOccupeeException("La case est déjà occupée")
 
         ligne, col = Plateau.decode_position(position_code)
         self.cases[ligne][col].placer_jeton(jeton)
@@ -199,7 +203,8 @@ class Plateau(Canvas):
         :return: Jeton, le jeton à enlever du plateau. Rappelez-vous qu'il existe une méthode retirer_jeton disponible pour les objets de type Case.
         :exception: Levez une exception avec assert si le code de la position est invalide ou la case n'est pas vide. -> erreur si la case EST vide!
         """
-        assert not self.case_est_vide(position_code),  "Erreur: La case est vide."
+        if self.case_est_vide(position_code):
+            raise CaseVideException("Erreur: La case est vide.")
 
         ligne, col = Plateau.decode_position(position_code)
         return self.cases[ligne][col].retirer_jeton()
@@ -214,7 +219,8 @@ class Plateau(Canvas):
         :exception: Levez une exception avec assert si le code de la position est invalide
         """
 
-        assert self.code_position_est_valide(position_code),  "La position de la case est invalide"
+        if not Plateau.code_position_est_valide(position_code):
+            raise PositionInvalideException("La position de la case n'est pas valide.")
 
         index_ligne, index_colonne = Plateau.decode_position(position_code)
         voisins = [(index_ligne, index_colonne - 1), (index_ligne, index_colonne + 1), (index_ligne + 1, index_colonne), (index_ligne - 1, index_colonne)]
@@ -275,7 +281,8 @@ class Plateau(Canvas):
             - Le second élément est le score obtenu si l'ajout a été fait, 0 sinon.
         :exception: Levez une exception avec assert si les positions sont invalides.
         """
-        assert self.valider_positions_avant_ajout(position_codes), "Les positions ne sont pas valides"
+        if not self.valider_positions_avant_ajout(position_codes):
+            raise PositionInvalideException("Les positions ne sont pas valides")
 
         # On ajoute les jetons aux positions spécifiées
         for jeton, pos in zip(jetons_a_ajouter, position_codes):
@@ -375,6 +382,12 @@ class Plateau(Canvas):
 # Tests unitaires
 
 if __name__ == '__main__':
+    parent = Tk()
+    plateau = Plateau(parent, 60)
+    plateau.grid(row=0, column=0, sticky=NSEW)
+    parent.mainloop()
+
+    """
     from jeton import Jeton
     # init de quelques jetons
     jetonA = Jeton('A', 1)
@@ -406,4 +419,5 @@ if __name__ == '__main__':
 
     # le return de placer_mots est le bon
     assert ret_mot == (['CAR'], 10), "Le return de placer_mot ne concorde pas"
+    """
 
