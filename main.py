@@ -10,6 +10,7 @@ class Window(Tk):
     def __init__(self):
         super().__init__()
         self.current = None
+        self.plateau = None
 
         self.title("Scrabble")
         self.grid_columnconfigure(0, weight=1)
@@ -34,6 +35,10 @@ class Window(Tk):
     def accueil(self):
         if self.current is not None:
             self.current.destroy()
+
+        if self.plateau is not None:
+            self.plateau.destroy()
+
 
         self.current = Frame(self)
         self.current.grid(row=20)
@@ -94,8 +99,8 @@ class Window(Tk):
         self.current.grid()
 
         # apparition du plateau
-        self.current.plateau = Plateau(self, 60)
-        self.current.plateau.grid(row=0, column=0, sticky=NSEW)
+        self.plateau = Plateau(self, 60)
+        self.plateau.grid(row=0, column=0, sticky=NSEW)
 
 
         # self.current
