@@ -34,8 +34,8 @@ class Scrabble(Frame):
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        super().__init__(self, master)
         assert isinstance(master, Tk)
+        Frame.__init__(self, master)
         self.master=master
 
         self.liste_langue = ['FR', 'EN']
@@ -43,7 +43,7 @@ class Scrabble(Frame):
         assert langue.upper() in self.liste_langue, 'Langue non supportée.'
         assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
 
-        # appartition du plateau
+        # apparition du plateau
         self.plateau = Plateau(self, 60)
         self.plateau.grid(row=0, column=0, sticky=NSEW)
 
@@ -87,16 +87,10 @@ class Scrabble(Frame):
 
         :return: Joueur, un des joueurs gagnants, i.e si plusieurs sont à égalité on prend un au hasard.
         """
-        # méthode 1 - ok, mais ne respecte pas vraiment la condition "en prendre un au hasard s'il y a égalité"
-        # return sorted(self.joueurs, key=lambda joueur: joueur.points, reverse=True)[0]
-
-        # méthode 2
         # On trouve le maximum de points
         max_points = max([joueur.points for joueur in self.joueurs])
-
         # On sélectionne les joueurs ayant le nombre max de points
         joueurs_gagnants = [joueur for joueur in self.joueurs if joueur.points == max_points]
-
         # On shuffle la liste ce qui permet de retourner un joueur au hasard.
         shuffle(joueurs_gagnants)
         return joueurs_gagnants[0]
