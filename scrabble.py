@@ -111,7 +111,7 @@ class Scrabble(Tk):
                                        padx=label_padx, pady=label_pady)
         self.bouton_commencer.grid(row=0)
 
-        # TODO cliquer sur commencer décolle Scrabble avec nb de joueurs sélectionnés et langue
+        # TODO cliquer sur commencer décolle Scrabble avec nb de joueurs sélectionnés et langue. ouvre aussi le plateau.
 
 
 
