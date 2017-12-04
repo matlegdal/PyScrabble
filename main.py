@@ -8,9 +8,6 @@ class App(Tk):
     label_padx = 10
     label_pady = 10
 
-    langue = 'fr'
-    nb_joueurs = 2
-
     def __init__(self):
         super().__init__()
         self.current = None
@@ -65,7 +62,7 @@ class App(Tk):
         Label(self.current, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3)
         cadre_choix_joueur = Frame(self.current)
         cadre_choix_joueur.grid(row=4)
-        nb_joueurs = StringVar()
+        nb_joueurs = IntVar()
         Radiobutton(cadre_choix_joueur, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=0)
         Radiobutton(cadre_choix_joueur, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=0)
         Radiobutton(cadre_choix_joueur, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=0)
@@ -76,13 +73,12 @@ class App(Tk):
         cadre_bouton_commencer = Frame(self.current, padx=App.label_padx, pady=App.label_pady)
         cadre_bouton_commencer.grid(row=5)
 
-        self.current.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=self.jouer,
+        self.current.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=lambda: self.jouer(nb_joueurs.get(), langue.get()),
                                        padx=App.label_padx, pady=App.label_pady)
         self.current.bouton_commencer.grid(row=0)
 
-        # TODO cliquer sur commencer décolle Scrabble avec nb de joueurs sélectionnés et langue. ouvre aussi le plateau.
 
-    def jouer(self, nb_joueurs=2, langue='FR'):
+    def jouer(self, nb_joueurs, langue):
         self.current.destroy()
 
         self.current = Scrabble(self, nb_joueurs, langue)
