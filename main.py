@@ -2,11 +2,14 @@ from scrabble import *
 from math import floor
 
 
-class Window(Tk):
+class App(Tk):
 
     # variable de pad
     label_padx = 10
     label_pady = 10
+
+    langue = 'fr'
+    nb_joueurs = 2
 
     def __init__(self):
         super().__init__()
@@ -46,54 +49,40 @@ class Window(Tk):
 
         # message de bienvenue
         Label(self.current, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24),
-              padx=Window.label_padx, pady=Window.label_pady).grid(row=0)
+              padx=App.label_padx, pady=App.label_pady).grid(row=0)
         # label de la langue
         Label(self.current, text="Choisissez la langue du jeu:", font=("Times", 16),
-              padx=Window.label_padx, pady=Window.label_pady).grid(row=1)
+              padx=App.label_padx, pady=App.label_pady).grid(row=1)
 
-        # frame des choix de langues
+        # Choix des langues
         cadre_choix_langue = Frame(self.current)
         cadre_choix_langue.grid(row=2)
+        langue = StringVar()
+        Radiobutton(cadre_choix_langue, text='Français', variable=langue, value='FR').grid(column=0, row=0)
+        Radiobutton(cadre_choix_langue, text='English', variable=langue, value='EN').grid(column=1, row=0)
 
-        # radio button des langues dispo
-        self.current.radio_bouton_fr = Radiobutton(cadre_choix_langue, text='FR')
-        self.current.radio_bouton_en = Radiobutton(cadre_choix_langue, text='EN')
-
-        self.current.radio_bouton_fr.grid(column=0, row=0)
-        self.current.radio_bouton_en.grid(column=1, row=0)
-        self.current.radio_bouton_fr.flash()
-        self.current.radio_bouton_en.deselect()
-        # todo: faire apparaître les boutons déselectionnés
-
-        # radio button pour le nb de joueurs
+        # Nombre des joueurs
         Label(self.current, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3)
-        # frame des choix de joueurs
         cadre_choix_joueur = Frame(self.current)
         cadre_choix_joueur.grid(row=4)
+        nb_joueurs = StringVar()
+        Radiobutton(cadre_choix_joueur, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=0)
+        Radiobutton(cadre_choix_joueur, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=0)
+        Radiobutton(cadre_choix_joueur, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=0)
+        Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1).grid(column=3, row=0)
 
-        # radio button des choix du nb de joueurs
-        self.current.radio_bouton_2 = Radiobutton(cadre_choix_joueur, text='2 joueurs')
-        self.current.radio_bouton_3 = Radiobutton(cadre_choix_joueur, text='3 joueurs')
-        self.current.radio_bouton_4 = Radiobutton(cadre_choix_joueur, text='4 joueurs')
-        self.current.radio_bouton_computer = Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur')
-        self.current.radio_bouton_2.grid(column=0, row=0)
-        self.current.radio_bouton_3.grid(column=1, row=0)
-        self.current.radio_bouton_4.grid(column=2, row=0)
-        self.current.radio_bouton_computer.grid(column=3, row=0)
-        # todo: faire apparaître les boutons déselectionnés
 
-        # frame du bouton commencer
-        cadre_bouton_commencer = Frame(self.current, padx=Window.label_padx, pady=Window.label_pady)
+        # Débuter la partie
+        cadre_bouton_commencer = Frame(self.current, padx=App.label_padx, pady=App.label_pady)
         cadre_bouton_commencer.grid(row=5)
 
-        # bouton de commencer la partie
         self.current.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=self.jouer,
-                                       padx=Window.label_padx, pady=Window.label_pady)
+                                       padx=App.label_padx, pady=App.label_pady)
         self.current.bouton_commencer.grid(row=0)
 
         # TODO cliquer sur commencer décolle Scrabble avec nb de joueurs sélectionnés et langue. ouvre aussi le plateau.
 
-    def jouer(self, nb_joueurs=2, langue='fr'):
+    def jouer(self, nb_joueurs=2, langue='FR'):
         self.current.destroy()
 
         self.current = Scrabble(self, nb_joueurs, langue)
@@ -121,5 +110,5 @@ class Window(Tk):
 
 
 
-Window().mainloop()
+App().mainloop()
 
