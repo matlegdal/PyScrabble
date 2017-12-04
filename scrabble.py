@@ -3,7 +3,7 @@ from random import randint, shuffle, seed
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
-from tkinter import Tk, NSEW, Label, Frame, Radiobutton, NORMAL, DISABLED, ACTIVE, Button, Menu
+from tkinter import *
 
 
 class Scrabble(Tk):
