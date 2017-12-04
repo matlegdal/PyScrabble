@@ -65,15 +65,12 @@ class Plateau(Canvas):
     """
     DIMENSION = 15
 
-    def __init__(self, parent, pixels_par_case):
-        """ *** Vous n'avez pas à coder cette méthode ***
-        Constructeur d'un plateau.
-        Pour compléter cette méthode vous devez vous référer à la configuration réelle d'un plateau de scrabble.
-        Vous pouvez commencer par créer l'attribut cases en considérant qu'aucune case n'est spéciale.
-        Regardez ensuite sur un vrai plateau de scrabble quelles positions sont spéciales, créer ces cases spéciales et remplacez les anciennes cases.
+    def __init__(self, master, pixels_par_case):
+        """Constructeur d'un plateau.
+        :param master:
         """
-        super().__init__(parent, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
-        self.parent = parent
+        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
+        self.master = master
         self.pixels_par_case = pixels_par_case
 
         self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
@@ -129,7 +126,7 @@ class Plateau(Canvas):
 
     @staticmethod
     def code_position_est_valide(code):
-        """ *** Vous n'avez pas à coder cette méthode ***
+        """
         Méthode statique permettant de valider si un code de positionnement sur le tableau est valide ou pas.
         :param code: str au format « XY » ou « xy » représentant un code de positionnement.
         :return: True si le code passé en argument est un code de positionnement au format « XY » ou « xy » valide.
@@ -382,10 +379,10 @@ class Plateau(Canvas):
 # Tests unitaires
 
 if __name__ == '__main__':
-    parent = Tk()
-    plateau = Plateau(parent, 60)
+    master = Tk()
+    plateau = Plateau(master, 60)
     plateau.grid(row=0, column=0, sticky=NSEW)
-    parent.mainloop()
+    master.mainloop()
 
     """
     from jeton import Jeton

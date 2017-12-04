@@ -43,9 +43,6 @@ class Scrabble(Frame):
         assert langue.upper() in self.liste_langue, 'Langue non supportée.'
         assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
 
-        # apparition du plateau
-        self.plateau = Plateau(self, 60)
-        self.plateau.grid(row=0, column=0, sticky=NSEW)
 
         self.joueur_actif = None
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]

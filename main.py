@@ -93,10 +93,15 @@ class Window(Tk):
         self.current = Scrabble(self, nb_joueurs, langue)
         self.current.grid()
 
+        # apparition du plateau
+        self.current.plateau = Plateau(self, 60)
+        self.current.plateau.grid(row=0, column=0, sticky=NSEW)
+
+
+        # self.current
 
 
 
-root = Window()
 
-root.mainloop()
+Window().mainloop()
 
