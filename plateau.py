@@ -110,7 +110,8 @@ class Plateau(Canvas):
                 delta = int(self.pixels_par_case/2)
 
                 if colonne == ligne and colonne == 7:
-                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta),
+                                     tags='case')
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
