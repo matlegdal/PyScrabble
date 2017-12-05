@@ -3,11 +3,6 @@ Fichier python contenant les classes d'exeption. J'ai pensé à les mettres dans
 
 """
 
-class NbrJoueursException(Exception):
-    pass
-
-class LangueInvalideException(Exception):
-    pass
 
 class PositionInvalideException(Exception):
     pass

@@ -39,8 +39,17 @@ class Scrabble(Tk):
         self.message = "Bienvenue sur Scrabble!"
 
         # Configure
+        self.content = Frame(self)
+        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=10, pady=10)
+
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.minsize(width=1200, height=800)
+
+        self.content.grid_columnconfigure(0, weight=2)
+        self.content.grid_columnconfigure(1, weight=1)
+        self.content.grid_rowconfigure(0, weight=1)
+        self.content.grid_rowconfigure(1, weight=2)
 
         # Création du menu
         barre_menu = Menu(self)
@@ -63,54 +72,34 @@ class Scrabble(Tk):
 
 
     def accueil(self):
-        # if self.current is not None:
-        #     self.current.destroy()
-        # if self.plateau is not None:
-        #     self.plateau.destroy()
-        # if self.aside is not None:
-        #     self.aside.destroy()
-
-        accueil = Frame(self)
-        accueil.grid()
+        accueil = Frame(self.content)
+        accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 
         # message de bienvenue
-        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0)
+        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0, columnspan=4)
         # label de la langue
-        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1)
+        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, columnspan=4)
 
         # Choix des langues
-        # cadre_choix_langue = Frame(accueil)
-        # cadre_choix_langue.grid(row=2)
         langue = StringVar()
-        Radiobutton(accueil, text='Français', variable=langue, value='FR').grid(column=0, row=2)
-        Radiobutton(accueil, text='English', variable=langue, value='EN').grid(column=1, row=2)
-        # Radiobutton(cadre_choix_langue, text='Français', variable=langue, value='FR').grid(column=0, row=0)
-        # Radiobutton(cadre_choix_langue, text='English', variable=langue, value='EN').grid(column=1, row=0)
+        langue.set('FR')
+        Radiobutton(accueil, text='Français', variable=langue, value='FR').grid(column=0, row=2, columnspan=2, sticky=E)
+        Radiobutton(accueil, text='English', variable=langue, value='EN').grid(column=2, row=2, columnspan=2, sticky=W)
 
         # Nombre des joueurs
-        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3)
-        # cadre_choix_joueur = Frame(accueil)
-        # cadre_choix_joueur.grid(row=4)
+        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4)
         nb_joueurs = IntVar()
+        nb_joueurs.set(2)
         Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=4)
         Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=4)
         Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=4)
         Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
-        # Radiobutton(cadre_choix_joueur, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=0)
-        # Radiobutton(cadre_choix_joueur, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=0)
-        # Radiobutton(cadre_choix_joueur, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=0)
-        # Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=0)
-
 
         # Débuter la partie
-        # cadre_bouton_commencer = Frame(accueil)
-        # cadre_bouton_commencer.grid(row=5)
+        Button(accueil, text="Commencer la partie", command=lambda: self.transition_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4)
 
-        Button(accueil, text="Commencer la partie", command=lambda: self.transition_partie(accueil, nb_joueurs.get(), langue.get())).grid()
-        # accueil.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=lambda: self.jouer(nb_joueurs.get(), langue.get()))
-        # accueil.bouton_commencer.grid(row=0)
 
-    def transition_partie(self, accueil, nb_joueurs, langue, pixels_par_case=30):
+    def transition_partie(self, accueil, nb_joueurs, langue, pixels_par_case=50):
         accueil.destroy()
         self.demarrer_partie(nb_joueurs, langue, pixels_par_case)
 
@@ -130,16 +119,14 @@ class Scrabble(Tk):
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        if nb_joueurs < 2 or nb_joueurs > 4:
-            raise NbrJoueursException
+        assert 2 <= nb_joueurs <= 4
+        assert langue.upper() in self.liste_langue
 
-        if langue.upper() not in self.liste_langue:
-            raise LangueInvalideException
-
-        self.plateau = Plateau(self, pixels_par_case)
-        self.joueur_actif = None
+        self.plateau = Plateau(self.content, pixels_par_case)
         self.joueurs = [Joueur(self, "Joueur {}".format(i+1), pixels_par_case) for i in range(nb_joueurs)]
-        self.message = "Bienvenue sur Scrabble!"
+        self.joueur_suivant()
+        self.message = Label(self.content, text="Bienvenue sur Scrabble! Le {} va commencer".format(self.joueur_actif.nom))
+        # self.affichage_points = Label(self)
 
         if langue.upper() == 'FR':
             # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
@@ -166,8 +153,11 @@ class Scrabble(Tk):
 
 
         # Représentation graphique
-        self.plateau.grid(row=0, column=0, rowspan=self.plateau.DIMENSION, columnspan=self.plateau.DIMENSION, sticky=NSEW)
+        self.plateau.grid(row=0, column=0, rowspan=2, columnspan=1, sticky=NSEW)
         self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+
+        self.message.grid(row=0, column=1, sticky=NW)
+
 
 
     def click_case(self, event):
