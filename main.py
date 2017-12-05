@@ -100,11 +100,19 @@ class App(Tk):
         # self.bind('<Configure>', self.current.plateau.redimensionner) #TODO: le redimensionage est buggy
 
         # Joueur
-        self.current.joueur_suivant()
-        Label(self.current, text="C'est le tour de {}".format(self.current.joueur_actif.nom)).grid(row=5, column=15, columnspan=10, sticky=N)
-        self.current.joueur_actif.dessiner_chevalet()
-        self.current.joueur_actif.grid(row=6, column=15)
-        self.current.joueur_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+        # self.current.joueur_suivant()
+
+        Label(self.current, text=self.current.message).grid(row=5, column=15, columnspan=10, sticky=N)
+
+        # TODO: à corriger: fais planter pour l'instant
+        try:
+            self.current.jouer()
+        except:
+            self.current.message = "Oups il y a un problème"
+
+        # self.current.joueur_actif.dessiner_chevalet()
+        # self.current.joueur_actif.grid(row=6, column=15)
+        # self.current.joueur_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
 
 
     def click_case(self, event):

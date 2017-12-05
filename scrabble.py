@@ -44,6 +44,7 @@ class Scrabble(Frame):
         self.plateau = Plateau(self, pixels_par_case)
         self.joueur_actif = None
         self.joueurs = [Joueur(self, "Joueur {}".format(i+1), pixels_par_case) for i in range(nb_joueurs)]
+        self.message = "Bienvenue sur Scrabble!"
 
         assert langue.upper() in self.liste_langue, 'Langue non supportée.'
 
@@ -292,38 +293,38 @@ class Scrabble(Frame):
             if changer_joueur:
                 self.joueur_suivant()
             if debut:
-                print("Le premier joueur sera: {}.".format(self.joueur_actif.nom))
+                self.message = "Le premier joueur sera: {}.".format(self.joueur_actif.nom)
 
             for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
                 self.joueur_actif.ajouter_jeton(jeton)
 
-            print("Tour du {}.".format(self.joueur_actif.nom))
-            choix = ''
-            while choix not in ['j', 'p', 'c', 'q', 's']:
-                choix = input("Entrez (j) pour jouer, (p) pour passer votre tour,\n"
-                              "(c) pour changer certains jetons, (s) pour sauvegarder\n"
-                              "ou (q) pour quitter: ").strip().lower()
-                if choix == "j":
-                    self.jouer_un_tour()
-                    changer_joueur = True
-                elif choix == "p":
-                    changer_joueur = True
-                elif choix == "c":
-                    self.changer_jetons()
-                    changer_joueur = True
-                elif choix == "q":
-                    quitter = self.joueur_actif
-                    self.joueur_suivant()
-                    self.joueurs.remove(quitter)
-                    changer_joueur = False
-                elif choix == "s":
-                    valide = False
-                    while not valide:
-                        nom_fichier = input("Nom du fichier de sauvegarde: ")
-                        valide = self.sauvegarder_partie(nom_fichier)
-                    changer_joueur = False
-                else:
-                    print('Erreur: Entrez un choix valide.')
+            self.message = "Tour du {}.".format(self.joueur_actif.nom)
+            # choix = ''
+            # while choix not in ['j', 'p', 'c', 'q', 's']:
+            #     choix = input("Entrez (j) pour jouer, (p) pour passer votre tour,\n"
+            #                   "(c) pour changer certains jetons, (s) pour sauvegarder\n"
+            #                   "ou (q) pour quitter: ").strip().lower()
+            #     if choix == "j":
+            #         self.jouer_un_tour()
+            #         changer_joueur = True
+            #     elif choix == "p":
+            #         changer_joueur = True
+            #     elif choix == "c":
+            #         self.changer_jetons()
+            #         changer_joueur = True
+            #     elif choix == "q":
+            #         quitter = self.joueur_actif
+            #         self.joueur_suivant()
+            #         self.joueurs.remove(quitter)
+            #         changer_joueur = False
+            #     elif choix == "s":
+            #         valide = False
+            #         while not valide:
+            #             nom_fichier = input("Nom du fichier de sauvegarde: ")
+            #             valide = self.sauvegarder_partie(nom_fichier)
+            #         changer_joueur = False
+            #     else:
+            #         print('Erreur: Entrez un choix valide.')
 
         if self.partie_terminee():
             print("Partie terminée.")
