@@ -5,6 +5,7 @@ from jeton import Jeton
 from plateau import Plateau
 from tkinter import *
 from exception import *
+from math import floor
 
 
 class Scrabble(Tk):
@@ -165,7 +166,27 @@ class Scrabble(Tk):
 
 
         # Représentation graphique
-        self.plateau.grid()
+        self.plateau.grid(row=0, column=0, rowspan=self.plateau.DIMENSION, columnspan=self.plateau.DIMENSION, sticky=NSEW)
+        self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+
+
+    def click_case(self, event):
+        """
+        Event handler des cases du plateau
+        """
+        ligne = floor(event.y/self.plateau.pixels_par_case)
+        col = floor(event.x/self.plateau.pixels_par_case)
+        if 0 <= ligne < self.plateau.DIMENSION and 0 <= ligne < self.plateau.DIMENSION:
+            print(event.x, event.y)
+            print(ligne, col)
+            print(self.plateau.cases[ligne][col])
+
+    def click_jeton(self, event):
+        """
+        Event handler des jetons du chevalet
+        """
+        pos = floor(event.x/self.joueur_actif.pixels_par_case)
+        print(pos)
 
 
     def mot_permis(self, mot):

@@ -93,11 +93,11 @@ class Plateau(Canvas):
         self.cases[7][7] = Case(2, 'M')
 
         self.dessiner()
-        # self.bind('<Configure>', self.redimensionner)
+        self.bind('<Configure>', self.redimensionner)
 
     def dessiner(self):
         self.delete('case')
-        self.delete('lettre')
+        # self.delete('lettre')
 
         for colonne in range(Plateau.DIMENSION):
             for ligne in range(Plateau.DIMENSION):
@@ -118,13 +118,11 @@ class Plateau(Canvas):
                                      font=("Times", int(delta/2)), tags='case')
 
 
-
-
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)
         self.pixels_par_case = new_dim//Plateau.DIMENSION
         self.delete('case')
-        self.delete('lettre')
+        # self.delete('lettre')
         self.dessiner()
 
 
