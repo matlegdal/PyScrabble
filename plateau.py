@@ -93,7 +93,7 @@ class Plateau(Canvas):
         self.cases[7][7] = Case(2, 'M')
 
         self.dessiner()
-        self.bind('<Configure>', self.redimensionner)
+        # self.bind('<Configure>', self.redimensionner)
 
     def dessiner(self):
         self.delete('case')
@@ -110,12 +110,12 @@ class Plateau(Canvas):
                 delta = int(self.pixels_par_case/2)
 
                 if colonne == ligne and colonne == 7:
-                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='lettre')
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
                                      text="{}".format(self.cases[colonne][ligne].text_case()),
-                                     font=("Times", int(delta/2)), tags='lettre')
+                                     font=("Times", int(delta/2)), tags='case')
 
 
 

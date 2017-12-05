@@ -19,8 +19,8 @@ class Scrabble(Frame):
     - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
-    def __init__(self, master, nb_joueurs, langue='fr'):
-        """ *** Vous n'avez pas à coder cette méthode ***
+    def __init__(self, master, nb_joueurs, langue='fr', pixels_par_case=30):
+        """
         Étant donnés un nombre de joueurs et une langue. Le constructeur crée une partie de scrabble.
         Pour une nouvelle partie de scrabble,
         - un nouvel objet Plateau est créé;
@@ -37,17 +37,16 @@ class Scrabble(Frame):
         assert isinstance(master, Tk)
         Frame.__init__(self, master)
         self.master=master
-
         self.liste_langue = ['FR', 'EN']
 
-        assert langue.upper() in self.liste_langue, 'Langue non supportée.'
         assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
 
-
-        self.plateau = Plateau(self, 30)
-
+        self.plateau = Plateau(self, pixels_par_case)
         self.joueur_actif = None
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
+
+        assert langue.upper() in self.liste_langue, 'Langue non supportée.'
+
         if langue.upper() == 'FR':
             # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
             data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),

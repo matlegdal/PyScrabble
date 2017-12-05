@@ -13,8 +13,8 @@ class App(Tk):
     def __init__(self):
         super().__init__()
         self.current = None
-        self.plateau = None
-        self.cadre_aside = None
+        # self.plateau = None
+        # self.cadre_aside = None
 
         self.title("Scrabble")
         self.grid_columnconfigure(0, weight=1)
@@ -40,10 +40,8 @@ class App(Tk):
     def accueil(self):
         if self.current is not None:
             self.current.destroy()
-
-        if self.plateau is not None:
-            self.plateau.destroy()
-
+        # if self.plateau is not None:
+        #     self.plateau.destroy()
         # if self.aside is not None:
         #     self.aside.destroy()
 
@@ -94,26 +92,27 @@ class App(Tk):
         self.current.destroy()
 
         self.current = Scrabble(self, nb_joueurs, langue)
-        self.current.grid()
+        self.current.grid(rowspan=self.current.plateau.DIMENSION, columnspan=self.current.plateau.DIMENSION+10)
 
         # Plateau
-        # self.current.plateau = Plateau(self.current, 20)
-        self.current.plateau.grid(row=0, column=0, sticky=E)
+        self.current.plateau.grid(row=0, column=0, rowspan=self.current.plateau.DIMENSION, columnspan=self.current.plateau.DIMENSION, sticky=NSEW)
         self.current.plateau.tag_bind('case', '<Button-1>', self.click_case)
+        # self.bind('<Configure>', self.current.plateau.redimensionner) #TODO: le redimensionage est buggy
 
-        # Aside
-        self.current.aside = Aside(self.current)
-        self.current.aside.grid(row=0, column=0, sticky=W)
-
+        # Chevalet
+        self.current.joueur_suivant()
+        Label(self.current, text="C'est le tour de {}".format(self.current.joueur_actif.nom)).grid(row=5, column=20, columnspan=10, sticky=N)
 
 
     def click_case(self, event):
         ligne = floor(event.y/self.current.plateau.pixels_par_case)
         col = floor(event.x/self.current.plateau.pixels_par_case)
 
-        print(event.x, event.y)
-        print(ligne, col)
-        print(self.current.plateau.cases[ligne][col])
+        if 0 <= ligne < self.current.plateau.DIMENSION and 0 <= ligne < self.current.plateau.DIMENSION:
+            print(event.x, event.y)
+            print(ligne, col)
+            print(self.current.plateau.cases[ligne][col])
+
 
 
 # Style().theme_use('aqua')
