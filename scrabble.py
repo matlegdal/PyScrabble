@@ -24,11 +24,7 @@ class Scrabble(Tk):
     PIXELS_PAR_CASE = 40
 
     def __init__(self):
-        # def __init__(self, nb_joueurs, langue='fr', pixels_par_case=30):
-
-        # assert isinstance(master, Tk)
         super().__init__()
-        # self.master=master
 
         # Declare parameters
         self.liste_langue = ['FR', 'EN']
@@ -131,16 +127,13 @@ class Scrabble(Tk):
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
         self.joueur_suivant()
         affichage_joueur = Frame(self.content)
-        nom_joueur = Label(affichage_joueur, text="{}".format(self.joueur_actif.nom))
-        chevalet = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+        self.nom_joueur = Label(affichage_joueur, text="{}".format(self.joueur_actif.nom))
+        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+10, width=(self.PIXELS_PAR_CASE+10)*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
 
         # Set le tableau d'affichange
         tableau = Frame(self.content)
         self.message = Label(tableau, text="Bienvenue sur Scrabble! Le {} va commencer".format(self.joueur_actif.nom))
-        msg_points = ""
-        for joueur in self.joueurs:
-            msg_points += "{}:{} ".format(joueur.nom, joueur.points)
-        affichage_points = Label(tableau, text=msg_points)
+        self.affichage_points = Label(tableau, text=self.msg_points())
 
         # Set les langues
         if langue.upper() == 'FR':
@@ -169,6 +162,8 @@ class Scrabble(Tk):
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
             self.joueur_actif.ajouter_jeton(jeton)
 
+        # self.joueur_actif.retirer_jeton(2)
+
         # Set les boutons d'actions
         btn_jouer = Button(affichage_joueur, text="Joueur le tour")
         btn_passer = Button(affichage_joueur, text="Passer le tour")
@@ -184,36 +179,57 @@ class Scrabble(Tk):
         # tableau
         tableau.grid(row=0, column=1, sticky=NSEW)
         self.message.grid(row=0)
-        affichage_points.grid(row=1)
+        self.affichage_points.grid(row=1)
 
         # Affichage joueur actif
-        affichage_joueur.grid(row=1, column=1, columnspan=1, sticky=NSEW)
-        nom_joueur.grid(row=0)
-        chevalet.grid(row=1, sticky=NSEW)
-        self.dessiner_chevalet(chevalet, self.joueur_actif)
-        chevalet.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+        affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=1, sticky=NSEW)
+        self.nom_joueur.grid(row=0, column=0, columnspan=4)
+        self.chevalet_actif.grid(row=1, column=0, columnspan=4, sticky=NSEW)
+        self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
 
         # Affichage des boutons d'actions
-        btn_jouer.grid(row=2)
-        btn_passer.grid(row=3)
-        btn_changer.grid(row=4)
-        btn_quitter.grid(row=5)
+        btn_jouer.grid(row=2, column=0, columnspan=4, sticky=NSEW, pady=30)
+        btn_passer.grid(row=3, column=0)
+        btn_changer.grid(row=3, column=1)
+        btn_quitter.grid(row=3, column=2)
 
 
     def dessiner_chevalet(self, master, joueur):
+        """
+        Cette fonction dessine le chevalet du joueur actif dans un canevas.
+        :param master: (obj Canvas) Le canvas parent.
+        :param joueur: (obj Joueur) Joueur actif
+        :return: Aucun
+        """
         assert isinstance(master, Canvas)
         assert isinstance(joueur, Joueur)
+
         for pos in range(Joueur.TAILLE_CHEVALET):
-            x1 = pos * self.PIXELS_PAR_CASE
-            y1 = self.PIXELS_PAR_CASE
+            if joueur.chevalet[pos] is None:
+                continue
+
+            x1 = pos * self.PIXELS_PAR_CASE+10
+            y1 = 10
             x2 = x1 + self.PIXELS_PAR_CASE
-            y2 = 0
+            y2 = 10+self.PIXELS_PAR_CASE
 
             master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
             delta = int(self.PIXELS_PAR_CASE / 2)
 
-            master.create_text(x1+delta, y2+delta, justify=CENTER, text="{}".format(joueur.chevalet[pos]), font=("Times", int(delta/2)), tags='chevalet')
+            master.create_text(x1+delta, y1+delta, justify=CENTER, text="{}".format(joueur.chevalet[pos]), font=("Times", int(delta)), tags='chevalet')
 
+
+    def msg_points(self):
+        """
+        Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
+        :return: (str) Chaine de charactères formattée montrant les points de tous les joueurs
+        """
+        msg_points = ""
+        for joueur in self.joueurs:
+            msg_points += "{}:{} ".format(joueur.nom, joueur.points)
+
+        return msg_points
 
     def click_case(self, event):
         """
@@ -342,7 +358,7 @@ class Scrabble(Tk):
         return pos_chevalet, pos_plateau
 
     def jouer_un_tour(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
+        """
         Faire jouer à un des joueurs son tour entier jusqu'à ce qu'il place un mot valide sur le
         plateau.
         Pour ce faire
@@ -522,10 +538,7 @@ class Scrabble(Tk):
 
 if __name__ == '__main__':
 
-    root = Tk()
-    scrabble = Scrabble(root, 2)
-
-    root.mainloop()
+    scrabble = Scrabble()
 
 # mot_permis()
     assert scrabble.mot_permis('car')
