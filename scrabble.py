@@ -166,6 +166,15 @@ class Scrabble(Tk):
         with open(nom_fichier_dictionnaire, 'r') as f:
             self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
 
+        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+            self.joueur_actif.ajouter_jeton(jeton)
+
+        # Set les boutons d'actions
+        btn_jouer = Button(affichage_joueur, text="Joueur le tour")
+        btn_passer = Button(affichage_joueur, text="Passer le tour")
+        btn_changer = Button(affichage_joueur, text="Changer les jetons")
+        btn_quitter = Button(affichage_joueur, text="Quitter la partie")
+
 
         # Représentation graphique
         # Plateau
@@ -178,11 +187,18 @@ class Scrabble(Tk):
         affichage_points.grid(row=1)
 
         # Affichage joueur actif
-        affichage_joueur.grid(row=1, column=1, sticky=NSEW)
+        affichage_joueur.grid(row=1, column=1, columnspan=1, sticky=NSEW)
         nom_joueur.grid(row=0)
         chevalet.grid(row=1, sticky=NSEW)
         self.dessiner_chevalet(chevalet, self.joueur_actif)
         chevalet.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+
+        # Affichage des boutons d'actions
+        btn_jouer.grid(row=2)
+        btn_passer.grid(row=3)
+        btn_changer.grid(row=4)
+        btn_quitter.grid(row=5)
+
 
     def dessiner_chevalet(self, master, joueur):
         assert isinstance(master, Canvas)

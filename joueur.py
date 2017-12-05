@@ -1,6 +1,5 @@
 from random import shuffle
 from exception import *
-from tkinter import *
 
 class Joueur:
     """
@@ -20,7 +19,6 @@ class Joueur:
     TAILLE_CHEVALET = 7
 
     def __init__(self, nom):
-    # def __init__(self, master, nom, pixels_par_case=30):
         """
         Initialise un objet joueur avec le nom passé en argument.
         Le nombre de points d'un joueur devra être 0 à l'initialisation, et le chevalet devra être vide.
@@ -32,19 +30,9 @@ class Joueur:
         if nom == '' and nom.isspace():
             raise NomInvalideException("Entrez un nom valide. Minimum 1 caractère.")
 
-        # super().__init__(master, height=pixels_par_case, width=self.TAILLE_CHEVALET*pixels_par_case)
         self.nom = nom
-        # self.pixels_par_case = pixels_par_case
         self.__points = 0
         self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
-
-    # def dessiner_chevalet(self):
-    #     for place in range(self.TAILLE_CHEVALET):
-    #         x1 = place * self.pixels_par_case
-    #         y1 = self.pixels_par_case
-    #         x2 = x1 + self.pixels_par_case
-    #         y2 = 0
-    #         self.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
 
     @property
     def nb_a_tirer(self):

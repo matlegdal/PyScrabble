@@ -1,5 +1,4 @@
 from exception import *
-# import tkinter as tk
 
 
 class Case:
@@ -35,10 +34,6 @@ class Case:
         self.multiplicateur = multiplicateur
         self.type = type
         self.jeton_occupant = None
-
-    #
-    # def dessiner_case(self, master, x1, y1, x2, y2):
-    #     master.create_rectangle(master, x1, y1, x2, y2, fill=self.code_couleur, tags="case")
 
 
     def est_vide(self):
