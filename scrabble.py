@@ -38,7 +38,7 @@ class Scrabble(Tk):
 
         # Configure
         self.content = Frame(self)
-        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=10, pady=10)
+        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -128,7 +128,7 @@ class Scrabble(Tk):
         self.joueur_suivant()
         affichage_joueur = Frame(self.content)
         self.nom_joueur = Label(affichage_joueur, text="{}".format(self.joueur_actif.nom))
-        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+10, width=(self.PIXELS_PAR_CASE+10)*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+15, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET+20, bg='#f5ebdc')
 
         # Set le tableau d'affichange
         tableau = Frame(self.content)
@@ -212,7 +212,7 @@ class Scrabble(Tk):
             x1 = pos * self.PIXELS_PAR_CASE+10
             y1 = 10
             x2 = x1 + self.PIXELS_PAR_CASE
-            y2 = 10+self.PIXELS_PAR_CASE
+            y2 = y1 + self.PIXELS_PAR_CASE
 
             master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
             delta = int(self.PIXELS_PAR_CASE / 2)

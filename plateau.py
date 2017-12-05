@@ -70,9 +70,9 @@ class Plateau(Canvas):
         :param master: Fenêtre principale, de type Tk
         :param pixels_par_case: Taille des cases en pixels
         """
-        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
+        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION+10, width=pixels_par_case*Plateau.DIMENSION+10)
         self.master = master
-        self.pixels_par_case = pixels_par_case + 10
+        self.pixels_par_case = pixels_par_case
 
         self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
         for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
@@ -101,8 +101,8 @@ class Plateau(Canvas):
 
         for colonne in range(Plateau.DIMENSION):
             for ligne in range(Plateau.DIMENSION):
-                x1 = colonne*self.pixels_par_case
-                y1 = ligne*self.pixels_par_case
+                x1 = colonne*self.pixels_par_case + 5
+                y1 = ligne*self.pixels_par_case + 5
                 x2 = x1 + self.pixels_par_case
                 y2 = y1 + self.pixels_par_case
 
