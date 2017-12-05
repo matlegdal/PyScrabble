@@ -99,9 +99,12 @@ class App(Tk):
         self.current.plateau.tag_bind('case', '<Button-1>', self.click_case)
         # self.bind('<Configure>', self.current.plateau.redimensionner) #TODO: le redimensionage est buggy
 
-        # Chevalet
+        # Joueur
         self.current.joueur_suivant()
-        Label(self.current, text="C'est le tour de {}".format(self.current.joueur_actif.nom)).grid(row=5, column=20, columnspan=10, sticky=N)
+        Label(self.current, text="C'est le tour de {}".format(self.current.joueur_actif.nom)).grid(row=5, column=15, columnspan=10, sticky=N)
+        self.current.joueur_actif.dessiner_chevalet()
+        self.current.joueur_actif.grid(row=6, column=15)
+        self.current.joueur_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
 
 
     def click_case(self, event):
@@ -112,6 +115,10 @@ class App(Tk):
             print(event.x, event.y)
             print(ligne, col)
             print(self.current.plateau.cases[ligne][col])
+
+    def click_jeton(self, event):
+        pos = floor(event.x/self.current.joueur_actif.pixels_par_case)
+        print(pos)
 
 
 

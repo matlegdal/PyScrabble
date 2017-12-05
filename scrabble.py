@@ -43,7 +43,7 @@ class Scrabble(Frame):
 
         self.plateau = Plateau(self, pixels_par_case)
         self.joueur_actif = None
-        self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
+        self.joueurs = [Joueur(self, "Joueur {}".format(i+1), pixels_par_case) for i in range(nb_joueurs)]
 
         assert langue.upper() in self.liste_langue, 'Langue non supportée.'
 
