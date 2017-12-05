@@ -44,6 +44,10 @@ class App(Tk):
         if self.plateau is not None:
             self.plateau.destroy()
 
+        # if self.aside is not None:
+        #     self.aside.destroy()
+
+
         self.current = Frame(self)
         self.current.grid(row=20)
 
@@ -93,22 +97,23 @@ class App(Tk):
         self.current.grid()
 
         # Plateau
-        self.plateau = Plateau(self, 60)
-        self.plateau.grid(row=0, column=0, sticky=NSEW)
-        self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+        # self.current.plateau = Plateau(self.current, 20)
+        self.current.plateau.grid(row=0, column=0, sticky=E)
+        self.current.plateau.tag_bind('case', '<Button-1>', self.click_case)
 
-        #Aside
+        # Aside
+        self.current.aside = Aside(self.current)
+        self.current.aside.grid(row=0, column=0, sticky=W)
 
 
 
     def click_case(self, event):
-        ligne = floor(event.y/self.plateau.pixels_par_case)
-        col = floor(event.x/self.plateau.pixels_par_case)
+        ligne = floor(event.y/self.current.plateau.pixels_par_case)
+        col = floor(event.x/self.current.plateau.pixels_par_case)
 
         print(event.x, event.y)
-        print(ligne)
-        print(col)
-        print(self.plateau.cases[ligne][col])
+        print(ligne, col)
+        print(self.current.plateau.cases[ligne][col])
 
 
 # Style().theme_use('aqua')

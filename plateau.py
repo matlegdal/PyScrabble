@@ -110,13 +110,15 @@ class Plateau(Canvas):
                 delta = int(self.pixels_par_case/2)
 
                 if colonne == ligne and colonne == 7:
-                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta),
-                                     tags='case')
+                    self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='lettre')
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
                                      text="{}".format(self.cases[colonne][ligne].text_case()),
-                                     font=("Times", int(delta/2)), tags='case')
+                                     font=("Times", int(delta/2)), tags='lettre')
+
+
+
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)

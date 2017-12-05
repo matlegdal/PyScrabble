@@ -1,4 +1,4 @@
-from tkinter import Canvas, Frame, Tk, Label
+from tkinter import *
 from joueur import Joueur
 
 # TODO: faire afficher le chevalet correctement

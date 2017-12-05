@@ -1,6 +1,6 @@
 from random import shuffle
 from exception import *
-from tkinter import Canvas
+from tkinter import *
 
 class Joueur:
     """
