@@ -1,7 +1,7 @@
 from scrabble import *
 # from tkinter.ttk import *
 from math import floor
-
+from aside import *
 
 
 class App(Tk):
@@ -14,6 +14,7 @@ class App(Tk):
         super().__init__()
         self.current = None
         self.plateau = None
+        self.cadre_aside = None
 
         self.title("Scrabble")
         self.grid_columnconfigure(0, weight=1)
@@ -42,7 +43,6 @@ class App(Tk):
 
         if self.plateau is not None:
             self.plateau.destroy()
-
 
         self.current = Frame(self)
         self.current.grid(row=20)
@@ -96,6 +96,8 @@ class App(Tk):
         self.plateau = Plateau(self, 60)
         self.plateau.grid(row=0, column=0, sticky=NSEW)
         self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+
+        #Aside
 
 
 
