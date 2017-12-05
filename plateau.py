@@ -72,7 +72,7 @@ class Plateau(Canvas):
         """
         super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
-        self.pixels_par_case = pixels_par_case
+        self.pixels_par_case = pixels_par_case + 10
 
         self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
         for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:

@@ -2,7 +2,7 @@ from random import shuffle
 from exception import *
 from tkinter import *
 
-class Joueur(Canvas):
+class Joueur:
     """
     Cette classe permet de représenter un joueur.
 
@@ -19,7 +19,8 @@ class Joueur(Canvas):
     """
     TAILLE_CHEVALET = 7
 
-    def __init__(self, master, nom, pixels_par_case=30):
+    def __init__(self, nom):
+    # def __init__(self, master, nom, pixels_par_case=30):
         """
         Initialise un objet joueur avec le nom passé en argument.
         Le nombre de points d'un joueur devra être 0 à l'initialisation, et le chevalet devra être vide.
@@ -31,19 +32,19 @@ class Joueur(Canvas):
         if nom == '' and nom.isspace():
             raise NomInvalideException("Entrez un nom valide. Minimum 1 caractère.")
 
-        super().__init__(master, height=pixels_par_case, width=self.TAILLE_CHEVALET*pixels_par_case)
+        # super().__init__(master, height=pixels_par_case, width=self.TAILLE_CHEVALET*pixels_par_case)
         self.nom = nom
-        self.pixels_par_case = pixels_par_case
+        # self.pixels_par_case = pixels_par_case
         self.__points = 0
         self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
 
-    def dessiner_chevalet(self):
-        for place in range(self.TAILLE_CHEVALET):
-            x1 = place * self.pixels_par_case
-            y1 = self.pixels_par_case
-            x2 = x1 + self.pixels_par_case
-            y2 = 0
-            self.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
+    # def dessiner_chevalet(self):
+    #     for place in range(self.TAILLE_CHEVALET):
+    #         x1 = place * self.pixels_par_case
+    #         y1 = self.pixels_par_case
+    #         x2 = x1 + self.pixels_par_case
+    #         y2 = 0
+    #         self.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
 
     @property
     def nb_a_tirer(self):
@@ -61,6 +62,14 @@ class Joueur(Canvas):
         :return: (int) Le nombre de points du joueur.
         """
         return self.__points
+
+    @property
+    def chevalet(self):
+        """
+        Méthode permettant d'obtenir le chevalet du joueur
+        :return: (List) Liste des jetons du joueur
+        """
+        return self.__chevalet
 
     @staticmethod
     def position_est_valide(pos):
@@ -167,10 +176,6 @@ class Joueur(Canvas):
         s += "\nChevalet: \_" + "__".join([chr(0x2080 + i + 1) for i in range(self.TAILLE_CHEVALET)]) + '_/\n'
         return s
 
-
-class Chevalet(Canvas):
-    pass
-    # TODO: Faire le canvas du chevalet pour le joueur actif
 
 
 # Tests

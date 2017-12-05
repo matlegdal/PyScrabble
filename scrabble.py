@@ -21,6 +21,8 @@ class Scrabble(Tk):
     - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
+    PIXELS_PAR_CASE = 40
+
     def __init__(self):
         # def __init__(self, nb_joueurs, langue='fr', pixels_par_case=30):
 
@@ -99,12 +101,12 @@ class Scrabble(Tk):
         Button(accueil, text="Commencer la partie", command=lambda: self.transition_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4)
 
 
-    def transition_partie(self, accueil, nb_joueurs, langue, pixels_par_case=50):
+    def transition_partie(self, accueil, nb_joueurs, langue):
         accueil.destroy()
-        self.demarrer_partie(nb_joueurs, langue, pixels_par_case)
+        self.demarrer_partie(nb_joueurs, langue)
 
 
-    def demarrer_partie(self, nb_joueurs, langue, pixels_par_case):
+    def demarrer_partie(self, nb_joueurs, langue):
         """
         Étant donnés un nombre de joueurs et une langue. La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -122,12 +124,25 @@ class Scrabble(Tk):
         assert 2 <= nb_joueurs <= 4
         assert langue.upper() in self.liste_langue
 
-        self.plateau = Plateau(self.content, pixels_par_case)
-        self.joueurs = [Joueur(self, "Joueur {}".format(i+1), pixels_par_case) for i in range(nb_joueurs)]
-        self.joueur_suivant()
-        self.message = Label(self.content, text="Bienvenue sur Scrabble! Le {} va commencer".format(self.joueur_actif.nom))
-        # self.affichage_points = Label(self)
+        # Set le plateau
+        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE)
 
+        # Set les joueurs
+        self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
+        self.joueur_suivant()
+        affichage_joueur = Frame(self.content)
+        nom_joueur = Label(affichage_joueur, text="{}".format(self.joueur_actif.nom))
+        chevalet = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+
+        # Set le tableau d'affichange
+        tableau = Frame(self.content)
+        self.message = Label(tableau, text="Bienvenue sur Scrabble! Le {} va commencer".format(self.joueur_actif.nom))
+        msg_points = ""
+        for joueur in self.joueurs:
+            msg_points += "{}:{} ".format(joueur.nom, joueur.points)
+        affichage_points = Label(tableau, text=msg_points)
+
+        # Set les langues
         if langue.upper() == 'FR':
             # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
             data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
@@ -153,11 +168,35 @@ class Scrabble(Tk):
 
 
         # Représentation graphique
+        # Plateau
         self.plateau.grid(row=0, column=0, rowspan=2, columnspan=1, sticky=NSEW)
         self.plateau.tag_bind('case', '<Button-1>', self.click_case)
 
-        self.message.grid(row=0, column=1, sticky=NW)
+        # tableau
+        tableau.grid(row=0, column=1, sticky=NSEW)
+        self.message.grid(row=0)
+        affichage_points.grid(row=1)
 
+        # Affichage joueur actif
+        affichage_joueur.grid(row=1, column=1, sticky=NSEW)
+        nom_joueur.grid(row=0)
+        chevalet.grid(row=1, sticky=NSEW)
+        self.dessiner_chevalet(chevalet, self.joueur_actif)
+        chevalet.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+
+    def dessiner_chevalet(self, master, joueur):
+        assert isinstance(master, Canvas)
+        assert isinstance(joueur, Joueur)
+        for pos in range(Joueur.TAILLE_CHEVALET):
+            x1 = pos * self.PIXELS_PAR_CASE
+            y1 = self.PIXELS_PAR_CASE
+            x2 = x1 + self.PIXELS_PAR_CASE
+            y2 = 0
+
+            master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
+            delta = int(self.PIXELS_PAR_CASE / 2)
+
+            master.create_text(x1+delta, y2+delta, justify=CENTER, text="{}".format(joueur.chevalet[pos]), font=("Times", int(delta/2)), tags='chevalet')
 
 
     def click_case(self, event):
@@ -171,11 +210,12 @@ class Scrabble(Tk):
             print(ligne, col)
             print(self.plateau.cases[ligne][col])
 
+
     def click_jeton(self, event):
         """
         Event handler des jetons du chevalet
         """
-        pos = floor(event.x/self.joueur_actif.pixels_par_case)
+        pos = floor(event.x/self.PIXELS_PAR_CASE)
         print(pos)
 
 

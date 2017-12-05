@@ -29,7 +29,7 @@
 #     def redimensionner(self, event):
 #         new_dim = min(event.width, event.height)
 #         self.pixel_par_case = new_dim//Aside.TAILLE_CHEVALET
-#         # todo: faire fonctionner le redimensionnement
+#         # faire fonctionner le redimensionnement
 #
 # class Chevalet(Canvas):
 #
@@ -59,7 +59,7 @@
 #     def redimensionner(self, event):
 #         new_dim = min(event.width, event.height)
 #         self.pixel_par_case = new_dim//Chevalet.TAILLE_CHEVALET
-#         # todo: faire fonctionner le redimensionnement
+#         # faire fonctionner le redimensionnement
 #
 #
 # if __name__ == '__main__':
