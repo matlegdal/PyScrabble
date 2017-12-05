@@ -1,5 +1,7 @@
 from scrabble import *
+# from tkinter.ttk import *
 from math import floor
+
 
 
 class App(Tk):
@@ -21,6 +23,7 @@ class App(Tk):
         barre_menu = Menu(self)
         fichier = Menu(barre_menu, tearoff=0)
         fichier.add_command(label="Nouvelle partie", command=self.accueil)
+        fichier.add_command(label="Sauvegarder la partie", state=DISABLED) # TODO: implanter sauvegarder_partie()
         fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
         fichier.add_command(label="Quitter", command=self.quit)
@@ -46,10 +49,12 @@ class App(Tk):
 
         # message de bienvenue
         Label(self.current, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24),
-              padx=App.label_padx, pady=App.label_pady).grid(row=0)
+              # padx=App.label_padx, pady=App.label_pady
+              ).grid(row=0)
         # label de la langue
         Label(self.current, text="Choisissez la langue du jeu:", font=("Times", 16),
-              padx=App.label_padx, pady=App.label_pady).grid(row=1)
+              # padx=App.label_padx, pady=App.label_pady
+              ).grid(row=1)
 
         # Choix des langues
         cadre_choix_langue = Frame(self.current)
@@ -66,15 +71,18 @@ class App(Tk):
         Radiobutton(cadre_choix_joueur, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=0)
         Radiobutton(cadre_choix_joueur, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=0)
         Radiobutton(cadre_choix_joueur, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=0)
-        Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1).grid(column=3, row=0)
+        Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=0)
 
 
         # Débuter la partie
-        cadre_bouton_commencer = Frame(self.current, padx=App.label_padx, pady=App.label_pady)
+        cadre_bouton_commencer = Frame(self.current,
+                                       # padx=App.label_padx, pady=App.label_pady
+                                       )
         cadre_bouton_commencer.grid(row=5)
 
         self.current.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=lambda: self.jouer(nb_joueurs.get(), langue.get()),
-                                       padx=App.label_padx, pady=App.label_pady)
+                                       # padx=App.label_padx, pady=App.label_pady
+                                               )
         self.current.bouton_commencer.grid(row=0)
 
 
@@ -84,10 +92,11 @@ class App(Tk):
         self.current = Scrabble(self, nb_joueurs, langue)
         self.current.grid()
 
-        # apparition du plateau
+        # Plateau
         self.plateau = Plateau(self, 60)
         self.plateau.grid(row=0, column=0, sticky=NSEW)
         self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+
 
 
     def click_case(self, event):
@@ -100,11 +109,6 @@ class App(Tk):
         print(self.plateau.cases[ligne][col])
 
 
-
-
-
-
-
-
+# Style().theme_use('aqua')
 App().mainloop()
 
