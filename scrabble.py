@@ -105,11 +105,16 @@ class Scrabble(Tk):
         # cadre_bouton_commencer = Frame(accueil)
         # cadre_bouton_commencer.grid(row=5)
 
-        Button(accueil, text="Commencer la partie").grid()
+        Button(accueil, text="Commencer la partie", command=lambda: self.transition_partie(accueil, nb_joueurs.get(), langue.get())).grid()
         # accueil.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=lambda: self.jouer(nb_joueurs.get(), langue.get()))
         # accueil.bouton_commencer.grid(row=0)
 
-    def demarrer_partie(self, nb_joueurs, langue='fr', pixels_par_case=30):
+    def transition_partie(self, accueil, nb_joueurs, langue, pixels_par_case=30):
+        accueil.destroy()
+        self.demarrer_partie(nb_joueurs, langue, pixels_par_case)
+
+
+    def demarrer_partie(self, nb_joueurs, langue, pixels_par_case):
         """
         Étant donnés un nombre de joueurs et une langue. La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -124,7 +129,7 @@ class Scrabble(Tk):
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        if 2 >= nb_joueurs or nb_joueurs >= 4:
+        if nb_joueurs < 2 or nb_joueurs > 4:
             raise NbrJoueursException
 
         if langue.upper() not in self.liste_langue:
@@ -157,6 +162,11 @@ class Scrabble(Tk):
         self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
         with open(nom_fichier_dictionnaire, 'r') as f:
             self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
+
+
+        # Représentation graphique
+        self.plateau.grid()
+
 
     def mot_permis(self, mot):
         """
