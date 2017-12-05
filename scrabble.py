@@ -4,9 +4,10 @@ from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
 from tkinter import *
+from exception import *
 
 
-class Scrabble(Frame):
+class Scrabble(Tk):
     """
     Classe Scrabble qui implémente aussi une partie de la logique de jeu.
 
@@ -19,9 +20,98 @@ class Scrabble(Frame):
     - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
-    def __init__(self, master, nb_joueurs, langue='fr', pixels_par_case=30):
+    def __init__(self):
+        # def __init__(self, nb_joueurs, langue='fr', pixels_par_case=30):
+
+        # assert isinstance(master, Tk)
+        super().__init__()
+        # self.master=master
+
+        # Declare parameters
+        self.liste_langue = ['FR', 'EN']
+        self.title("Scrabble")
+        self.plateau = None
+        self.joueur_actif = None
+        self.joueurs = []
+        self.jetons_libres = []
+        self.dictionnaire = None
+        self.message = "Bienvenue sur Scrabble!"
+
+        # Configure
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        # Création du menu
+        barre_menu = Menu(self)
+        fichier = Menu(barre_menu, tearoff=0)
+        fichier.add_command(label="Nouvelle partie", command=self.accueil)
+        fichier.add_command(label="Sauvegarder la partie", state=DISABLED)  # TODO: implanter sauvegarder_partie()
+        fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
+        fichier.add_separator()
+        fichier.add_command(label="Quitter", command=self.quit)
+        barre_menu.add_cascade(label="Fichier", menu=fichier)
+
+        aide = Menu(barre_menu, tearoff=0)
+        aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements
+        barre_menu.add_cascade(label="Aide", menu=aide)
+
+        self.config(menu=barre_menu)
+
+        # On appelle l'écran d'accueil
+        self.accueil()
+
+
+    def accueil(self):
+        # if self.current is not None:
+        #     self.current.destroy()
+        # if self.plateau is not None:
+        #     self.plateau.destroy()
+        # if self.aside is not None:
+        #     self.aside.destroy()
+
+        accueil = Frame(self)
+        accueil.grid()
+
+        # message de bienvenue
+        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0)
+        # label de la langue
+        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1)
+
+        # Choix des langues
+        # cadre_choix_langue = Frame(accueil)
+        # cadre_choix_langue.grid(row=2)
+        langue = StringVar()
+        Radiobutton(accueil, text='Français', variable=langue, value='FR').grid(column=0, row=2)
+        Radiobutton(accueil, text='English', variable=langue, value='EN').grid(column=1, row=2)
+        # Radiobutton(cadre_choix_langue, text='Français', variable=langue, value='FR').grid(column=0, row=0)
+        # Radiobutton(cadre_choix_langue, text='English', variable=langue, value='EN').grid(column=1, row=0)
+
+        # Nombre des joueurs
+        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3)
+        # cadre_choix_joueur = Frame(accueil)
+        # cadre_choix_joueur.grid(row=4)
+        nb_joueurs = IntVar()
+        Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=4)
+        Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=4)
+        Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=4)
+        Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
+        # Radiobutton(cadre_choix_joueur, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=0)
+        # Radiobutton(cadre_choix_joueur, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=0)
+        # Radiobutton(cadre_choix_joueur, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=0)
+        # Radiobutton(cadre_choix_joueur, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=0)
+
+
+        # Débuter la partie
+        # cadre_bouton_commencer = Frame(accueil)
+        # cadre_bouton_commencer.grid(row=5)
+
+        Button(accueil, text="Commencer la partie").grid()
+        # accueil.bouton_commencer = Button(cadre_bouton_commencer, text="Commencer la partie", command=lambda: self.jouer(nb_joueurs.get(), langue.get()))
+        # accueil.bouton_commencer.grid(row=0)
+
+    def demarrer_partie(self, nb_joueurs, langue='fr', pixels_par_case=30):
         """
-        Étant donnés un nombre de joueurs et une langue. Le constructeur crée une partie de scrabble.
+        Étant donnés un nombre de joueurs et une langue. La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
         - un nouvel objet Plateau est créé;
         - La liste des joueurs est créée et chaque joueur porte automatiquement le nom Joueur 1, Joueur 2, ... Joueur n où n est le nombre de joueurs;
@@ -34,19 +124,16 @@ class Scrabble(Frame):
         *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
         :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
         """
-        assert isinstance(master, Tk)
-        Frame.__init__(self, master)
-        self.master=master
-        self.liste_langue = ['FR', 'EN']
+        if 2 >= nb_joueurs or nb_joueurs >= 4:
+            raise NbrJoueursException
 
-        assert 2 <= nb_joueurs <= 4, "Il faut entre 2 et 4 personnes pour jouer."
+        if langue.upper() not in self.liste_langue:
+            raise LangueInvalideException
 
         self.plateau = Plateau(self, pixels_par_case)
         self.joueur_actif = None
         self.joueurs = [Joueur(self, "Joueur {}".format(i+1), pixels_par_case) for i in range(nb_joueurs)]
         self.message = "Bienvenue sur Scrabble!"
-
-        assert langue.upper() in self.liste_langue, 'Langue non supportée.'
 
         if langue.upper() == 'FR':
             # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
@@ -67,7 +154,7 @@ class Scrabble(Frame):
                     ('Z', 1, 10)]
             nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
 
-        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for i in range(occurences)]
+        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
         with open(nom_fichier_dictionnaire, 'r') as f:
             self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
 
