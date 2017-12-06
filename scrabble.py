@@ -58,7 +58,7 @@ class Scrabble(Tk):
         # Création du menu
         barre_menu = Menu(self)
         fichier = Menu(barre_menu, tearoff=0)
-        fichier.add_command(label="Nouvelle partie", command=self.accueil)
+        fichier.add_command(label="Nouvelle partie", command=Scrabble)
         fichier.add_command(label="Sauvegarder la partie", state=DISABLED)  # TODO: implanter sauvegarder_partie()
         fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
@@ -190,7 +190,7 @@ class Scrabble(Tk):
         btn_jouer = Button(affichage_joueur, text="Joueur le tour")
         btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
-        btn_quitter = Button(affichage_joueur, text="Quitter la partie")
+        btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
         btn_jouer.grid(row=2, column=0, columnspan=4, sticky=NSEW, pady=30)
@@ -244,6 +244,8 @@ class Scrabble(Tk):
             print(ligne, col)
             print(self.plateau.cases[ligne][col])
 
+        # TODO: à compléter
+
 
     def click_jeton(self, event):
         """
@@ -251,8 +253,15 @@ class Scrabble(Tk):
         """
         pos = floor(event.x/self.PIXELS_PAR_CASE)
         print(pos)
+        # TODO: à compléter
 
-
+    def jouer_tour(self):
+        """
+        Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
+        Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
+        :return: Aucun return
+        """
+        # TODO: à compléter
 
     def mot_permis(self, mot):
         """
@@ -322,6 +331,22 @@ class Scrabble(Tk):
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
 
+    def quitter(self):
+        """
+        Retire un joueur de la liste des joueurs
+        :return: Aucun return
+        """
+        quitter = self.joueur_actif
+        self.changer_joueur()
+        self.joueurs.remove(quitter)
+
+    def changer_jetons(self):
+        """
+        Change les jetons du joueur actif.
+        :return: Aucun return
+        :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
+        """
+        #TODO: à compléter, on peut s'inspirer de l'ancienne méthode, mais il y a bcp à changer
 
     def tirer_jetons(self, n):
         """
@@ -343,142 +368,142 @@ class Scrabble(Tk):
         # On retourne les jetons tirés
         return jetons_tires
 
-    def demander_positions(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
-        Demande à l'utilisateur d'entrer les positions sur le chevalet et le plateau
-        pour jouer son coup.
-        Si les positions entrées sont valides, on retourne les listes de ces positions. On doit
-        redemander tant que l'utilisateur ne donne pas des positions valides.
-        Valide ici veut dire uniquement dans les limites donc pensez à utilisez valider_positions_avant_ajout et Joueur.position_est_valide.
+    # def demander_positions(self):
+    #     """ *** Vous n'avez pas à coder cette méthode ***
+    #     Demande à l'utilisateur d'entrer les positions sur le chevalet et le plateau
+    #     pour jouer son coup.
+    #     Si les positions entrées sont valides, on retourne les listes de ces positions. On doit
+    #     redemander tant que l'utilisateur ne donne pas des positions valides.
+    #     Valide ici veut dire uniquement dans les limites donc pensez à utilisez valider_positions_avant_ajout et Joueur.position_est_valide.
+    #
+    #     :return: tuple (int list, str list): Deux listes, la première contient les positions du chevalet (plus précisement il s'agit des indexes de ces positions) et l'autre liste contient les positions codées du plateau.
+    #     """
+    #     # Cette méthode devrait être décomposée en 2 méthodes: demander_positions_chevalet() et demander_positions_cases()
+    #     # En effet une méthode devrait faire une seule chose, pas deux comme c'est le cas ici.
+    #     valide = False
+    #     while not valide:
+    #         input_pos_chevalet = input("Entrez les positions du chevalet à jouer séparées par un espace: ").upper().strip()
+    #         pos_chevalet = [int(x) - 1 for x in input_pos_chevalet.split(' ')]
+    #         valide = all([Joueur.position_est_valide(pos) for pos in pos_chevalet])
+    #
+    #     valide = False
+    #     while not valide:
+    #         input_pos_plateau = input("Entrez les cases de chacune de ces lettres séparées par un espace: ").upper().strip()
+    #         pos_plateau = input_pos_plateau.split(' ')
+    #
+    #         if len(pos_chevalet) != len(pos_plateau):
+    #             print("Les nombres de jetons et de positions ne sont pas les mêmes.")
+    #             valide = False
+    #         else:
+    #             # Nous avons refactorée cette partie pour pouvoir afficher un message d'erreur plutôt que juste re-prompter le joueur sans rien dire.
+    #             # ligne originale:
+    #             # valide = self.plateau.valider_positions_avant_ajout(pos_plateau)
+    #             if self.plateau.valider_positions_avant_ajout(pos_plateau):
+    #                 valide = True
+    #             else:
+    #                 print("""Les cases spécifiées ne sont pas valides.
+    #                 Les positions sont valides si:
+    #                     - elles sont toutes vides;
+    #                     - elles sont toutes sur la même ligne ou la même colonne;
+    #                     - si le plateau est vide, le centre du plateau (H8) doit être dans les positions;
+    #                     - sinon, au moins une des positions doit être adjacente à une des cases occupées
+    #                       du plateau""""")
+    #
+    #     return pos_chevalet, pos_plateau
 
-        :return: tuple (int list, str list): Deux listes, la première contient les positions du chevalet (plus précisement il s'agit des indexes de ces positions) et l'autre liste contient les positions codées du plateau.
-        """
-        # Cette méthode devrait être décomposée en 2 méthodes: demander_positions_chevalet() et demander_positions_cases()
-        # En effet une méthode devrait faire une seule chose, pas deux comme c'est le cas ici.
-        valide = False
-        while not valide:
-            input_pos_chevalet = input("Entrez les positions du chevalet à jouer séparées par un espace: ").upper().strip()
-            pos_chevalet = [int(x) - 1 for x in input_pos_chevalet.split(' ')]
-            valide = all([Joueur.position_est_valide(pos) for pos in pos_chevalet])
-
-        valide = False
-        while not valide:
-            input_pos_plateau = input("Entrez les cases de chacune de ces lettres séparées par un espace: ").upper().strip()
-            pos_plateau = input_pos_plateau.split(' ')
-    
-            if len(pos_chevalet) != len(pos_plateau):
-                print("Les nombres de jetons et de positions ne sont pas les mêmes.")
-                valide = False
-            else:
-                # Nous avons refactorée cette partie pour pouvoir afficher un message d'erreur plutôt que juste re-prompter le joueur sans rien dire.
-                # ligne originale:
-                # valide = self.plateau.valider_positions_avant_ajout(pos_plateau)
-                if self.plateau.valider_positions_avant_ajout(pos_plateau):
-                    valide = True
-                else:
-                    print("""Les cases spécifiées ne sont pas valides.
-                    Les positions sont valides si:
-                        - elles sont toutes vides;
-                        - elles sont toutes sur la même ligne ou la même colonne;
-                        - si le plateau est vide, le centre du plateau (H8) doit être dans les positions;
-                        - sinon, au moins une des positions doit être adjacente à une des cases occupées
-                          du plateau""""")
-
-        return pos_chevalet, pos_plateau
-
-    def jouer_un_tour(self):
-        """
-        Faire jouer à un des joueurs son tour entier jusqu'à ce qu'il place un mot valide sur le
-        plateau.
-        Pour ce faire
-        1 - Afficher le plateau puis le joueur;
-        2 - Demander les positions à jouer;
-        3 - Retirer les jetons du chevalet;
-        4 - Valider si les positions sont valides pour un ajout sur le plateau;
-        5 - Si oui, placer les jetons sur le plateau, sinon retourner en 1;
-        6 - Si tous les mots formés sont dans le dictionnaire, alors ajouter les points au joueur actif;
-        7 - Sinon retirer les jetons du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
-        8 - Afficher le plateau.
-
-        :return: Ne retourne rien.
-        """
-        print(self.plateau)
-        print(self.joueur_actif)
-
-        # Nous avons modifié légèrement la méthode fournie pour la rendre beaucoup plus robuste et éviter la fin abrupte du programme.
-        # La seule modification est l'ajout de boucles incluant un try/except pour valider les inputs.
-        valide = False
-        while not valide:
-            while True:
-                try:
-                    pos_chevalet, pos_plateau = self.demander_positions()
-                    break
-                except (AssertionError, ValueError) as e:
-                    print(e)
-                    continue
-
-            jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
-
-            while True:
-                try:
-                    mots, score = self.plateau.placer_mots(jetons, pos_plateau)
-                    break
-                except AssertionError as e:
-                    print(e)
-                    continue
-
-            if any([not self.mot_permis(m) for m in mots]):
-                print("Au moins l'un des mots formés est absent du dictionnaire.")
-                for pos in pos_plateau:
-                    jeton = self.plateau.retirer_jeton(pos)
-                    self.joueur_actif.ajouter_jeton(jeton)
-                valide = False
-            else:
-                print("Mots formés:", mots)
-                print("Score obtenu:", score)
-                self.joueur_actif.ajouter_points(score)
-                valide = True
-
-        print(self.plateau)
-
-    def changer_jetons(self):
-        """
-        Faire changer au joueur actif ses jetons. La méthode doit demander au joueur de saisir les positions à changer les unes après les autres séparés par un espace.
-        Si une position est invalide (utilisez Joueur.position_est_valide) alors redemander.
-        Dès que toutes les positions valides les retirer du chevalier du joueur et lui en donner de nouveau.
-        Enfin, on remet des jetons pris chez le joueur parmi les jetons libres.
-        :return: Ne retourne rien.
-        """
-        print(self.joueur_actif)
-        # On demande au joueur de saisir les positions du chevalet à changer
-        valide = False
-        while not valide:
-            try:
-                input_pos_chevalet = input("Entrez les positions du chevalet à changer séparées par un espace: ").strip()
-                pos_chevalet = [int(pos) - 1 for pos in input_pos_chevalet.split(' ')]
-
-                # On vérifie que toutes les positions du chevalet fournies ont un jeton (pas vides)
-                valide = all([not self.joueur_actif.position_est_vide(pos) for pos in pos_chevalet])
-
-                # Si le nb de jetons à changer excède le nb de jetons dispo dans le sac, on lève une exception
-                if len(pos_chevalet) > len(self.jetons_libres):
-                    raise AssertionError("Le nombre de jeton à changer excède le nombre de jetons restants dans le sac à jetons.")
-            except (AssertionError, ValueError) as e:
-                print(e)
-                continue
-
-        # On retire les jetons désirés et on les place dans la liste des jetons retirés
-        jetons_retires = [self.joueur_actif.retirer_jeton(pos) for pos in pos_chevalet]
-
-        # On pige les nouveaux jetons dans le sac à jetons et on les ajoute au chevalet du joueur
-        jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
-        for jeton in jetons_a_ajouter:
-            self.joueur_actif.ajouter_jeton(jeton)
-
-        # On retourne les jetons retirés du joueur dans le sac à jeton
-        self.jetons_libres = self.jetons_libres + jetons_retires
-
-        print("Nouveau plateau du", self.joueur_actif)
+    # def jouer_un_tour(self):
+    #     """
+    #     Faire jouer à un des joueurs son tour entier jusqu'à ce qu'il place un mot valide sur le
+    #     plateau.
+    #     Pour ce faire
+    #     1 - Afficher le plateau puis le joueur;
+    #     2 - Demander les positions à jouer;
+    #     3 - Retirer les jetons du chevalet;
+    #     4 - Valider si les positions sont valides pour un ajout sur le plateau;
+    #     5 - Si oui, placer les jetons sur le plateau, sinon retourner en 1;
+    #     6 - Si tous les mots formés sont dans le dictionnaire, alors ajouter les points au joueur actif;
+    #     7 - Sinon retirer les jetons du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
+    #     8 - Afficher le plateau.
+    #
+    #     :return: Ne retourne rien.
+    #     """
+    #     print(self.plateau)
+    #     print(self.joueur_actif)
+    #
+    #     # Nous avons modifié légèrement la méthode fournie pour la rendre beaucoup plus robuste et éviter la fin abrupte du programme.
+    #     # La seule modification est l'ajout de boucles incluant un try/except pour valider les inputs.
+    #     valide = False
+    #     while not valide:
+    #         while True:
+    #             try:
+    #                 pos_chevalet, pos_plateau = self.demander_positions()
+    #                 break
+    #             except (AssertionError, ValueError) as e:
+    #                 print(e)
+    #                 continue
+    #
+    #         jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
+    #
+    #         while True:
+    #             try:
+    #                 mots, score = self.plateau.placer_mots(jetons, pos_plateau)
+    #                 break
+    #             except AssertionError as e:
+    #                 print(e)
+    #                 continue
+    #
+    #         if any([not self.mot_permis(m) for m in mots]):
+    #             print("Au moins l'un des mots formés est absent du dictionnaire.")
+    #             for pos in pos_plateau:
+    #                 jeton = self.plateau.retirer_jeton(pos)
+    #                 self.joueur_actif.ajouter_jeton(jeton)
+    #             valide = False
+    #         else:
+    #             print("Mots formés:", mots)
+    #             print("Score obtenu:", score)
+    #             self.joueur_actif.ajouter_points(score)
+    #             valide = True
+    #
+    #     print(self.plateau)
+    #
+    # def changer_jetons(self):
+    #     """
+    #     Faire changer au joueur actif ses jetons. La méthode doit demander au joueur de saisir les positions à changer les unes après les autres séparés par un espace.
+    #     Si une position est invalide (utilisez Joueur.position_est_valide) alors redemander.
+    #     Dès que toutes les positions valides les retirer du chevalier du joueur et lui en donner de nouveau.
+    #     Enfin, on remet des jetons pris chez le joueur parmi les jetons libres.
+    #     :return: Ne retourne rien.
+    #     """
+    #     print(self.joueur_actif)
+    #     # On demande au joueur de saisir les positions du chevalet à changer
+    #     valide = False
+    #     while not valide:
+    #         try:
+    #             input_pos_chevalet = input("Entrez les positions du chevalet à changer séparées par un espace: ").strip()
+    #             pos_chevalet = [int(pos) - 1 for pos in input_pos_chevalet.split(' ')]
+    #
+    #             # On vérifie que toutes les positions du chevalet fournies ont un jeton (pas vides)
+    #             valide = all([not self.joueur_actif.position_est_vide(pos) for pos in pos_chevalet])
+    #
+    #             # Si le nb de jetons à changer excède le nb de jetons dispo dans le sac, on lève une exception
+    #             if len(pos_chevalet) > len(self.jetons_libres):
+    #                 raise AssertionError("Le nombre de jeton à changer excède le nombre de jetons restants dans le sac à jetons.")
+    #         except (AssertionError, ValueError) as e:
+    #             print(e)
+    #             continue
+    #
+    #     # On retire les jetons désirés et on les place dans la liste des jetons retirés
+    #     jetons_retires = [self.joueur_actif.retirer_jeton(pos) for pos in pos_chevalet]
+    #
+    #     # On pige les nouveaux jetons dans le sac à jetons et on les ajoute au chevalet du joueur
+    #     jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
+    #     for jeton in jetons_a_ajouter:
+    #         self.joueur_actif.ajouter_jeton(jeton)
+    #
+    #     # On retourne les jetons retirés du joueur dans le sac à jeton
+    #     self.jetons_libres = self.jetons_libres + jetons_retires
+    #
+    #     print("Nouveau plateau du", self.joueur_actif)
 
     # def jouer(self):
     #     """
