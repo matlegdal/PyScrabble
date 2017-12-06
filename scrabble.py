@@ -5,6 +5,7 @@ from jeton import Jeton
 from plateau import Plateau
 from utils import dessiner_jeton
 from tkinter import *
+from tkinter import messagebox
 from exception import *
 from math import floor
 
@@ -187,7 +188,7 @@ class Scrabble(Tk):
 
         # Set les boutons d'actions
         btn_jouer = Button(affichage_joueur, text="Joueur le tour")
-        btn_passer = Button(affichage_joueur, text="Passer le tour")
+        btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
         btn_quitter = Button(affichage_joueur, text="Quitter la partie")
 
@@ -196,15 +197,6 @@ class Scrabble(Tk):
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
-
-
-        # self.joueur_suivant()
-
-        # # On tire les jetons du joueur actif
-        #
-
-        # test
-        # self.joueur_actif.retirer_jeton(2)
 
 
     def dessiner_chevalet(self, master, joueur):
@@ -304,13 +296,16 @@ class Scrabble(Tk):
             self.joueur_actif = self.joueurs[randint(0, len(self.joueurs)-1)]
         else:
             self.joueur_actif = self.joueurs[(self.joueurs.index(self.joueur_actif)+1) % len(self.joueurs)]
-            print(self.joueur_actif)
 
     def changer_joueur(self):
         """
         Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
+        La méthode vérifie aussi si la partie est terminée.
         :return: Aucun return
         """
+        if self.partie_terminee():
+            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+
         self.joueur_suivant()
 
         if self.debut:
