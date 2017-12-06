@@ -38,6 +38,7 @@ class Scrabble(Tk):
         self.message = StringVar()
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
+        self.debut = True
 
 
         # Configure
@@ -172,8 +173,8 @@ class Scrabble(Tk):
         affichage_joueur = Frame(self.content)
         affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=1, sticky=NSEW)
 
-        self.nom_joueur.set(self.joueur_actif)
-        Label(affichage_joueur, textvariable=self.nom_joueur.get()).grid(row=0, column=0, columnspan=4)
+        # self.nom_joueur.set(self.joueur_actif)
+        Label(affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=4)
 
         self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+15, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET+20, bg='#f5ebdc')
         self.chevalet_actif.grid(row=1, column=0, columnspan=4, sticky=NSEW)
@@ -181,8 +182,8 @@ class Scrabble(Tk):
         # Set le tableau d'affichange
         tableau = Frame(self.content)
         tableau.grid(row=0, column=1, sticky=NSEW)
-        Label(tableau, textvariable=self.message.get()).grid(row=0)
-        Label(tableau, textvariable=self.pointage.get()).grid(row=1)
+        Label(tableau, textvariable=self.message).grid(row=0)
+        Label(tableau, textvariable=self.pointage).grid(row=1)
 
         # Set les boutons d'actions
         btn_jouer = Button(affichage_joueur, text="Joueur le tour")
@@ -200,8 +201,7 @@ class Scrabble(Tk):
         # self.joueur_suivant()
 
         # # On tire les jetons du joueur actif
-        # for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
-        #     self.joueur_actif.ajouter_jeton(jeton)
+        #
 
         # test
         # self.joueur_actif.retirer_jeton(2)
@@ -307,10 +307,23 @@ class Scrabble(Tk):
             print(self.joueur_actif)
 
     def changer_joueur(self):
+        """
+        Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
+        :return: Aucun return
+        """
         self.joueur_suivant()
-        # self.message.set()
+
+        if self.debut:
+            msg = "La partie va commencer avec le {}".format(self.joueur_actif.nom)
+            self.debut = False
+        else:
+            msg = "C'est le tour de {}".format(self.joueur_actif.nom)
+        self.message.set(msg)
         self.pointage.set(self.msg_points())
-        self.nom_joueur.set(self.joueur_actif)
+        self.nom_joueur.set(self.joueur_actif.nom)
+
+        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+            self.joueur_actif.ajouter_jeton(jeton)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
 
