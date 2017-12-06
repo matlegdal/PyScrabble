@@ -3,6 +3,7 @@ from random import randint, shuffle, seed
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
+from utils import dessiner_jeton
 from tkinter import *
 from exception import *
 from math import floor
@@ -159,9 +160,11 @@ class Scrabble(Tk):
         with open(nom_fichier_dictionnaire, 'r') as f:
             self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
 
+        # On tire les jetons du joueur actif
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
             self.joueur_actif.ajouter_jeton(jeton)
 
+        # test
         # self.joueur_actif.retirer_jeton(2)
 
         # Set les boutons d'actions
@@ -173,6 +176,10 @@ class Scrabble(Tk):
 
         # Représentation graphique
         # Plateau
+
+        # test
+        # self.plateau.cases[0][0].placer_jeton(Jeton('A', 3))
+
         self.plateau.grid(row=0, column=0, rowspan=2, columnspan=1, sticky=NSEW)
         self.plateau.tag_bind('case', '<Button-1>', self.click_case)
 
@@ -215,16 +222,16 @@ class Scrabble(Tk):
             y2 = y1 + self.PIXELS_PAR_CASE
 
             delta = int(self.PIXELS_PAR_CASE / 2)
-            self.dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], 'chevalet')
+            dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], 'chevalet')
 
-
-    @staticmethod
-    def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tag):
-        assert isinstance(master, Canvas)
-        assert isinstance(jeton, Jeton)
-
-        master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tag)
-        master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tag)
+    #
+    # @staticmethod
+    # def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tag):
+    #     assert isinstance(master, Canvas)
+    #     assert isinstance(jeton, Jeton)
+    #
+    #     master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tag)
+    #     master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tag)
 
     def msg_points(self):
         """

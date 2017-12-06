@@ -1,4 +1,5 @@
 from case import Case
+from utils import dessiner_jeton
 from tkinter import Canvas, CENTER, Tk, NSEW
 from exception import *
 
@@ -97,32 +98,34 @@ class Plateau(Canvas):
 
     def dessiner(self):
         self.delete('case')
-        # self.delete('lettre')
+        self.delete('jeton')
 
-        for colonne in range(Plateau.DIMENSION):
-            for ligne in range(Plateau.DIMENSION):
-                x1 = colonne*self.pixels_par_case + 5
-                y1 = ligne*self.pixels_par_case + 5
+        for ligne in range(Plateau.DIMENSION):
+            for col in range(Plateau.DIMENSION):
+                x1 = ligne*self.pixels_par_case + 5
+                y1 = col*self.pixels_par_case + 5
                 x2 = x1 + self.pixels_par_case
                 y2 = y1 + self.pixels_par_case
 
-                self.create_rectangle(x1, y1, x2, y2, fill=self.cases[colonne][ligne].code_couleur, tags="case")
+                self.create_rectangle(x1, y1, x2, y2, fill=self.cases[ligne][col].code_couleur, tags="case")
                 delta = int(self.pixels_par_case/2)
 
-                if colonne == ligne and colonne == 7:
+                if ligne == col and ligne == 7:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')
 
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
-                                     text="{}".format(self.cases[colonne][ligne].text_case()),
+                                     text="{}".format(self.cases[ligne][col].text_case()),
                                      font=("Times", int(delta/2)), tags='case')
+                if not self.cases[ligne][col].est_vide():
+                    dessiner_jeton(self, x1, y1, x2, y2, delta, self.cases[ligne][col].jeton_occupant, 'jeton')
 
 
     def redimensionner(self, event):
         new_dim = min(event.width, event.height)
         self.pixels_par_case = new_dim//Plateau.DIMENSION
         self.delete('case')
-        # self.delete('lettre')
+        self.delete('jeton')
         self.dessiner()
 
 
