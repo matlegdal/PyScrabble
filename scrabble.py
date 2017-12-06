@@ -35,7 +35,7 @@ class Scrabble(Tk):
         self.joueurs = []
         self.jetons_libres = []
         self.dictionnaire = None
-        self.message = "Bienvenue sur Scrabble!"
+        self.message = ''
 
         # Configure
         self.content = Frame(self)
@@ -43,7 +43,7 @@ class Scrabble(Tk):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        self.minsize(width=1200, height=800)
+        self.minsize(width=800, height=600)
 
         self.content.grid_columnconfigure(0, weight=2)
         self.content.grid_columnconfigure(1, weight=1)
@@ -128,7 +128,7 @@ class Scrabble(Tk):
         self.joueurs = [Joueur("Joueur {}".format(i+1)) for i in range(nb_joueurs)]
         self.joueur_suivant()
         affichage_joueur = Frame(self.content)
-        self.nom_joueur = Label(affichage_joueur, text="{}".format(self.joueur_actif.nom))
+        self.nom_joueur = Label(affichage_joueur, textvariable=self.joueur_actif.nom)
         self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+15, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET+20, bg='#f5ebdc')
 
         # Set le tableau d'affichange
@@ -224,14 +224,6 @@ class Scrabble(Tk):
             delta = int(self.PIXELS_PAR_CASE / 2)
             dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], 'chevalet')
 
-    #
-    # @staticmethod
-    # def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tag):
-    #     assert isinstance(master, Canvas)
-    #     assert isinstance(jeton, Jeton)
-    #
-    #     master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tag)
-    #     master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tag)
 
     def msg_points(self):
         """
