@@ -214,11 +214,17 @@ class Scrabble(Tk):
             x2 = x1 + self.PIXELS_PAR_CASE
             y2 = y1 + self.PIXELS_PAR_CASE
 
-            master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags='chevalet')
             delta = int(self.PIXELS_PAR_CASE / 2)
+            self.dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], 'chevalet')
 
-            master.create_text(x1+delta, y1+delta, justify=CENTER, text="{}".format(joueur.chevalet[pos]), font=("Times", int(delta)), tags='chevalet')
 
+    @staticmethod
+    def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tag):
+        assert isinstance(master, Canvas)
+        assert isinstance(jeton, Jeton)
+
+        master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tag)
+        master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tag)
 
     def msg_points(self):
         """
@@ -249,6 +255,7 @@ class Scrabble(Tk):
         """
         pos = floor(event.x/self.PIXELS_PAR_CASE)
         print(pos)
+
 
 
     def mot_permis(self, mot):
