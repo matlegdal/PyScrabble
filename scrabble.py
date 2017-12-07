@@ -40,6 +40,7 @@ class Scrabble(Tk):
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
         self.chevalet_actif = None
+        self.affichage_joueur = None
 
         # Configure
         self.content = Frame(self)
