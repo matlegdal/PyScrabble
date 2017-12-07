@@ -265,8 +265,10 @@ class Scrabble(Tk):
         ligne, col, case = self.determiner_case(event)
         try:
             case.placer_jeton(self.joueur_actif.jeton_actif)
-            self.plateau.cases_placees.append(case)
+            self.plateau.positions.append((ligne, col))
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
+            print(self.plateau.positions)
+            print(self.plateau.jetons_places)
 
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
             dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton_place', "jeton_{}_{}".format(ligne, col)))
@@ -278,7 +280,6 @@ class Scrabble(Tk):
         except (CaseOccupeeException, AssertionError) as e:
             print(e) # TODO: améliorer la gestion des erreurs!
 
-        # TODO: à compléter -> gestion de la liste des cases et des jetons placés
 
     def reprendre_jeton(self, event):
         """

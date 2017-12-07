@@ -19,6 +19,17 @@ class CaseOccupeeException(Exception):
 class CaseVideException(Exception):
     pass
 
+class CasesNonEnLigneException(Exception):
+    pass
+
+class CentreNonUtilise(Exception):
+    pass
+
+class PasDeCasesAdjacentes(Exception):
+    pass
+
+class CaseVideDansMot(Exception):
+    pass
 
 class CaseMultiException(Exception):
     pass
