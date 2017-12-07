@@ -76,6 +76,7 @@ class Plateau(Canvas):
         self.delete('case')
         self.delete('jeton')
         self.dessiner()
+        # TODO: corriger le bug avec le redimensionnement lorsqu'on a placé des jetons au cours du tour
 
     def case_est_vide(self, ligne, col):
         """

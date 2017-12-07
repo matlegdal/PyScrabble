@@ -177,24 +177,20 @@ class Scrabble(Tk):
 
         # Set le plateau
         self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE)
-        self.plateau.grid(row=0, column=0, rowspan=2, columnspan=1, sticky=NSEW)
-        # self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
-
-        # Set les joueurs
-        affichage_joueur = Frame(self.content)
-        affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=1, sticky=NSEW)
-
-        # self.nom_joueur.set(self.joueur_actif)
-        Label(affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=4)
-
-        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
-        self.chevalet_actif.grid(row=1, column=0, columnspan=4, sticky=NSEW)
+        self.plateau.grid(row=0, column=0, rowspan=3, columnspan=1, sticky=NSEW)
 
         # Set le tableau d'affichange
         tableau = Frame(self.content)
-        tableau.grid(row=0, column=1, sticky=NSEW)
+        tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
         Label(tableau, textvariable=self.message).grid(row=0)
         Label(tableau, textvariable=self.pointage).grid(row=1)
+
+        # Set les joueurs
+        affichage_joueur = Frame(self.content)
+        affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        Label(affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
+        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+        self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
         # Set les boutons d'actions
         btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_tour)
@@ -207,6 +203,11 @@ class Scrabble(Tk):
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
+
+        # Set une zone de warning
+        # avertissement = Frame(self.content)
+        # avertissement.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        # Label(avertissement, textvariable=self.flash).grid(row=0, column=0, columnspan=3)
 
         # TODO: ajouter une zone pour les messages d'erreur? ou alors sous forme de messagebox?
 
@@ -270,13 +271,15 @@ class Scrabble(Tk):
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
 
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
-            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton_place', "jeton_{}_{}".format(ligne, col)))
+            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton','jeton_place', "jeton_{}_{}".format(ligne, col)))
 
             self.joueur_actif.jeton_actif = None
 
             self.unbind_redeposer()
+            self.unbind_poser()
             self.after(500, self.bind_reprendre)
         except (CaseOccupeeException, AssertionError) as e:
+            messagebox.showwarning(message=e)
             print(e) # TODO: améliorer la gestion des erreurs!
 
 
@@ -301,6 +304,7 @@ class Scrabble(Tk):
                 self.plateau.positions.remove((ligne, col))
 
                 self.bind_redeposer()
+                self.bind_poser()
             except CaseVideException as e:
                 print(e)
 
@@ -327,11 +331,23 @@ class Scrabble(Tk):
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
 
                 self.after(500, self.bind_redeposer)
-                self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
+                self.bind_poser()
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
         # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
+
+    def bind_poser(self):
+        """
+        Fonction utilitaire pour binder le clic de souris à la pose d'un jeton sur une case
+        """
+        self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
+
+    def unbind_poser(self):
+        """
+        Fonction utilitaire pour unbinder le clic de souris à la pose d'un jeton sur une case
+        """
+        self.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
 
     def bind_reprendre(self):
         """
@@ -363,7 +379,6 @@ class Scrabble(Tk):
         :param event: Évènement du clic de la souris. Non-utilisé
         :return: Aucun retour
         """
-        self.unbind_redeposer()
         if self.joueur_actif.jeton_actif is not None:
             try:
                 pos = self.joueur_actif.chevalet.index(None)
@@ -374,6 +389,8 @@ class Scrabble(Tk):
                 dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
                 self.joueur_actif.jeton_actif = None
 
+                self.unbind_redeposer()
+                self.unbind_poser()
             except PositionChevaletException as e:
                 print(e)
 
