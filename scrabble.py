@@ -267,8 +267,6 @@ class Scrabble(Tk):
             case.placer_jeton(self.joueur_actif.jeton_actif)
             self.plateau.positions.append((ligne, col))
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
-            print(self.plateau.positions)
-            print(self.plateau.jetons_places)
 
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
             dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton_place', "jeton_{}_{}".format(ligne, col)))
@@ -299,7 +297,7 @@ class Scrabble(Tk):
 
                 self.plateau.jetons_places.remove(jeton)
                 self.joueur_actif.jeton_actif = jeton
-                self.plateau.cases_placees.remove(case)
+                self.plateau.positions.remove((ligne, col))
 
                 self.bind_redeposer()
             except CaseVideException as e:
