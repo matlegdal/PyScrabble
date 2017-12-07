@@ -265,11 +265,15 @@ class Scrabble(Tk):
         ligne, col, case = self.determiner_case(event)
         try:
             case.placer_jeton(self.joueur_actif.jeton_actif)
+            self.plateau.cases_placees.append(case)
+            self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
+
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
             dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton_place', "jeton_{}_{}".format(ligne, col)))
 
-            self.unbind_redeposer()
             self.joueur_actif.jeton_actif = None
+
+            self.unbind_redeposer()
             self.after(500, self.bind_reprendre)
         except (CaseOccupeeException, AssertionError) as e:
             print(e) # TODO: améliorer la gestion des erreurs!
@@ -281,6 +285,7 @@ class Scrabble(Tk):
         Permet de reprendre un jeton déposé sur le plateau par le joueur.
         - Retirer le jeton de la case
         - Effacer le jeton du plateau
+        - Enlever la case et le jeton des listes cases_placees et jetons_places
         - Binder redéposer
         """
         ligne, col, case = self.determiner_case(event)
@@ -288,8 +293,12 @@ class Scrabble(Tk):
         # TODO: s'assurer que le joueur ne peut reprendre que les jetons placés au cours de son tour.
         if self.joueur_actif.jeton_actif is None:
             try:
-                self.joueur_actif.jeton_actif = case.retirer_jeton()
+                jeton = case.retirer_jeton()
                 self.plateau.delete("jeton_{}_{}".format(ligne, col))
+
+                self.plateau.jetons_places.remove(jeton)
+                self.joueur_actif.jeton_actif = jeton
+                self.plateau.cases_placees.remove(case)
 
                 self.bind_redeposer()
             except CaseVideException as e:
