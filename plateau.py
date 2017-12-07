@@ -139,14 +139,23 @@ class Plateau(Canvas):
         if 0 > ligne >= self.DIMENSION or 0 > col >= self.DIMENSION:
             raise PositionInvalideException("La position de la case n'est pas valide.")
 
+        # On calcule les positions voisines
         voisins = [(ligne, col - 1), (ligne, col + 1), (ligne + 1, col), (ligne - 1, col)]
+
+        # On vérifie que les positions des voisins sont dans les limites du plateau
         voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION) and (0 <= j < Plateau.DIMENSION)]
 
+        # On enlève les positions qui sont des cases qui ont été joués dans le tour courant
+        voisins_a_retirer = []
         for (i,j) in voisins:
             if (i,j) in self.positions:
-                voisins.remove((i,j))
+                voisins_a_retirer.append((i,j))
+        for voisin in voisins_a_retirer:
+            voisins.remove(voisin)
 
-        return any([not self.cases[i][j].est_vide() for (i, j) in voisins])
+        au_moins_une_case_adjacente_occupee = any([not self.cases[i][j].est_vide() for (i, j) in voisins])
+
+        return au_moins_une_case_adjacente_occupee
 
     def valider_positions(self, positions):
         """
@@ -166,31 +175,39 @@ class Plateau(Canvas):
         :return: True si les positions sont valides, rien sinon
         :exception: Des exceptions sont levés pour chaque type d'erreur
         """
+        positions_cp = self.positions
 
+        # On mappe les positions en lignes et colonnes
         lignes, cols = zip(*positions)
         lignes, cols = list(set(lignes)), list(set(cols))
-        meme_ligne, meme_col = len(lignes) == 1, len(cols) == 1
 
+        # On vérifie que les cases utilisées sont en ligne
+        meme_ligne, meme_col = len(lignes) == 1, len(cols) == 1
         if not meme_ligne and not meme_col:
             raise CasesNonEnLigneException('Les cases ne sont pas en ligne')
 
+        # On vérifie que les cases utilisées touchent à au moins une case occupée du plateau (ou le centre si c'est le 1er tour)
         if self.tour == 1:
             if (7, 7) not in positions:
                 raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
         else:
-            if not any([self.cases_adjacentes_occupees(pos) for pos in positions]):
+            au_moins_une_case_adjacente_occupee = any([self.cases_adjacentes_occupees(pos) for pos in positions])
+            if not au_moins_une_case_adjacente_occupee:
                 raise PasDeCasesAdjacentes("Au moins un des jetons placés doit être adjacent à un jeton du plateau.")
 
+        # On vérifie qu'il n'y a pas de 'trous' dans les mots placés
         if meme_ligne:
             ligne, n, m = lignes[0], min(cols), max(cols)
             if any([(not self.cases[ligne][i].est_vide()) for i in range(n, m + 1) if i not in cols]):
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
+                #todo: corriger le bug -> ne fonctionne pas comme il devrait
         elif meme_col:
             col, n, m = cols[0], min(lignes), max(lignes)
             if any([(not self.cases[i][col].est_vide()) for i in range(n, m + 1) if i not in lignes]):
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
 
-        return True
+        assert positions_cp == self.positions == positions
+        return
 
     def mots_score_obtenus(self, positions):
         """

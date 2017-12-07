@@ -406,7 +406,7 @@ class Scrabble(Tk):
         """
         try:
             self.plateau.valider_positions(self.plateau.positions)
-        except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot) as e:
+        except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot, CentreNonUtilise) as e:
             messagebox.showwarning(message=e)
             print(e)
             # TODO: implanter la bonne exception -> retourner jetons ?
