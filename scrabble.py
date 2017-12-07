@@ -3,7 +3,7 @@ from random import randint, shuffle, seed
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
-from utils import dessiner_jeton
+from utils import *
 from tkinter import *
 from tkinter import messagebox
 from exception import *
@@ -189,6 +189,8 @@ class Scrabble(Tk):
 
         self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+15, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET+20, bg='#f5ebdc')
         self.chevalet_actif.grid(row=1, column=0, columnspan=4, sticky=NSEW)
+        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
+
 
         # Set le tableau d'affichange
         tableau = Frame(self.content)
@@ -229,7 +231,7 @@ class Scrabble(Tk):
             y2 = y1 + self.PIXELS_PAR_CASE
 
             delta = int(self.PIXELS_PAR_CASE / 2)
-            dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], 'chevalet')
+            dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))
 
 
     def msg_points(self):
@@ -259,15 +261,56 @@ class Scrabble(Tk):
         # TODO: à compléter
 
 
-    def click_jeton(self, event):
+    def prendre_jeton(self, event):
         """
-        Event handler des jetons du chevalet
+        Gère l'évènement d'un clique de souris sur un jeton du chevalet.
         - Retirer le jeton du chevalet
-        - Binder le jeton à la souris?
+        - Met le jeton retiré dans la variable jeton_actif du joueur.
+        - Retirer le visuel du jeton du chevalet_actif
+        :param event: évènement du clic de la souris. Inclus la position en x,y sur le canevas.
+        :return: Aucun retour
         """
-        pos = floor(event.x/self.PIXELS_PAR_CASE)
-        print(pos)
-        # TODO: à compléter
+        pos = floor(event.x / self.PIXELS_PAR_CASE)
+        if self.joueur_actif.jeton_actif is None:
+            try:
+                self.joueur_actif.jeton_actif = self.joueur_actif.retirer_jeton(pos)
+
+                assert isinstance(self.joueur_actif.jeton_actif, Jeton)
+                assert self.joueur_actif.chevalet[pos] is None
+
+                self.chevalet_actif.delete('chevalet{}'.format(pos))
+
+            except (PositionChevaletException, AssertionError) as e:
+                print(e)
+
+        # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
+
+    def redeposer_jeton(self, event):
+        """
+        Gère l'évènement de redéposer le jeton actif dans le chevalet.
+        - Ajouter le jeton au chevalet
+        - Dessiner le jeton
+        - Mettre le jeton_actif à None
+        :param event: Évènement du clic de la souris. Non-utilisé
+        :return: Aucun retour
+        """
+        if self.joueur_actif.jeton_actif is not None:
+            try:
+                print("redeposer_jeton déclenché")
+                print(self.joueur_actif.chevalet)
+                print(self.joueur_actif.jeton_actif)
+                pos = self.joueur_actif.chevalet[self.joueur_actif.chevalet.index(None)]
+                print(pos)
+                self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
+
+                x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+
+                dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
+                self.joueur_actif.jeton_actif = None
+            except PositionChevaletException as e:
+                print(e)
+
+            # TODO: à compléter
 
     def jouer_tour(self):
         """
@@ -344,7 +387,7 @@ class Scrabble(Tk):
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
             self.joueur_actif.ajouter_jeton(jeton)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
 
 
     def quitter(self):
