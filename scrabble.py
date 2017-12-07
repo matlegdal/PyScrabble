@@ -396,6 +396,16 @@ class Scrabble(Tk):
         else:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
 
+            if any([not self.mot_permis(m) for m in mots]):
+                pass
+                # TODO: à compléter la vérification des mots dans le dictionnaire. On peut s'inspirer de ci-dessous la fonction ancienne...
+                # print("Au moins l'un des mots formés est absent du dictionnaire.")
+                # for pos in pos_plateau:
+                #      jeton = self.plateau.retirer_jeton(pos)
+                #      self.joueur_actif.ajouter_jeton(jeton)
+                #      valide = False
+
+
             self.joueur_actif.ajouter_points(score)
             self.plateau.positions = []
             self.plateau.jetons_places = []
