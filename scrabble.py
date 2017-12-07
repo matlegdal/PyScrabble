@@ -398,7 +398,7 @@ class Scrabble(Tk):
         Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
         Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
         - Vérifier la validité des mots placés
-        - Calculer les mots et le score obtenus
+        - Calculer les mots et le score obtenus et vérifier si tous les mots sont permis
         - Ajouter les points au joueur
         - Resetter les listes de positions et jetons placés
         - changer de joueur
@@ -408,28 +408,24 @@ class Scrabble(Tk):
             self.plateau.valider_positions(self.plateau.positions)
         except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot, CentreNonUtilise) as e:
             messagebox.showwarning(message=e)
-            print(e)
-            # TODO: implanter la bonne exception -> retourner jetons ?
+            return
 
-        else:
+        try:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
+            mots_non_permis = [mot for mot in mots if not self.mot_permis(mot)]
+            if len(mots_non_permis) != 0:
+                msg = "Un ou plusieurs mots ne sont pas permis:\n"
+                for mot in mots_non_permis:
+                    msg = msg + "- " + mot + "\n"
+                raise MotNonPermisException(msg)
+        except MotNonPermisException as e:
+            messagebox.showwarning(message=e)
+            return
 
-            if any([not self.mot_permis(m) for m in mots]):
-                pass
-                # TODO: à compléter la vérification des mots dans le dictionnaire. On peut s'inspirer de ci-dessous la fonction ancienne...
-                # print("Au moins l'un des mots formés est absent du dictionnaire.")
-                # for pos in pos_plateau:
-                #      jeton = self.plateau.retirer_jeton(pos)
-                #      self.joueur_actif.ajouter_jeton(jeton)
-                #      valide = False
-
-
-            self.joueur_actif.ajouter_points(score)
-            self.plateau.positions = []
-            self.plateau.jetons_places = []
-
-            self.changer_joueur()
-
+        self.joueur_actif.ajouter_points(score)
+        self.plateau.positions = []
+        self.plateau.jetons_places = []
+        self.changer_joueur()
 
     def mot_permis(self, mot):
         """
