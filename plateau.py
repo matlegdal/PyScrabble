@@ -191,7 +191,6 @@ class Plateau(Canvas):
             au_moins_un_trou = any([self.cases[ligne][col].est_vide() for col in range(n, m + 1) if col not in cols])
             if au_moins_un_trou:
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
-
         elif meme_col:
             col, n, m = cols[0], min(lignes), max(lignes)
             au_moins_un_trou = any([self.cases[ligne][col].est_vide() for ligne in range(n, m + 1) if ligne not in lignes])

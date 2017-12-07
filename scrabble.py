@@ -8,7 +8,7 @@ from tkinter import *
 from tkinter import messagebox
 from exception import *
 from math import floor
-from tkinter import Toplevel
+
 
 class Scrabble(Tk):
     """
@@ -61,7 +61,7 @@ class Scrabble(Tk):
         barre_menu = Menu(self)
         fichier = Menu(barre_menu, tearoff=0)
         fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        fichier.add_command(label="Sauvegarder la partie", command=self.demande_sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        fichier.add_command(label="Sauvegarder la partie", state=DISABLED)  # TODO: implanter sauvegarder_partie()
         fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
         fichier.add_command(label="Quitter", command=self.quit)
@@ -194,7 +194,7 @@ class Scrabble(Tk):
         self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
         # Set les boutons d'actions
-        btn_jouer = Button(affichage_joueur, text="Jouer le tour", command=self.jouer_tour)
+        btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_tour)
         btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
         btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
@@ -272,8 +272,7 @@ class Scrabble(Tk):
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
 
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
-            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton','jeton_place',
-                                                                                                "jeton_{}_{}".format(ligne, col)))
+            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton','jeton_place', "jeton_{}_{}".format(ligne, col)))
 
             self.joueur_actif.jeton_actif = None
 
@@ -750,23 +749,11 @@ class Scrabble(Tk):
         :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
         """
         try:
-            f = open(nom_fichier, 'w')
-            f.write("{}\n{}\n{}\n{}".format(nom_fichier,Plateau.positions, Plateau.jetons_places))
-            f.close()
-            print("succes")
+            with open(nom_fichier, "wb") as f:
+                pickle.dump(self, f)
         except:
-            print('echec')
-
-        #todo: faire fonctionner ca
-       #try:
-       #    with open(nom_fichier, "wb") as f:
-       #        pickle.dump(self, f)
-       #    print(nom_fichier)
-
-       #except:
-       #    print("echec")
-       #    return False
-       #return True
+            return False
+        return True
 
     @staticmethod
     def charger_partie(nom_fichier):
@@ -779,31 +766,6 @@ class Scrabble(Tk):
         with open(nom_fichier, "rb") as f:
             objet = pickle.load(f)
         return objet
-
-    def demande_sauvegarder_partie(self):
-
-        fenetre_sauv = Toplevel(self)
-        fenetre_sauv.title("Sauvegarder")
-        cadre_label_entry = Frame(fenetre_sauv, padx=10, pady=10)
-        cadre_label_entry.grid(row=0)
-
-        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-        label_sauvegarde.grid(row=0)
-
-        nom_fichier =StringVar()
-
-        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-        entry_sauvegarde.grid(row=1)
-
-        cadre_btn = Frame(fenetre_sauv, padx=10, pady=10)
-        cadre_btn.grid(row=1)
-        btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-                        command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-        btn_ok.grid(row=0, column=0)
-        btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=fenetre_sauv.destroy)
-        btn_cancel.grid(row=0, column=2)
-
-
 
 
 # if __name__ == '__main__':
