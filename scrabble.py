@@ -44,6 +44,7 @@ class Scrabble(Tk):
 
         # Configure
         self.content = Frame(self)
+        # self.content.grid(row=0, column=0, sticky=NSEW)
         self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
 
         self.grid_columnconfigure(0, weight=1)
@@ -54,6 +55,7 @@ class Scrabble(Tk):
         self.content.grid_columnconfigure(1, weight=1)
         self.content.grid_rowconfigure(0, weight=1)
         self.content.grid_rowconfigure(1, weight=2)
+        self.content.grid_rowconfigure(2, weight=1)
 
         # Création du menu
         barre_menu = Menu(self)
@@ -194,7 +196,7 @@ class Scrabble(Tk):
         # Set les boutons d'actions
         btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        btn_changer = Button(self.affichage_joueur, text="Changer les jetons")
+        btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.changer_jetons)
         btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
@@ -203,12 +205,11 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
 
-        # Set une zone de warning
-        # avertissement = Frame(self.content)
-        # avertissement.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        # Label(avertissement, textvariable=self.flash).grid(row=0, column=0, columnspan=3)
+        # Set le sac à jetons
+        self.bottom_right = Frame(self.content)
+        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        # Label(sac_a_jetons, textvariable=self.flash).grid(row=0, column=0, columnspan=3)
 
-        # TODO: ajouter une zone pour les messages d'erreur? ou alors sous forme de messagebox? pour l'instant j'ai fait un messagebox, mais à voir...
 
     def dessiner_chevalet(self, master, joueur):
         """
@@ -565,6 +566,12 @@ class Scrabble(Tk):
         :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
         """
         #TODO: à compléter, on peut s'inspirer de l'ancienne méthode, mais il y a bcp à changer
+        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        sac_a_jeton = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
+        sac_a_jeton.grid(row=1, column=0, columnspan=2)
+        Button(self.bottom_right, text="Confirmer").grid(row=3, column=0)
+        Button(self.bottom_right, text="Cancel").grid(row=3, column=1)
+
 
     def tirer_jetons(self, n):
         """
