@@ -194,7 +194,7 @@ class Scrabble(Tk):
         self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
         # Set les boutons d'actions
-        btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_tour)
+        btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
         btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
         btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
@@ -210,7 +210,7 @@ class Scrabble(Tk):
         # avertissement.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         # Label(avertissement, textvariable=self.flash).grid(row=0, column=0, columnspan=3)
 
-        # TODO: ajouter une zone pour les messages d'erreur? ou alors sous forme de messagebox?
+        # TODO: ajouter une zone pour les messages d'erreur? ou alors sous forme de messagebox? pour l'instant j'ai fait un messagebox, mais à voir...
 
     def dessiner_chevalet(self, master, joueur):
         """
@@ -393,7 +393,7 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    def jouer_tour(self):
+    def jouer_un_tour(self):
         """
         Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
         Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
