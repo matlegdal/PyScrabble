@@ -99,6 +99,17 @@ class Plateau(Canvas):
         """
         return all([case.est_vide() for ligne in self.cases for case in ligne])
 
+    def etait_vide(self):
+        """
+        Permet de déterminer si le plateau était vide avant le tour courant, c'est à dire que toutes les cases étaient vides.
+        :return: True si le plateau était vide, False sinon.
+        """
+        # On enlève de la liste des cases à vérifier les positions occupées lors du tour courant
+        cases_a_verifier = [self.cases[ligne][col] for ligne in range(Plateau.DIMENSION) for col in range(Plateau.DIMENSION) if (ligne, col) not in self.positions]
+        # On vérifie si toutes les cases à vérifier sont vides
+        etait_vide = all([case.est_vide() for case in cases_a_verifier])
+        return etait_vide
+
     def ajouter_jeton(self, jeton, ligne, col):
         """
         Permet d'ajouter un jeton dans une case vide du plateau.
@@ -177,7 +188,7 @@ class Plateau(Canvas):
             raise CasesNonEnLigneException('Les cases ne sont pas en ligne')
 
         # On vérifie que les cases utilisées touchent à au moins une case occupée du plateau (ou le centre si c'est le 1er tour)
-        if self.tour == 1:  # TODO: corriger cette condition -> si le 1er joueur passe fait bugger
+        if self.etait_vide():
             if (7, 7) not in positions:
                 raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
         else:
@@ -264,7 +275,10 @@ if __name__ == '__main__':
     master = Tk()
     plateau = Plateau(master, 60)
     plateau.grid(row=0, column=0, sticky=NSEW)
-    master.mainloop()
+
+
+
+    # master.mainloop()
 
     """
     from jeton import Jeton
