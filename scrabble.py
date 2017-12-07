@@ -39,6 +39,7 @@ class Scrabble(Tk):
         self.message = StringVar()
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
+        self.chevalet_actif = None
         self.debut = True
 
 
@@ -66,7 +67,7 @@ class Scrabble(Tk):
         barre_menu.add_cascade(label="Fichier", menu=fichier)
 
         aide = Menu(barre_menu, tearoff=0)
-        aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements
+        aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements ->
         barre_menu.add_cascade(label="Aide", menu=aide)
 
         self.config(menu=barre_menu)
@@ -100,10 +101,17 @@ class Scrabble(Tk):
         Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
 
         # Débuter la partie
-        Button(accueil, text="Commencer la partie", command=lambda: self.transition_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4)
+        Button(accueil, text="Commencer la partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4)
 
 
-    def transition_partie(self, accueil, nb_joueurs, langue):
+    def demarrer_partie(self, accueil, nb_joueurs, langue):
+        """
+        Démarre une partie en détruisant la page d'accueil, initialisant la partie et passe le contrôle à jouer().
+        :param accueil: (Frame) Page d'accueil
+        :param nb_joueurs: (int) Nombre de joueurs
+        :param langue: (str) Code de langue à 2 lettres
+        :return: aucun return
+        """
         accueil.destroy()
         self.initialiser_partie(nb_joueurs, langue)
         self.jouer()
@@ -147,6 +155,8 @@ class Scrabble(Tk):
                     ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
                     ('Z', 1, 10)]
             nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
+
+        # TODO: refactor -> mettre les jetons (data) dans des fichiers à part (pour pouvoir ajouter des langues facilement)
 
         self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
         with open(nom_fichier_dictionnaire, 'r') as f:
@@ -235,7 +245,9 @@ class Scrabble(Tk):
 
     def click_case(self, event):
         """
-        Event handler des cases du plateau
+        Event handler des cases du plateau.
+        - Ajouter le jeton actif à la case
+        - Dessiner le jeton
         """
         ligne = floor(event.y/self.plateau.pixels_par_case)
         col = floor(event.x/self.plateau.pixels_par_case)
@@ -250,6 +262,8 @@ class Scrabble(Tk):
     def click_jeton(self, event):
         """
         Event handler des jetons du chevalet
+        - Retirer le jeton du chevalet
+        - Binder le jeton à la souris?
         """
         pos = floor(event.x/self.PIXELS_PAR_CASE)
         print(pos)
@@ -314,6 +328,7 @@ class Scrabble(Tk):
         """
         if self.partie_terminee():
             messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
 
         self.joueur_suivant()
 
@@ -330,6 +345,7 @@ class Scrabble(Tk):
             self.joueur_actif.ajouter_jeton(jeton)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.click_jeton)
+
 
     def quitter(self):
         """
@@ -590,57 +606,58 @@ class Scrabble(Tk):
             objet = pickle.load(f)
         return objet
 
-if __name__ == '__main__':
 
-    scrabble = Scrabble()
-
-# mot_permis()
-    assert scrabble.mot_permis('car')
-    assert not scrabble.mot_permis('abc')
-
-# déterminer_gagnant
-    scrabble.joueurs[0].ajouter_points(1)
-    scrabble.joueurs[1].ajouter_points(5)
-    assert scrabble.determiner_gagnant() == scrabble.joueurs[1]
-
-    scrabble.joueurs[2].ajouter_points(5)
-    print(scrabble.determiner_gagnant().nom)
-
-# partie_terminee
-    assert not scrabble.partie_terminee()
-
-    scrabble.jetons_libres = []
-    assert scrabble.partie_terminee()
-
-    scrabble = Scrabble(2)
-    scrabble.joueurs.pop()
-    assert scrabble.partie_terminee()
-
-# joueur_actif
-    scrabble = Scrabble(2)
-    scrabble.joueur_suivant()
-    assert isinstance(scrabble.joueur_actif, Joueur)
-
-    scrabble.joueur_actif = scrabble.joueurs[0]
-    scrabble.joueur_suivant()
-    assert scrabble.joueur_actif == scrabble.joueurs[1]
-    scrabble.joueur_suivant()
-    assert scrabble.joueur_actif == scrabble.joueurs[0]
-
-    scrabble = Scrabble(4)
-    scrabble.joueur_actif = scrabble.joueurs[0]
-    scrabble.joueur_suivant()
-    scrabble.joueur_suivant()
-    scrabble.joueur_suivant()
-    assert scrabble.joueur_actif == scrabble.joueurs[3]
-    scrabble.joueur_suivant()
-    assert scrabble.joueur_actif == scrabble.joueurs[0]
-
-# tirer_jetons
-    assert len(scrabble.tirer_jetons(2)) == 2 and isinstance(scrabble.tirer_jetons(2)[0], Jeton)
-    nbr_jetons_libres = len(scrabble.jetons_libres)
-    scrabble.tirer_jetons(2)
-    assert len(scrabble.jetons_libres) == nbr_jetons_libres - 2
+# if __name__ == '__main__':
+#
+#     scrabble = Scrabble()
+#
+# # mot_permis()
+#     assert scrabble.mot_permis('car')
+#     assert not scrabble.mot_permis('abc')
+#
+# # déterminer_gagnant
+#     scrabble.joueurs[0].ajouter_points(1)
+#     scrabble.joueurs[1].ajouter_points(5)
+#     assert scrabble.determiner_gagnant() == scrabble.joueurs[1]
+#
+#     scrabble.joueurs[2].ajouter_points(5)
+#     print(scrabble.determiner_gagnant().nom)
+#
+# # partie_terminee
+#     assert not scrabble.partie_terminee()
+#
+#     scrabble.jetons_libres = []
+#     assert scrabble.partie_terminee()
+#
+#     scrabble = Scrabble(2)
+#     scrabble.joueurs.pop()
+#     assert scrabble.partie_terminee()
+#
+# # joueur_actif
+#     scrabble = Scrabble(2)
+#     scrabble.joueur_suivant()
+#     assert isinstance(scrabble.joueur_actif, Joueur)
+#
+#     scrabble.joueur_actif = scrabble.joueurs[0]
+#     scrabble.joueur_suivant()
+#     assert scrabble.joueur_actif == scrabble.joueurs[1]
+#     scrabble.joueur_suivant()
+#     assert scrabble.joueur_actif == scrabble.joueurs[0]
+#
+#     scrabble = Scrabble(4)
+#     scrabble.joueur_actif = scrabble.joueurs[0]
+#     scrabble.joueur_suivant()
+#     scrabble.joueur_suivant()
+#     scrabble.joueur_suivant()
+#     assert scrabble.joueur_actif == scrabble.joueurs[3]
+#     scrabble.joueur_suivant()
+#     assert scrabble.joueur_actif == scrabble.joueurs[0]
+#
+# # tirer_jetons
+#     assert len(scrabble.tirer_jetons(2)) == 2 and isinstance(scrabble.tirer_jetons(2)[0], Jeton)
+#     nbr_jetons_libres = len(scrabble.jetons_libres)
+#     scrabble.tirer_jetons(2)
+#     assert len(scrabble.jetons_libres) == nbr_jetons_libres - 2
 
 
 # changer jetons
