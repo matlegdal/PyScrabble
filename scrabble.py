@@ -8,7 +8,7 @@ from tkinter import *
 from tkinter import messagebox
 from exception import *
 from math import floor
-
+from tkinter import Toplevel
 
 class Scrabble(Tk):
     """
@@ -58,7 +58,7 @@ class Scrabble(Tk):
         barre_menu = Menu(self)
         fichier = Menu(barre_menu, tearoff=0)
         fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        fichier.add_command(label="Sauvegarder la partie", state=DISABLED)  # TODO: implanter sauvegarder_partie()
+        fichier.add_command(label="Sauvegarder la partie", command=self.demande_sauvegarder_partie)  # TODO: state active quand une partie est en cours
         fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
         fichier.add_command(label="Quitter", command=self.quit)
@@ -789,11 +789,23 @@ class Scrabble(Tk):
         :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
         """
         try:
-            with open(nom_fichier, "wb") as f:
-                pickle.dump(self, f)
+            f = open(nom_fichier, 'w')
+            f.write("{}\n{}\n{}\n{}".format(nom_fichier,Plateau.positions, Plateau.jetons_places))
+            f.close()
+            print("succes")
         except:
-            return False
-        return True
+            print('echec')
+
+        #todo: faire fonctionner ca
+       #try:
+       #    with open(nom_fichier, "wb") as f:
+       #        pickle.dump(self, f)
+       #    print(nom_fichier)
+
+       #except:
+       #    print("echec")
+       #    return False
+       #return True
 
     @staticmethod
     def charger_partie(nom_fichier):
@@ -806,6 +818,31 @@ class Scrabble(Tk):
         with open(nom_fichier, "rb") as f:
             objet = pickle.load(f)
         return objet
+
+    def demande_sauvegarder_partie(self):
+
+        fenetre_sauv = Toplevel(self)
+        fenetre_sauv.title("Sauvegarder")
+        cadre_label_entry = Frame(fenetre_sauv, padx=10, pady=10)
+        cadre_label_entry.grid(row=0)
+
+        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
+        label_sauvegarde.grid(row=0)
+
+        nom_fichier =StringVar()
+
+        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+        entry_sauvegarde.grid(row=1)
+
+        cadre_btn = Frame(fenetre_sauv, padx=10, pady=10)
+        cadre_btn.grid(row=1)
+        btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
+                        command=lambda: self.sauvegarder_partie(nom_fichier.get()))
+        btn_ok.grid(row=0, column=0)
+        btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=fenetre_sauv.destroy)
+        btn_cancel.grid(row=0, column=2)
+
+
 
 
 # if __name__ == '__main__':
