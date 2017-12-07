@@ -405,19 +405,27 @@ class Scrabble(Tk):
         """
         Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
         Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
-        - Vérifier la validité des mots placés
+        - Vérifier la validité des positions des cases
         - Calculer les mots et le score obtenus et vérifier si tous les mots sont permis
         - Ajouter les points au joueur
         - Resetter les listes de positions et jetons placés
         - changer de joueur
         :return: Aucun return
         """
+        #Vérifie si le joueur a placé des jetons
+        if len(self.plateau.positions) == 0 or len(self.plateau.jetons_places) == 0:
+            messagebox.showinfo(message="Vous n'avez pas placé de jetons!\nSi vous ne désirez pas jouer ce tour-ci, "
+                                           "veuillez sélectionner le bouton 'Passer le tour'")
+            return
+
+        # Vérifie la validité des positions des jetons placés
         try:
             self.plateau.valider_positions(self.plateau.positions)
         except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot, CentreNonUtilise) as e:
             messagebox.showwarning(message=e)
             return
 
+        # Vérifie si les mots sont permis
         try:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
             mots_non_permis = [mot for mot in mots if not self.mot_permis(mot)]
@@ -465,6 +473,7 @@ class Scrabble(Tk):
         :return: bool, True si la partie est terminée, et False autrement.
         """
         return len(self.jetons_libres) < 1 or len(self.joueurs) < 2
+        #todo: à voir si on peut améliorer ce qui se passe quand une partie termine
 
     def joueur_suivant(self):
         """
