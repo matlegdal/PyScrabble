@@ -798,6 +798,10 @@ class Scrabble(Tk):
             print('echec')
 
         #todo: faire fonctionner ca
+       #  commentaire: es-tu sûr que pickle ne fonctionne pas? pcq si tu veux parser les infos de tous les objets ça va être l'enfer!! vrmt vrmt plus de travail requis!!!
+       #  considérant le nb de points, c'est presqu'assuré qu'on doit juste modifier légèrement la fonction originale
+       #  note -> la var positions n'est pas statique! si tu veux y référer tu dois utiliser self.plateau.positions (différence entre une variable de classe et une var d'instance)
+
        #try:
        #    with open(nom_fichier, "wb") as f:
        #        pickle.dump(self, f)
@@ -821,6 +825,9 @@ class Scrabble(Tk):
         return objet
 
     def demande_sauvegarder_partie(self):
+
+        # Commentaire: pourquoi tu n'utilises pas le module tkFileDialog??
+        # Ça va vrmt te simplifier la vie. cherches ça sur google et tu vas trouver. je t'ai envoyé un lien dans skype aussi!
 
         fenetre_sauv = Toplevel(self)
         fenetre_sauv.title("Sauvegarder")
