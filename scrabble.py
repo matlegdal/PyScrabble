@@ -339,6 +339,8 @@ class Scrabble(Tk):
     def reprendre_jeton(self, event):
         """
         Permet de reprendre un jeton déposé sur le plateau par le joueur.
+        - Vérifier que le jeton a été placé lors du tour courant
+        - Vérifier que le joueur n'est pas en train de poser un jeton (il n'y a pas de jeton_actif)
         - Retirer le jeton de la case
         - Effacer le jeton du plateau
         - Enlever la case et le jeton des listes cases_placees et jetons_places
@@ -346,8 +348,14 @@ class Scrabble(Tk):
         """
         ligne, col, case = self.determiner_case(event)
 
-        # TODO: s'assurer que le joueur ne peut reprendre que les jetons placés au cours de son tour.
+        # Vérifie que le jeton a bien été placé dans le tour courant
+        if (ligne, col) not in self.plateau.positions:
+            return
+
+        # Reprend le jeton
         if self.joueur_actif.jeton_actif is None:
+            # Todo: vérifier -> le try/except est pas vrmt utile ici je crois, car le cases vides ne sont même pas bindées à la souris...
+            # donc aucun moyen d'arriver ici à partir d'une case vide...
             try:
                 jeton = case.retirer_jeton()
                 self.plateau.delete("jeton_{}_{}".format(ligne, col))
