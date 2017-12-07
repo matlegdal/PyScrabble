@@ -225,12 +225,7 @@ class Scrabble(Tk):
             if joueur.chevalet[pos] is None:
                 continue
 
-            x1 = pos * self.PIXELS_PAR_CASE+10
-            y1 = 10
-            x2 = x1 + self.PIXELS_PAR_CASE
-            y2 = y1 + self.PIXELS_PAR_CASE
-
-            delta = int(self.PIXELS_PAR_CASE / 2)
+            x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
             dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))
 
 
