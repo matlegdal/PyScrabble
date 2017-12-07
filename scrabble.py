@@ -44,7 +44,6 @@ class Scrabble(Tk):
 
         # Configure
         self.content = Frame(self)
-        # self.content.grid(row=0, column=0, sticky=NSEW)
         self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
 
         self.grid_columnconfigure(0, weight=1)
@@ -456,6 +455,11 @@ class Scrabble(Tk):
         self.changer_joueur()
         self.joueurs.remove(quitter)
 
+        # Vérifie si la partie est terminée
+        if self.partie_terminee():
+            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            return
+
     def demander_jetons_a_changer(self):
         """
         Interface graphique pour changer les jetons
@@ -472,18 +476,18 @@ class Scrabble(Tk):
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
+        # Bindings
         self.unbind_prendre()
+        self.bind_jeter()
 
+        # Affichage de l'interface
         self.bottom_right = Frame(self.content)
         self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
         self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
         self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
         Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
-        Button(self.bottom_right, text="Cancel").grid(row=3, column=1)
-
-        self.bind_jeter()
-        # TODO: à compléter -> bouton cancel
+        Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
 
     def changer_jetons(self):
         """
@@ -496,18 +500,35 @@ class Scrabble(Tk):
         - On passe au joueur suivant
         :return: Aucun return
         """
+        # Piger de nouveaux jetons et retourner les jetons jetés au sac à jetons
         jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
         for jeton in jetons_a_ajouter:
             self.joueur_actif.ajouter_jeton(jeton)
-
         self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
+        # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
         self.bottom_right.destroy()
-
+        # Passer un tour
         self.changer_joueur()
 
+    def annuler_changer_jetons(self):
+        """
+        - Remettre les jetons dans le chevalet du joueur.
+        - unbind jeter_jeton et rebind prendre_jeton
+        - effacer le frame pour changer les jetons
+        :return:
+        """
+        # Remettre les jetons jetés dans le chevalet du joueur
+        for jeton in self.joueur_actif.jetons_jetes:
+            self.joueur_actif.ajouter_jeton(jeton)
+        self.dessiner_chevalet(self.chevalet_actif,self.joueur_actif)
+        self.joueur_actif.jetons_jetes = []
+        # Détruire l'interface pour changer les jetons
+        self.unbind_jeter()
+        self.bind_prendre()
+        self.bottom_right.destroy()
 
     def changer_joueur(self):
         """
