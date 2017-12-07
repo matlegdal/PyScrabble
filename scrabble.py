@@ -187,10 +187,8 @@ class Scrabble(Tk):
         # self.nom_joueur.set(self.joueur_actif)
         Label(affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=4)
 
-        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE+15, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET+20, bg='#f5ebdc')
+        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
         self.chevalet_actif.grid(row=1, column=0, columnspan=4, sticky=NSEW)
-        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
-
 
         # Set le tableau d'affichange
         tableau = Frame(self.content)
@@ -262,11 +260,12 @@ class Scrabble(Tk):
         - Retirer le jeton du chevalet
         - Met le jeton retiré dans la variable jeton_actif du joueur.
         - Retirer le visuel du jeton du chevalet_actif
+        - Activer le event handler pour redeposer le jeton
         :param event: évènement du clic de la souris. Inclus la position en x,y sur le canevas.
         :return: Aucun retour
         """
-        pos = floor(event.x / self.PIXELS_PAR_CASE)
         if self.joueur_actif.jeton_actif is None:
+            pos = floor(event.x / self.PIXELS_PAR_CASE)
             try:
                 self.joueur_actif.jeton_actif = self.joueur_actif.retirer_jeton(pos)
 
@@ -274,15 +273,30 @@ class Scrabble(Tk):
                 assert self.joueur_actif.chevalet[pos] is None
 
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
-
+                self.after(500, self.bind_redeposer)
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
         # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
 
+    def bind_redeposer(self):
+        """
+        Fonction utilitaire pour binder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
+        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
+        """
+        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
+
+    def unbind_redeposer(self):
+        """
+        Fonction utilitaire pour unbinder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
+        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
+        """
+        self.chevalet_actif.bind('<Button-1>', lambda e: "break")
+
     def redeposer_jeton(self, event):
         """
         Gère l'évènement de redéposer le jeton actif dans le chevalet.
+        - Désactiver le event-handler de redeposer
         - Ajouter le jeton au chevalet
         - Dessiner le jeton
         - Mettre le jeton_actif à None
@@ -290,22 +304,18 @@ class Scrabble(Tk):
         :return: Aucun retour
         """
         if self.joueur_actif.jeton_actif is not None:
+            self.unbind_redeposer()
             try:
-                print("redeposer_jeton déclenché")
-                print(self.joueur_actif.chevalet)
-                print(self.joueur_actif.jeton_actif)
-                pos = self.joueur_actif.chevalet[self.joueur_actif.chevalet.index(None)]
-                print(pos)
+                pos = self.joueur_actif.chevalet.index(None)
                 self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
 
                 x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
 
                 dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
                 self.joueur_actif.jeton_actif = None
+
             except PositionChevaletException as e:
                 print(e)
-
-            # TODO: à compléter
 
     def jouer_tour(self):
         """

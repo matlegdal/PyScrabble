@@ -5,8 +5,8 @@ def coord_pos(pos, pixels_par_case):
     assert 0 <= pos <= 6
     assert pixels_par_case == 40
 
-    x1 = pos * pixels_par_case + 10
-    y1 = 10
+    x1 = pos * pixels_par_case
+    y1 = 0
     x2 = x1 + pixels_par_case
     y2 = y1 + pixels_par_case
     delta = int(pixels_par_case / 2)
