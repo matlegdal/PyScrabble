@@ -414,6 +414,10 @@ class Scrabble(Tk):
                 for mot in mots_non_permis:
                     msg = msg + "- " + mot + "\n"
                 raise MotNonPermisException(msg)
+            # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
+            if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
+                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos jetons!\nVous obtenez 50 points boni!')
+                score += 50
         except MotNonPermisException as e:
             messagebox.showwarning(message=e)
             return

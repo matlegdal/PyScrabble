@@ -136,7 +136,7 @@ IMPLANTÉE:
      Commentaires :
      TODO: Règles à ajouter
      - Gestion des jokers
-     - Un joueur qui pose 7 jetons en un seul tour a un bonus de 50 points (Scrabble!)
+     - Un joueur qui pose 7 jetons en un seul tour a un bonus de 50 points (Scrabble!) -> OK
      - Gestion du temps
      - Un joueur qui se trompe dans un mot reprend ses lettres et passe son tour
 
