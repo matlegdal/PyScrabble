@@ -238,6 +238,20 @@ class Scrabble(Tk):
 
         return msg_points
 
+    def determiner_case(self, event):
+        """
+        Permet de déterminer la case clickée par un event de souris
+        :param event: l'event de souris
+        :return: (tuple) tuple à 3 éléments: ligne du plateau, colonne du plateau, case
+        """
+        ligne = floor(event.y / self.plateau.pixels_par_case)
+        col = floor(event.x / self.plateau.pixels_par_case)
+
+        if 0 > ligne >= self.plateau.DIMENSION or 0 > col >= self.plateau.DIMENSION:
+            raise PositionInvalideException("La position est invalide")
+
+        return ligne, col, self.plateau.cases[ligne][col]
+
     def poser_jeton(self, event):
         """
         Event handler des cases du plateau.
@@ -246,26 +260,40 @@ class Scrabble(Tk):
         - Dessiner le jeton dans la case.
         - Ajouter la case à la liste des positions à vérifier
         - Ajouter le jeton à la liste des jetons placés
-        - Met jeton_actif à None
-        Attention: n'ajoute pas le jeton à la case! Cela sera gérer dans la fonction jouer_tour()
+        - Unbind redeposer et met jeton_actif à None
         """
-        ligne = floor(event.y/self.plateau.pixels_par_case)
-        col = floor(event.x/self.plateau.pixels_par_case)
-
-        if 0 > ligne >= self.plateau.DIMENSION or 0 > col >= self.plateau.DIMENSION:
-            raise PositionInvalideException("La position est invalide")
-
-        case = self.plateau.cases[ligne][col]
+        ligne, col, case = self.determiner_case(event)
         try:
             case.placer_jeton(self.joueur_actif.jeton_actif)
             x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
-            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, "jeton_place")
+            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton_place', "jeton_{}_{}".format(ligne, col)))
+
+            self.unbind_redeposer()
             self.joueur_actif.jeton_actif = None
+            self.after(500, self.bind_reprendre)
         except (CaseOccupeeException, AssertionError) as e:
-            print(e)
+            print(e) # TODO: améliorer la gestion des erreurs!
 
+        # TODO: à compléter -> gestion de la liste des cases et des jetons placés
 
-        # TODO: à compléter
+    def reprendre_jeton(self, event):
+        """
+        Permet de reprendre un jeton déposé sur le plateau par le joueur.
+        - Retirer le jeton de la case
+        - Effacer le jeton du plateau
+        - Binder redéposer
+        """
+        ligne, col, case = self.determiner_case(event)
+
+        # TODO: s'assurer que le joueur ne peut reprendre que les jetons placés au cours de son tour.
+        if self.joueur_actif.jeton_actif is None:
+            try:
+                self.joueur_actif.jeton_actif = case.retirer_jeton()
+                self.plateau.delete("jeton_{}_{}".format(ligne, col))
+
+                self.bind_redeposer()
+            except CaseVideException as e:
+                print(e)
 
 
     def prendre_jeton(self, event):
@@ -295,6 +323,12 @@ class Scrabble(Tk):
                 print(e)
 
         # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
+
+    def bind_reprendre(self):
+        """
+        Fonction utilitaire pour binder le clic de souris aux jetons placés.
+        """
+        self.plateau.tag_bind('jeton_place', '<Button-1>', self.reprendre_jeton)
 
     def bind_redeposer(self):
         """
