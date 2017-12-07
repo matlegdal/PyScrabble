@@ -195,7 +195,7 @@ class Scrabble(Tk):
 
         # Set les boutons d'actions
         btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
-        btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
+        btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
         btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
 
@@ -441,6 +441,22 @@ class Scrabble(Tk):
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
         self.plateau.jetons_places = []
+        self.changer_joueur()
+
+    def passer_un_tour(self):
+        """
+        Permet à un joueur de passer son tour.
+        - vérifier que le joueur n'a pas placé de jetons sur le plateau
+        - changer de joueur
+        :return: aucun retour
+        """
+        # Vérifie si le joueur a placé des jetons
+        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
+            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
+                                        "retirez vos jetons du plateau.\n"
+                                        "Sinon, sélectionnez 'Jouer un tour'")
+            return
+
         self.changer_joueur()
 
     def mot_permis(self, mot):
