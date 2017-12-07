@@ -338,11 +338,20 @@ class Scrabble(Tk):
 
         # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop -> fucking compliqué! laissons tomber, surtout pour 5 points supp...
 
+    def jeter_jeton(self, event):
+        pos = floor(event.x / self.PIXELS_PAR_CASE)
+        jeton_retire = self.joueur_actif.retirer_jeton(pos)
+        self.joueur_actif.jetons_jetes.append(jeton_retire)
+
+        x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+        dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
+        self.chevalet_actif.delete('chevalet{}'.format(pos))
+
+
     # def drag(self, event, jeton):
     #     # jeton_drag = DragJeton(self, self.PIXELS_PAR_CASE, jeton, event)
     #     # jeton_drag.start_drag()
     #     dnd_start()
-
 
     def reprendre_jeton(self, event):
         """
@@ -377,40 +386,6 @@ class Scrabble(Tk):
             except CaseVideException as e:
                 print(e)
 
-    def bind_poser(self):
-        """
-        Fonction utilitaire pour binder le clic de souris à la pose d'un jeton sur une case
-        """
-        self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
-
-    def unbind_poser(self):
-        """
-        Fonction utilitaire pour unbinder le clic de souris à la pose d'un jeton sur une case
-        """
-        self.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
-
-    # def bind_prendre(self):
-    #     self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
-
-    def bind_reprendre(self):
-        """
-        Fonction utilitaire pour binder le clic de souris aux jetons placés.
-        """
-        self.plateau.tag_bind('jeton_place', '<Button-1>', self.reprendre_jeton)
-
-    def bind_redeposer(self):
-        """
-        Fonction utilitaire pour binder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
-        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
-        """
-        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
-
-    def unbind_redeposer(self):
-        """
-        Fonction utilitaire pour unbinder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
-        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
-        """
-        self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
     def jouer_un_tour(self):
         """
@@ -470,6 +445,72 @@ class Scrabble(Tk):
 
         self.changer_joueur()
 
+    def quitter(self):
+        """
+        Retire un joueur de la liste des joueurs
+        :return: Aucun return
+        """
+        # TODO: vérifier que le joueur n'a pas mis des jetons sur le plateau.
+        quitter = self.joueur_actif
+        self.changer_joueur()
+        self.joueurs.remove(quitter)
+
+    def changer_jetons(self):
+        """
+        Change les jetons du joueur actif.
+        - unbinder la fonction prendre
+        - afficher le sac a jeton et les boutons
+        - binder la fonction jeter
+        :return: Aucun return
+        :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
+        """
+
+        self.unbind_prendre()
+
+        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
+        self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
+        Button(self.bottom_right, text="Confirmer").grid(row=3, column=0)
+        Button(self.bottom_right, text="Cancel").grid(row=3, column=1)
+
+        self.bind_jeter()
+        # TODO: à compléter, on peut s'inspirer de l'ancienne méthode, mais il y a bcp à changer
+
+    def changer_joueur(self):
+        """
+        Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
+        La méthode vérifie aussi si la partie est terminée.
+        -
+        :return: Aucun return
+        """
+        # Vérification si la partie est terminée
+        if self.partie_terminee():
+            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            return
+            # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
+
+        # On passe au joueur suivant et on incrémente le tour de la partie
+        self.joueur_suivant()
+        self.plateau.tour += 1
+
+        # On détermine le message à afficher
+        if self.plateau.tour == 1:
+            msg = "Tour {}\nLa partie va commencer avec le {}".format(self.plateau.tour, self.joueur_actif.nom)
+        else:
+            msg = "Tour {}\nC'est le tour de {}".format(self.plateau.tour, self.joueur_actif.nom)
+
+        # On pige les jetons
+        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+            self.joueur_actif.ajouter_jeton(jeton)
+
+        # On update l'affichage
+        self.message.set(msg)
+        self.pointage.set(self.msg_points())
+        self.nom_joueur.set(self.joueur_actif.nom)
+        self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
+        self.bind_prendre()
+
+
     def mot_permis(self, mot):
         """
         Permet de savoir si un mot est permis dans la partie ou pas en regardant dans le dictionnaire.
@@ -514,64 +555,6 @@ class Scrabble(Tk):
         else:
             self.joueur_actif = self.joueurs[(self.joueurs.index(self.joueur_actif)+1) % len(self.joueurs)]
 
-    def changer_joueur(self):
-        """
-        Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
-        La méthode vérifie aussi si la partie est terminée.
-        -
-        :return: Aucun return
-        """
-        # Vérification si la partie est terminée
-        if self.partie_terminee():
-            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
-            return
-            # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
-
-        # On passe au joueur suivant et on incrémente le tour de la partie
-        self.joueur_suivant()
-        self.plateau.tour += 1
-
-        # On détermine le message à afficher
-        if self.plateau.tour == 1:
-            msg = "Tour {}\nLa partie va commencer avec le {}".format(self.plateau.tour, self.joueur_actif.nom)
-        else:
-            msg = "Tour {}\nC'est le tour de {}".format(self.plateau.tour, self.joueur_actif.nom)
-
-        # On pige les jetons
-        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
-            self.joueur_actif.ajouter_jeton(jeton)
-
-        # On update l'affichage
-        self.message.set(msg)
-        self.pointage.set(self.msg_points())
-        self.nom_joueur.set(self.joueur_actif.nom)
-        self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
-        # self.bind_prendre()
-
-    def quitter(self):
-        """
-        Retire un joueur de la liste des joueurs
-        :return: Aucun return
-        """
-        # TODO: vérifier que le joueur n'a pas mis des jetons sur le plateau.
-        quitter = self.joueur_actif
-        self.changer_joueur()
-        self.joueurs.remove(quitter)
-
-    def changer_jetons(self):
-        """
-        Change les jetons du joueur actif.
-        :return: Aucun return
-        :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
-        """
-        #TODO: à compléter, on peut s'inspirer de l'ancienne méthode, mais il y a bcp à changer
-        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-        sac_a_jeton = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
-        sac_a_jeton.grid(row=1, column=0, columnspan=2)
-        Button(self.bottom_right, text="Confirmer").grid(row=3, column=0)
-        Button(self.bottom_right, text="Cancel").grid(row=3, column=1)
-
 
     def tirer_jetons(self, n):
         """
@@ -592,6 +575,50 @@ class Scrabble(Tk):
 
         # On retourne les jetons tirés
         return jetons_tires
+
+    def bind_poser(self):
+        """
+        Fonction utilitaire pour binder le clic de souris à la pose d'un jeton sur une case
+        """
+        self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
+
+    def unbind_poser(self):
+        """
+        Fonction utilitaire pour unbinder le clic de souris à la pose d'un jeton sur une case
+        """
+        self.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
+
+    def bind_prendre(self):
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
+
+    def unbind_prendre(self):
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', lambda e: "break")
+
+    def bind_jeter(self):
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.jeter_jeton)
+
+    def unbind_jeter(self):
+        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', lambda e: "break")
+
+    def bind_reprendre(self):
+        """
+        Fonction utilitaire pour binder le clic de souris aux jetons placés.
+        """
+        self.plateau.tag_bind('jeton_place', '<Button-1>', self.reprendre_jeton)
+
+    def bind_redeposer(self):
+        """
+        Fonction utilitaire pour binder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
+        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
+        """
+        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
+
+    def unbind_redeposer(self):
+        """
+        Fonction utilitaire pour unbinder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
+        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
+        """
+        self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
     # def demander_positions(self):
     #     """ *** Vous n'avez pas à coder cette méthode ***

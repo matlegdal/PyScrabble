@@ -177,7 +177,7 @@ class Plateau(Canvas):
             raise CasesNonEnLigneException('Les cases ne sont pas en ligne')
 
         # On vérifie que les cases utilisées touchent à au moins une case occupée du plateau (ou le centre si c'est le 1er tour)
-        if self.tour == 1:
+        if self.tour == 1:  # TODO: corriger cette condition -> si le 1er joueur passe fait bugger
             if (7, 7) not in positions:
                 raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
         else:

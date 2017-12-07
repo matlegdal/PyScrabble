@@ -34,6 +34,7 @@ class Joueur:
         self.__points = 0
         self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
         self.jeton_actif = None
+        self.jetons_jetes = []
 
 
     @property
