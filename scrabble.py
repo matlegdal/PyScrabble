@@ -40,9 +40,6 @@ class Scrabble(Tk):
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
         self.chevalet_actif = None
-        # self.debut = True
-
-
 
         # Configure
         self.content = Frame(self)
@@ -187,17 +184,17 @@ class Scrabble(Tk):
         Label(tableau, textvariable=self.pointage).grid(row=1)
 
         # Set les joueurs
-        affichage_joueur = Frame(self.content)
-        affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        Label(affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
-        self.chevalet_actif = Canvas(affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+        self.affichage_joueur = Frame(self.content)
+        self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
+        self.chevalet_actif = Canvas(self.affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
         self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
         # Set les boutons d'actions
-        btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
-        btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        btn_changer = Button(affichage_joueur, text="Changer les jetons")
-        btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
+        btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
+        btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
+        btn_changer = Button(self.affichage_joueur, text="Changer les jetons")
+        btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
         btn_jouer.grid(row=2, column=0, columnspan=4, sticky=NSEW, pady=30)
@@ -329,12 +326,21 @@ class Scrabble(Tk):
 
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
 
+                # self.chevalet_actif.move()
+                # self.drag(event, self.joueur_actif.jeton_actif)
+
                 self.after(500, self.bind_redeposer)
                 self.bind_poser()
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
-        # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
+        # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop -> fucking compliqué! laissons tomber, surtout pour 5 points supp...
+
+    # def drag(self, event, jeton):
+    #     # jeton_drag = DragJeton(self, self.PIXELS_PAR_CASE, jeton, event)
+    #     # jeton_drag.start_drag()
+    #     dnd_start()
+
 
     def reprendre_jeton(self, event):
         """
@@ -381,6 +387,9 @@ class Scrabble(Tk):
         """
         self.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
 
+    # def bind_prendre(self):
+    #     self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
+
     def bind_reprendre(self):
         """
         Fonction utilitaire pour binder le clic de souris aux jetons placés.
@@ -404,7 +413,7 @@ class Scrabble(Tk):
     def jouer_un_tour(self):
         """
         Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
-        Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
+        Si les mots sont corrects, on change de joueur, sinon on avertit quels mots ne sont pas permis et le joueur peut continuer à jouer son tour.
         - Vérifier la validité des positions des cases
         - Calculer les mots et le score obtenus et vérifier si tous les mots sont permis
         - Ajouter les points au joueur
@@ -536,12 +545,14 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
+        # self.bind_prendre()
 
     def quitter(self):
         """
         Retire un joueur de la liste des joueurs
         :return: Aucun return
         """
+        # TODO: vérifier que le joueur n'a pas mis des jetons sur le plateau.
         quitter = self.joueur_actif
         self.changer_joueur()
         self.joueurs.remove(quitter)

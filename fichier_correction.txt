@@ -44,13 +44,13 @@ Fonctionnalités obligatoires (70%)
 /4 : La fin de la partie est détectée et affichée
      Commentaires :
 
-/4 : On peut sauvegarder une partie via un bouton
+/4 : Todo: On peut sauvegarder une partie via un bouton
      Commentaires :
 
-/4 : On peut charger une partie via un bouton
+/4 : TODO: On peut charger une partie via un bouton
      Commentaires :
 
-/4 : On peut démarrer une nouvelle partie
+/4 : TODO: On peut démarrer une nouvelle partie
      Commentaires :
 
 /4 :Les informations de partie sont affichées (points des joueurs et nom du joueur courant)
@@ -75,10 +75,10 @@ INDIQUEZ PAR OUI/NON SI LA FONCTIONNALITÉ EST IMPLANTÉE
 
 
 IMPLANTÉE: 
-/5 : Option de lire les règlements du jeu
+/5 : TODO: Option de lire les règlements du jeu
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: oui
 /5 : Permettre de choisir la langue du jeu
      Commentaires :
 
@@ -90,9 +90,9 @@ IMPLANTÉE:
 /5 : Affichage de la liste des mots sur le plateau
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: oui
 /5 : Permettre d'annuler le dernier mouvement
-     Commentaires :
+     Commentaires : On peut reprendre les jetons déposés sur le plateau sans problème.
 
 IMPLANTÉE:
 /5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
@@ -111,7 +111,7 @@ IMPLANTÉE:
      Commentaires :
 
 IMPLANTÉE:
-/10 : Afficher un compteur de temps de jeu pour chaque joueur
+/10 : TODO: Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires :
 
 IMPLANTÉE:
@@ -123,17 +123,23 @@ IMPLANTÉE:
      Commentaires :
 
 IMPLANTÉE:
-/5 : Demander si on veut sauvegarder avant de quitter/charger
+/5 : TODO: Demander si on veut sauvegarder avant de quitter/charger
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: Oui
 /5 : Fenêtre de bienvenue, avec explications du jeu et sélection d'options
      Commentaires :
 
 IMPLANTÉE:
 /30 : Implémenter toutes les règles offcielles d'une version du scrabble
-     Source: [À PRÉCISER]
+     Source: Fédération internationale de Scrabble francophone (https://www.fisf.net)
      Commentaires :
+     TODO: Règles à ajouter
+     - Gestion des jokers
+     - Un joueur qui pose 7 jetons en un seul tour a un bonus de 50 points (Scrabble!)
+     - Gestion du temps
+     - Un joueur qui se trompe dans un mot reprend ses lettres et passe son tour
+
 
 IMPLANTÉE:
 /30 : Jouer contre l'ordinateur en implémentant une intelligence artificielle
