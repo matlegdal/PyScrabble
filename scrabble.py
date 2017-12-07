@@ -196,7 +196,7 @@ class Scrabble(Tk):
         # Set les boutons d'actions
         btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.changer_jetons)
+        btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
         btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
@@ -204,11 +204,6 @@ class Scrabble(Tk):
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
-
-        # Set le sac à jetons
-        self.bottom_right = Frame(self.content)
-        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        # Label(sac_a_jetons, textvariable=self.flash).grid(row=0, column=0, columnspan=3)
 
 
     def dessiner_chevalet(self, master, joueur):
@@ -450,31 +445,69 @@ class Scrabble(Tk):
         Retire un joueur de la liste des joueurs
         :return: Aucun return
         """
-        # TODO: vérifier que le joueur n'a pas mis des jetons sur le plateau.
+        # Vérifie si le joueur a placé des jetons
+        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
+            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
+                                        "retirez vos jetons du plateau.\n"
+                                        "Sinon, sélectionnez 'Jouer un tour'")
+            return
+
         quitter = self.joueur_actif
         self.changer_joueur()
         self.joueurs.remove(quitter)
 
-    def changer_jetons(self):
+    def demander_jetons_a_changer(self):
         """
-        Change les jetons du joueur actif.
+        Interface graphique pour changer les jetons
         - unbinder la fonction prendre
         - afficher le sac a jeton et les boutons
         - binder la fonction jeter
         :return: Aucun return
         :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
         """
+        # Vérifie si le joueur a placé des jetons
+        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
+            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
+                                        "retirez vos jetons du plateau.\n"
+                                        "Sinon, sélectionnez 'Jouer un tour'")
+            return
 
         self.unbind_prendre()
 
+        self.bottom_right = Frame(self.content)
+        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
         self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
         self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-        Button(self.bottom_right, text="Confirmer").grid(row=3, column=0)
+        Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
         Button(self.bottom_right, text="Cancel").grid(row=3, column=1)
 
         self.bind_jeter()
-        # TODO: à compléter, on peut s'inspirer de l'ancienne méthode, mais il y a bcp à changer
+        # TODO: à compléter -> bouton cancel
+
+    def changer_jetons(self):
+        """
+        Change les jetons sélectionnés par le joueur.
+        - On tire de nouveaux jetons dans le sac à jetons
+        - On ajoute les jetons tirés au chevalet du joueur
+        - On retourne les jetons jetés par le joueur dans le sac à jetons
+        - unbind jeter_jeton et rebind prendre jeton
+        - effacer le frame pour changer les jetons
+        - On passe au joueur suivant
+        :return: Aucun return
+        """
+        jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
+        for jeton in jetons_a_ajouter:
+            self.joueur_actif.ajouter_jeton(jeton)
+
+        self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
+
+        self.unbind_jeter()
+        self.bind_prendre()
+        self.bottom_right.destroy()
+
+        self.changer_joueur()
+
 
     def changer_joueur(self):
         """
