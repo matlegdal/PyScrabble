@@ -130,7 +130,7 @@ class Plateau(Canvas):
         """
         Étant donnée une position, cette méthode permet de voir si au moins l'une de ses positions voisines est occupée.
         Les cases voisines sont les cases juste en haut, en bas, à gauche et à droite de la case concernée.
-        NB: Les cases voisines diagonales ne comptent pas.
+        NB: Les cases voisines diagonales ne comptent pas et les cases jouées lors du tour courant (représenté par Plateau.positions) ne comptent pas non plus
         :param position: tuple, position sous la forme (ligne, colonne)
         :return: True si au moins l'une des cases voisines est occupée, False si aucune case voisine n'est occupée.
         :exception: Levez une exception avec assert si le code de la position est invalide
@@ -159,15 +159,10 @@ class Plateau(Canvas):
         Étant données des positions où un utilisateur veut placer ses jetons, cette méthode permet de valider
         s'il peut réelement ajouter les jetons à ces positions.
         Les positions sont valides si:
-         - elles sont toutes vides;
          - elles sont toutes sur la même ligne ou la même colonne;
-         - une fois qu'elles seront placées sur une même ligne ou une même colonne, elles formeront un mot et pas plus
-            sur cette même ligne ou colonne. Ici, le mot formé n'est pas important du tout donc n'essayez pas de le trouver;
-            Par exemple, si toutes les positions sont sur la ligne 5, votre code doit juste s'assurer qu'entre les positions
-            où vous devez ajouter des jetons, des cases ne sont vides.
+         - une fois qu'elles sont placées sur une même ligne ou une même colonne, il n'y a pas de cases vides entre les cases occupées
          - si le plateau est vide, le centre du plateau doit être dans les positions;
-         - sinon, au moins une des positions doit être adjacente à une des cases occupées
-         du plateau (Pensez à réutilisez cases_adjacentes_occupees et case_est_vide).
+         - sinon, au moins une des positions doit être adjacente à une des cases occupées du plateau
         :param positions: list, Liste des positions sous forme de tuples (ligne, col)
         :return: True si les positions sont valides, rien sinon
         :exception: Des exceptions sont levés pour chaque type d'erreur
@@ -193,15 +188,17 @@ class Plateau(Canvas):
         # On vérifie qu'il n'y a pas de 'trous' dans les mots placés
         if meme_ligne:
             ligne, n, m = lignes[0], min(cols), max(cols)
-            if any([(not self.cases[ligne][i].est_vide()) for i in range(n, m + 1) if i not in cols]):
-                raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
-                #todo: corriger le bug -> ne fonctionne pas comme il devrait
-        elif meme_col:
-            col, n, m = cols[0], min(lignes), max(lignes)
-            if any([(not self.cases[i][col].est_vide()) for i in range(n, m + 1) if i not in lignes]):
+            au_moins_un_trou = any([self.cases[ligne][col].est_vide() for col in range(n, m + 1) if col not in cols])
+            if au_moins_un_trou:
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
 
-        return
+        elif meme_col:
+            col, n, m = cols[0], min(lignes), max(lignes)
+            au_moins_un_trou = any([self.cases[ligne][col].est_vide() for ligne in range(n, m + 1) if ligne not in lignes])
+            if au_moins_un_trou:
+                raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
+
+        return True
 
     def mots_score_obtenus(self, positions):
         """
