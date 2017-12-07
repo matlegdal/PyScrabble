@@ -283,32 +283,30 @@ class Scrabble(Tk):
             messagebox.showwarning(message=e)
             print(e) # TODO: améliorer la gestion des erreurs!
 
-
-    def reprendre_jeton(self, event):
+    def redeposer_jeton(self, event):
         """
-        Permet de reprendre un jeton déposé sur le plateau par le joueur.
-        - Retirer le jeton de la case
-        - Effacer le jeton du plateau
-        - Enlever la case et le jeton des listes cases_placees et jetons_places
-        - Binder redéposer
+        Gère l'évènement de redéposer le jeton actif dans le chevalet.
+        - Désactiver le event-handler de redeposer
+        - Ajouter le jeton au chevalet
+        - Dessiner le jeton
+        - Mettre le jeton_actif à None
+        :param event: Évènement du clic de la souris. Non-utilisé
+        :return: Aucun retour
         """
-        ligne, col, case = self.determiner_case(event)
-
-        # TODO: s'assurer que le joueur ne peut reprendre que les jetons placés au cours de son tour.
-        if self.joueur_actif.jeton_actif is None:
+        if self.joueur_actif.jeton_actif is not None:
             try:
-                jeton = case.retirer_jeton()
-                self.plateau.delete("jeton_{}_{}".format(ligne, col))
+                pos = self.joueur_actif.chevalet.index(None)
+                self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
 
-                self.plateau.jetons_places.remove(jeton)
-                self.joueur_actif.jeton_actif = jeton
-                self.plateau.positions.remove((ligne, col))
+                x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
 
-                self.bind_redeposer()
-                self.bind_poser()
-            except CaseVideException as e:
+                dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
+                self.joueur_actif.jeton_actif = None
+
+                self.unbind_redeposer()
+                self.unbind_poser()
+            except PositionChevaletException as e:
                 print(e)
-
 
     def prendre_jeton(self, event):
         """
@@ -337,6 +335,31 @@ class Scrabble(Tk):
                 print(e)
 
         # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop
+
+    def reprendre_jeton(self, event):
+        """
+        Permet de reprendre un jeton déposé sur le plateau par le joueur.
+        - Retirer le jeton de la case
+        - Effacer le jeton du plateau
+        - Enlever la case et le jeton des listes cases_placees et jetons_places
+        - Binder redéposer
+        """
+        ligne, col, case = self.determiner_case(event)
+
+        # TODO: s'assurer que le joueur ne peut reprendre que les jetons placés au cours de son tour.
+        if self.joueur_actif.jeton_actif is None:
+            try:
+                jeton = case.retirer_jeton()
+                self.plateau.delete("jeton_{}_{}".format(ligne, col))
+
+                self.plateau.jetons_places.remove(jeton)
+                self.joueur_actif.jeton_actif = jeton
+                self.plateau.positions.remove((ligne, col))
+
+                self.bind_redeposer()
+                self.bind_poser()
+            except CaseVideException as e:
+                print(e)
 
     def bind_poser(self):
         """
@@ -369,31 +392,6 @@ class Scrabble(Tk):
         et de redéposer un jeton ne soient déclenchés par le même clic de souris.
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
-
-    def redeposer_jeton(self, event):
-        """
-        Gère l'évènement de redéposer le jeton actif dans le chevalet.
-        - Désactiver le event-handler de redeposer
-        - Ajouter le jeton au chevalet
-        - Dessiner le jeton
-        - Mettre le jeton_actif à None
-        :param event: Évènement du clic de la souris. Non-utilisé
-        :return: Aucun retour
-        """
-        if self.joueur_actif.jeton_actif is not None:
-            try:
-                pos = self.joueur_actif.chevalet.index(None)
-                self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
-
-                x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-
-                dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
-                self.joueur_actif.jeton_actif = None
-
-                self.unbind_redeposer()
-                self.unbind_poser()
-            except PositionChevaletException as e:
-                print(e)
 
     def jouer_tour(self):
         """
@@ -480,30 +478,35 @@ class Scrabble(Tk):
         """
         Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
         La méthode vérifie aussi si la partie est terminée.
+        -
         :return: Aucun return
         """
+        # Vérification si la partie est terminée
         if self.partie_terminee():
             messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            return
             # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
 
+        # On passe au joueur suivant et on incrémente le tour de la partie
         self.joueur_suivant()
-
-        if self.plateau.tour == 0:
-            msg = "La partie va commencer avec le {}".format(self.joueur_actif.nom)
-        else:
-            msg = "C'est le tour de {}".format(self.joueur_actif.nom)
-
         self.plateau.tour += 1
 
+        # On détermine le message à afficher
+        if self.plateau.tour == 1:
+            msg = "Tour {}\nLa partie va commencer avec le {}".format(self.plateau.tour, self.joueur_actif.nom)
+        else:
+            msg = "Tour {}\nC'est le tour de {}".format(self.plateau.tour, self.joueur_actif.nom)
+
+        # On pige les jetons
+        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+            self.joueur_actif.ajouter_jeton(jeton)
+
+        # On update l'affichage
         self.message.set(msg)
         self.pointage.set(self.msg_points())
         self.nom_joueur.set(self.joueur_actif.nom)
-
-        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
-            self.joueur_actif.ajouter_jeton(jeton)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
-
 
     def quitter(self):
         """
