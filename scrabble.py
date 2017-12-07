@@ -208,6 +208,7 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
 
+        # TODO: ajouter une zone pour les messages d'erreur? ou alors sous forme de messagebox?
 
     def dessiner_chevalet(self, master, joueur):
         """

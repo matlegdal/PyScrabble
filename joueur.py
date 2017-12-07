@@ -155,18 +155,6 @@ class Joueur:
         """
         shuffle(self.__chevalet)
 
-    def __str__(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
-        Formatage du joueur. Cette méthode est appelée lorsque vous faites str(v) où v est un joueur.
-        :return: str représentant le joueur.
-        """
-        s = "{}\n".format(self.nom)
-        s += "Score: {}\n".format(self.points)
-        s += "            " + "".join(["{:<3s}".format(str(x)) if x else '  ' for x in self.__chevalet])
-        s += "\nChevalet: \_" + "__".join([chr(0x2080 + i + 1) for i in range(self.TAILLE_CHEVALET)]) + '_/\n'
-        return s
-
-
 
 # Tests
 if __name__ == '__main__':
