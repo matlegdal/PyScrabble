@@ -146,10 +146,7 @@ class Plateau(Canvas):
         voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION) and (0 <= j < Plateau.DIMENSION)]
 
         # On enlève les positions qui sont des cases qui ont été joués dans le tour courant
-        voisins_a_retirer = []
-        for (i,j) in voisins:
-            if (i,j) in self.positions:
-                voisins_a_retirer.append((i,j))
+        voisins_a_retirer = [(i,j) for (i,j) in voisins if (i,j) in self.positions]
         for voisin in voisins_a_retirer:
             voisins.remove(voisin)
 
@@ -175,8 +172,6 @@ class Plateau(Canvas):
         :return: True si les positions sont valides, rien sinon
         :exception: Des exceptions sont levés pour chaque type d'erreur
         """
-        positions_cp = self.positions
-
         # On mappe les positions en lignes et colonnes
         lignes, cols = zip(*positions)
         lignes, cols = list(set(lignes)), list(set(cols))
@@ -206,7 +201,6 @@ class Plateau(Canvas):
             if any([(not self.cases[i][col].est_vide()) for i in range(n, m + 1) if i not in lignes]):
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
 
-        assert positions_cp == self.positions == positions
         return
 
     def mots_score_obtenus(self, positions):
