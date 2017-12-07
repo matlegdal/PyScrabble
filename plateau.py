@@ -249,22 +249,26 @@ class Plateau(Canvas):
     #     ligne, col = Plateau.decode_position(position_code)
     #     return self.cases[ligne][col].retirer_jeton()
 
-    def cases_adjacentes_occupees(self, ligne, col):
+    def cases_adjacentes_occupees(self, position):
         """
         Étant donnée une position, cette méthode permet de voir si au moins l'une de ses positions voisines est occupée.
         Les cases voisines sont les cases juste en haut, en bas, à gauche et à droite de la case concernée.
         NB: Les cases voisines diagonales ne comptent pas.
-        :param ligne: int, index de la ligne
-        :param col: int, index de la colonne
+        :param position: tuple, position sous la forme (ligne, colonne)
         :return: True si au moins l'une des cases voisines est occupée, False si aucune case voisine n'est occupée.
         :exception: Levez une exception avec assert si le code de la position est invalide
         """
+        ligne, col = position
         if 0 > ligne >= self.DIMENSION or 0 > col >= self.DIMENSION:
             raise PositionInvalideException("La position de la case n'est pas valide.")
 
         voisins = [(ligne, col - 1), (ligne, col + 1), (ligne + 1, col), (ligne - 1, col)]
-        voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION)
-                   and (0 <= j < Plateau.DIMENSION)]
+        voisins = [(i, j) for i, j in voisins if (0 <= i < Plateau.DIMENSION) and (0 <= j < Plateau.DIMENSION)]
+
+        for (i,j) in voisins:
+            if (i,j) in self.positions:
+                voisins.remove((i,j))
+
         return any([not self.cases[i][j].est_vide() for (i, j) in voisins])
 
     # def cases_adjacentes_occupees(self, position_code):
@@ -286,7 +290,7 @@ class Plateau(Canvas):
     #                and (0 <= j < Plateau.DIMENSION)]
     #     return any([not self.cases[i][j].est_vide() for (i, j) in voisins])
 
-    def valider_positions_avant_ajout(self, positions):
+    def valider_positions(self, positions):
         """
         Étant données des positions où un utilisateur veut placer ses jetons, cette méthode permet de valider
         s'il peut réelement ajouter les jetons à ces positions.
@@ -301,40 +305,33 @@ class Plateau(Canvas):
          - sinon, au moins une des positions doit être adjacente à une des cases occupées
          du plateau (Pensez à réutilisez cases_adjacentes_occupees et case_est_vide).
         :param positions: list, Liste des positions sous forme de tuples (ligne, col)
-        :return: True si les positions sont valides, False sinon.
-        :exception: Levez une exception avec assert si le code d'une des positions est invalide.
+        :return: True si les positions sont valides, rien sinon
+        :exception: Des exceptions sont levés pour chaque type d'erreur
         """
 
         lignes, cols = zip(*positions)
         lignes, cols = list(set(lignes)), list(set(cols))
         meme_ligne, meme_col = len(lignes) == 1, len(cols) == 1
 
-        valide = True
-
         if not meme_ligne and not meme_col:
-            valide = False
             raise CasesNonEnLigneException('Les cases ne sont pas en ligne')
 
-        if self.est_vide() and (7, 7) not in positions:
-            valide = False
-            raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
-
-        if not any([self.cases_adjacentes_occupees(ligne, col) for ligne, col in zip(*positions)]):
-            valide = False
+        if self.est_vide():
+            if (7, 7) not in positions:
+                raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
+        elif not any([self.cases_adjacentes_occupees(pos) for pos in positions]):
             raise PasDeCasesAdjacentes("Au moins un des jetons placés doit être adjacent à un jeton du plateau.")
 
         if meme_ligne:
             ligne, n, m = lignes[0], min(cols), max(cols)
             if any([(not self.cases[ligne][i].est_vide()) for i in range(n, m + 1) if i not in cols]):
-                valide = False
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
         elif meme_col:
             col, n, m = cols[0], min(lignes), max(lignes)
             if any([(not self.cases[i][col].est_vide()) for i in range(n, m + 1) if i not in lignes]):
-                valide = False
                 raise CaseVideDansMot("Il ne doit pas y avoir de cases vides entre les lettres placées")
 
-        return valide
+        return True
 
     # def valider_positions_avant_ajout(self, positions_codes):
     #     """ *** Vous n'avez pas à coder cette méthode ***

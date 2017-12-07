@@ -55,6 +55,6 @@ class JetonValeurException(Exception):
     pass
 
 
-class AutreExeption(Exception):
+class AutreException(Exception):
     pass
 

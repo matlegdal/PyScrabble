@@ -197,7 +197,7 @@ class Scrabble(Tk):
         Label(tableau, textvariable=self.pointage).grid(row=1)
 
         # Set les boutons d'actions
-        btn_jouer = Button(affichage_joueur, text="Joueur le tour")
+        btn_jouer = Button(affichage_joueur, text="Joueur le tour", command=self.jouer_tour)
         btn_passer = Button(affichage_joueur, text="Passer le tour", command=self.changer_joueur)
         btn_changer = Button(affichage_joueur, text="Changer les jetons")
         btn_quitter = Button(affichage_joueur, text="Quitter la partie", command=self.quitter)
@@ -380,9 +380,28 @@ class Scrabble(Tk):
         """
         Permet à un joueur de jouer un tour. La fonction vérifie que les mots placés sont acceptés et met à jour les scores.
         Si les mots sont corrects, on change de joueur, sinon on retourne les jetons dans le chevalet et le joueur peut continuer à tenter des mots.
+        - Vérifier la validité des mots placés
+        - Calculer les mots et le score obtenus
+        - Ajouter les points au joueur
+        - Resetter les listes de positions et jetons placés
+        - changer de joueur
         :return: Aucun return
         """
-        # TODO: à compléter
+        try:
+            self.plateau.valider_positions(self.plateau.positions)
+        except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot) as e:
+            print(e)
+            # TODO: implanter la bonne exception -> retourner jetons
+
+        else:
+            mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
+
+            self.joueur_actif.ajouter_points(score)
+            self.plateau.positions = []
+            self.plateau.jetons_places = []
+
+            self.changer_joueur()
+
 
     def mot_permis(self, mot):
         """
