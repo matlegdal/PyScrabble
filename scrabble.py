@@ -40,7 +40,8 @@ class Scrabble(Tk):
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
         self.chevalet_actif = None
-        self.debut = True
+        # self.debut = True
+
 
 
         # Configure
@@ -408,8 +409,9 @@ class Scrabble(Tk):
         try:
             self.plateau.valider_positions(self.plateau.positions)
         except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot) as e:
+            messagebox.showwarning(message=e)
             print(e)
-            # TODO: implanter la bonne exception -> retourner jetons
+            # TODO: implanter la bonne exception -> retourner jetons ?
 
         else:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
@@ -486,11 +488,13 @@ class Scrabble(Tk):
 
         self.joueur_suivant()
 
-        if self.debut:
+        if self.plateau.tour == 0:
             msg = "La partie va commencer avec le {}".format(self.joueur_actif.nom)
-            self.debut = False
         else:
             msg = "C'est le tour de {}".format(self.joueur_actif.nom)
+
+        self.plateau.tour += 1
+
         self.message.set(msg)
         self.pointage.set(self.msg_points())
         self.nom_joueur.set(self.joueur_actif.nom)

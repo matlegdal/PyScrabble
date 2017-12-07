@@ -28,6 +28,7 @@ class Plateau(Canvas):
         self.pixels_par_case = pixels_par_case
         self.positions = []
         self.jetons_places = []
+        self.tour = 0
 
         self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
         for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
@@ -173,11 +174,12 @@ class Plateau(Canvas):
         if not meme_ligne and not meme_col:
             raise CasesNonEnLigneException('Les cases ne sont pas en ligne')
 
-        if self.est_vide():
+        if self.tour == 1:
             if (7, 7) not in positions:
                 raise CentreNonUtilise("Le centre doit être utilisé lors du premier tour")
-        elif not any([self.cases_adjacentes_occupees(pos) for pos in positions]):
-            raise PasDeCasesAdjacentes("Au moins un des jetons placés doit être adjacent à un jeton du plateau.")
+        else:
+            if not any([self.cases_adjacentes_occupees(pos) for pos in positions]):
+                raise PasDeCasesAdjacentes("Au moins un des jetons placés doit être adjacent à un jeton du plateau.")
 
         if meme_ligne:
             ligne, n, m = lignes[0], min(cols), max(cols)
