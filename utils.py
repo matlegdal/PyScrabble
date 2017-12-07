@@ -2,11 +2,17 @@ from tkinter import Canvas, CENTER
 from jeton import Jeton
 
 def coord_pos(pos, pixels_par_case):
-    assert 0 <= pos <= 6
-    assert pixels_par_case == 40
-
     x1 = pos * pixels_par_case
     y1 = 0
+    x2 = x1 + pixels_par_case
+    y2 = y1 + pixels_par_case
+    delta = int(pixels_par_case / 2)
+
+    return x1, y1, x2, y2, delta
+
+def coord_case(ligne, col, pixels_par_case):
+    x1 = col * pixels_par_case
+    y1 = ligne * pixels_par_case
     x2 = x1 + pixels_par_case
     y2 = y1 + pixels_par_case
     delta = int(pixels_par_case / 2)

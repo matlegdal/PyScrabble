@@ -35,6 +35,7 @@ class Joueur:
         self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
         self.jeton_actif = None
 
+
     @property
     def nb_a_tirer(self):
         """

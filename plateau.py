@@ -1,5 +1,5 @@
 from case import Case
-from utils import dessiner_jeton
+from utils import *
 from tkinter import Canvas, CENTER, Tk, NSEW
 from exception import *
 
@@ -71,7 +71,7 @@ class Plateau(Canvas):
         :param master: Fenêtre principale, de type Tk
         :param pixels_par_case: Taille des cases en pixels
         """
-        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION+10, width=pixels_par_case*Plateau.DIMENSION+10)
+        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
         self.pixels_par_case = pixels_par_case
 
@@ -102,13 +102,8 @@ class Plateau(Canvas):
 
         for ligne in range(Plateau.DIMENSION):
             for col in range(Plateau.DIMENSION):
-                x1 = ligne*self.pixels_par_case + 5
-                y1 = col*self.pixels_par_case + 5
-                x2 = x1 + self.pixels_par_case
-                y2 = y1 + self.pixels_par_case
-
+                x1, y1, x2, y2, delta = coord_case(ligne, col, self.pixels_par_case)
                 self.create_rectangle(x1, y1, x2, y2, fill=self.cases[ligne][col].code_couleur, tags="case")
-                delta = int(self.pixels_par_case/2)
 
                 if ligne == col and ligne == 7:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')

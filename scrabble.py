@@ -178,7 +178,7 @@ class Scrabble(Tk):
         # Set le plateau
         self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE)
         self.plateau.grid(row=0, column=0, rowspan=2, columnspan=1, sticky=NSEW)
-        self.plateau.tag_bind('case', '<Button-1>', self.click_case)
+        # self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
 
         # Set les joueurs
         affichage_joueur = Frame(self.content)
@@ -238,18 +238,32 @@ class Scrabble(Tk):
 
         return msg_points
 
-    def click_case(self, event):
+    def poser_jeton(self, event):
         """
         Event handler des cases du plateau.
-        - Ajouter le jeton actif à la case
-        - Dessiner le jeton
+        - Vérifier que la position est valide et que la case est vide.
+        - Placer le jeton dans la case
+        - Dessiner le jeton dans la case.
+        - Ajouter la case à la liste des positions à vérifier
+        - Ajouter le jeton à la liste des jetons placés
+        - Met jeton_actif à None
+        Attention: n'ajoute pas le jeton à la case! Cela sera gérer dans la fonction jouer_tour()
         """
         ligne = floor(event.y/self.plateau.pixels_par_case)
         col = floor(event.x/self.plateau.pixels_par_case)
-        if 0 <= ligne < self.plateau.DIMENSION and 0 <= ligne < self.plateau.DIMENSION:
-            print(event.x, event.y)
-            print(ligne, col)
-            print(self.plateau.cases[ligne][col])
+
+        if 0 > ligne >= self.plateau.DIMENSION or 0 > col >= self.plateau.DIMENSION:
+            raise PositionInvalideException("La position est invalide")
+
+        case = self.plateau.cases[ligne][col]
+        try:
+            case.placer_jeton(self.joueur_actif.jeton_actif)
+            x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
+            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, "jeton_place")
+            self.joueur_actif.jeton_actif = None
+        except (CaseOccupeeException, AssertionError) as e:
+            print(e)
+
 
         # TODO: à compléter
 
@@ -260,7 +274,8 @@ class Scrabble(Tk):
         - Retirer le jeton du chevalet
         - Met le jeton retiré dans la variable jeton_actif du joueur.
         - Retirer le visuel du jeton du chevalet_actif
-        - Activer le event handler pour redeposer le jeton
+        - Activer le event handler pour redeposer le jeton sur le chevalet
+        - Activer le event handler pour poser le jeton sur le plateau
         :param event: évènement du clic de la souris. Inclus la position en x,y sur le canevas.
         :return: Aucun retour
         """
@@ -273,7 +288,9 @@ class Scrabble(Tk):
                 assert self.joueur_actif.chevalet[pos] is None
 
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
+
                 self.after(500, self.bind_redeposer)
+                self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
@@ -303,8 +320,8 @@ class Scrabble(Tk):
         :param event: Évènement du clic de la souris. Non-utilisé
         :return: Aucun retour
         """
+        self.unbind_redeposer()
         if self.joueur_actif.jeton_actif is not None:
-            self.unbind_redeposer()
             try:
                 pos = self.joueur_actif.chevalet.index(None)
                 self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
