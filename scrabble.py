@@ -884,7 +884,7 @@ class Scrabble(Tk):
                 print(f) # le code est lu ici
 
         except:
-            print("echec") # et ici
+            print("echec") # et ici...
             return False
         return True
 
