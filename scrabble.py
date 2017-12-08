@@ -25,6 +25,8 @@ class Scrabble(Tk):
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
     PIXELS_PAR_CASE = 40
+    PADX = 10
+    PADY = 10
 
     def __init__(self):
         super().__init__()
@@ -85,7 +87,7 @@ class Scrabble(Tk):
         # message de bienvenue
         Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0, columnspan=4)
         # label de la langue
-        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, columnspan=4)
+        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, columnspan=4, pady=self.PADY)
 
         # Choix des langues
         langue = StringVar()
@@ -94,7 +96,7 @@ class Scrabble(Tk):
         Radiobutton(accueil, text='English', variable=langue, value='en').grid(column=2, row=2, columnspan=2, sticky=W)
 
         # Nombre des joueurs
-        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4)
+        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4, pady=self.PADY)
         nb_joueurs = IntVar()
         nb_joueurs.set(2)
         Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=4)
@@ -103,7 +105,8 @@ class Scrabble(Tk):
         Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
 
         # Débuter la partie
-        Button(accueil, text="Commencer la partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4)
+        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=2, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=5, column=2, columnspan=2, pady=self.PADY)
 
 
     def demarrer_partie(self, accueil, nb_joueurs, langue):
