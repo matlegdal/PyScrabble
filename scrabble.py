@@ -145,9 +145,9 @@ class Scrabble(Tk):
         Les dictionnaires sont dans le dossier dic et sont nommés par l'abbéviation à deux lettres de la langue du dictionnaire.
         Exemple: le chemin d'accès du dictionnaire français est 'dic/fr.txt' et celui du dictionnaire anglais est 'dic/en.txt'
         Ensuite il suffit d'extraire les mots contenus pour construire un set avec le mot clé set.
-        Aussi, grâce à la langue vous devez être capable de créer tous les data de départ et les mettre dans jetons_libres.
+        Aussi, grâce à la langue vous devez être capable de créer tous les jetons de départ et les mettre dans jetons_libres.
 
-        Pour savoir combien de data créés pour chaque langue vous pouvez regarder à l'adresse:
+        Pour savoir combien de jetons sont créés pour chaque langue vous pouvez regarder à l'adresse:
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
 
         :param difficulte: str, difficulté de la partie -> facile et difficile. Le mode difficile implémente les règles officielles du jeu de Scrabble
@@ -431,7 +431,7 @@ class Scrabble(Tk):
 
             # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
             if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
-                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos data!\nVous obtenez 50 points boni!')
+                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos jetons!\nVous obtenez 50 points boni!')
                 score += 50
         except MotNonPermisException as e:
             messagebox.showwarning(message=e)
@@ -687,7 +687,7 @@ class Scrabble(Tk):
         except AttributeError:
             pass
         finally:
-            self.timer = 5
+            self.timer = 60
             self.timer_label = Label(self.tableau, text='')
             self.timer_label.grid(row=3, column=1, pady=self.PADY)
             self.clock()
@@ -769,7 +769,9 @@ class Scrabble(Tk):
         try:
             with open(nom_fichier, "wb") as f:
                 pickle.dump(self.langue, f)
+                print(self.langue)
                 pickle.dump(self.joueurs, f)
+                print(self.joueurs)
                 pickle.dump(self.joueur_actif, f)
                 print(self.joueur_actif)
                 pickle.dump(self.jetons_libres, f)
@@ -784,7 +786,6 @@ class Scrabble(Tk):
                 print(self.plateau.jetons_places)
                 pickle.dump(self.difficulte, f)
                 print(self.difficulte)
-                f.close()
 
             self.fenetre_sauv.destroy()
 
@@ -800,27 +801,38 @@ class Scrabble(Tk):
         :return: Scrabble, l'objet chargé en mémoire.
         """
         with open(nom_fichier, "rb") as f:
-            self.langue = pickle.load(f)
-            print(self.langue)
-            self.joueurs = pickle.load(f)
-            print(self.joueurs)
-            self.joueur_actif = pickle.load(f)
-            print(self.joueur_actif)
-            self.jetons_libres = pickle.load(f)
-            print(self.jetons_libres)
-            print(pickle.load(f))
-            print(self.plateau.cases)
-            self.plateau.tour = pickle.load(f)
-            print(self.plateau.tour)
-            self.plateau.positions = pickle.load(f)
-            print(self.plateau.positions)
-            self.plateau.jetons_places = pickle.load(f)
-            print(self.plateau.jetons_places)
-            self.difficulte = pickle.load(f)
-            print(self.difficulte)
-            f.close()
+            langue = pickle.load(f)
+            print(langue)
+            joueurs = pickle.load(f)
+            print(joueurs)
+            joueur_actif = pickle.load(f)
+            print(joueur_actif)
+            jetons_libres = pickle.load(f)
+            print(jetons_libres)
+            cases = pickle.load(f)
+            print(cases)
+            tour = pickle.load(f)
+            print(tour)
+            positions = pickle.load(f)
+            print(positions)
+            jetons_places = pickle.load(f)
+            print(jetons_places)
+            difficulte = pickle.load(f)
+            print(difficulte)
 
-        self.demarrer_partie(self, nb_joueurs=len(self.joueurs), langue=self.langue, difficulte=self.difficulte)
+            assert cases is not None
+
+            self.langue = langue
+            self.joueurs = joueurs
+            self.joueur_actif = joueur_actif
+            self.jetons_libres = jetons_libres
+            self.plateau.cases = cases
+            self.plateau.tour = tour
+            self.plateau.positions = positions
+            self.plateau.jetons_places = jetons_places
+            self.difficulte = difficulte
+
+            self.demarrer_partie(nb_joueurs=len(self.joueurs), langue=self.langue, difficulte=self.difficulte)
 
     def demande_sauvegarder_partie(self):
 
@@ -831,7 +843,6 @@ class Scrabble(Tk):
         # print(self.nom_fichier)
         #
         # self.sauvegarder_partie(self.nom_fichier)
-
 
        self.fenetre_sauv = Toplevel(self)
        self.fenetre_sauv.title("Sauvegarder")
@@ -856,7 +867,7 @@ class Scrabble(Tk):
 
     def demander_charger_partie(self):
 
-        self.nom_fichier = filedialog.askopenfilename(initialdir="/", title="Sélectionnez un fichier",
+        self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
                                                       filetypes=(("all files", "*.*"),))
         print(self.nom_fichier)
         self.charger_partie(self.nom_fichier)
