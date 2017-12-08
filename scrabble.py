@@ -662,21 +662,40 @@ class Scrabble(Tk):
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
     def sauvegarder_partie(self, nom_fichier):
-        """ *** Vous n'avez pas à coder cette méthode ***
+        """
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
         La sauvegarde se fera grâce à la fonction dump du module pickle.
         :param nom_fichier: Nom du fichier qui contient un objet scrabble.
         :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
         """
+
+        # Note: ici la stratégie est de dumper les infos qui sont propres à la partie
+        # self.langue
+        # self.joueur_actif
+        # self.joueurs
+        # self.jetons_libres
+        # self.plateau.cases
+        # self.plateau.tour
+        # self.plateau.positions
+        # self.plateau.jetons_places
+
         try:
             with open(nom_fichier, "wb") as f:
-                pickle.dump(self, f)
-                print(f)  # le code est lu ici
+                pickle.dump(self.langue, f)
+                pickle.dump(self.joueurs, f)
+                pickle.dump(self.plateau.cases, f)
+            self.fenetre_sauv.destroy()
 
         except:
             print("echec")  # et ici...
             return False
-        return True
+
+        # ici éventuellement c'est à bouger dans charger évidemment -> je l'ai mis la pour accélerer les tests au début.
+        with open(nom_fichier, "rb") as f:
+            langue = pickle.load(f)
+            joueurs = pickle.load(f)
+            print(langue, joueurs)
+            print(joueurs[0].points)
 
     @staticmethod
     def charger_partie(nom_fichier):
@@ -688,38 +707,38 @@ class Scrabble(Tk):
         """
         with open(nom_fichier, "rb") as f:
             objet = pickle.load(f)
+            print(objet)
         return objet
 
     def demande_sauvegarder_partie(self):
 
         # Commentaire: pourquoi tu n'utilises pas le module tkFileDialog??
         # Ça va vrmt te simplifier la vie. cherches ça sur google et tu vas trouver. je t'ai envoyé un lien dans skype aussi!
-        self.nom_fichier = filedialog.asksaveasfile(initialdir="/", title="Sélectionnez un fichier",
-                                                    filetypes=(("all files", "*.*"),))
-        print(self.nom_fichier)
+        # self.nom_fichier = filedialog.asksaveasfilename(initialdir="/", title="Sélectionnez un fichier", filetypes=(("all files", "*.*"),))
+        # print(self.nom_fichier)
+        #
+        # self.sauvegarder_partie(self.nom_fichier)
 
-        self.sauvegarder_partie(self.nom_fichier)
+       self.fenetre_sauv = Toplevel(self)
+       self.fenetre_sauv.title("Sauvegarder")
+       cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
+       cadre_label_entry.grid(row=0)
 
-       # fenetre_sauv = Toplevel(self)
-       # fenetre_sauv.title("Sauvegarder")
-       # cadre_label_entry = Frame(fenetre_sauv, padx=10, pady=10)
-       # cadre_label_entry.grid(row=0)
-#
-       # label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-       # label_sauvegarde.grid(row=0)
-#
-       # nom_fichier =StringVar()
-#
-       # entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-       # entry_sauvegarde.grid(row=1)
-#
-       # cadre_btn = Frame(fenetre_sauv, padx=10, pady=10)
-       # cadre_btn.grid(row=1)
-       # btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-       #                 command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-       # btn_ok.grid(row=0, column=0)
-       # btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=fenetre_sauv.destroy)
-       # btn_cancel.grid(row=0, column=2)
+       label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
+       label_sauvegarde.grid(row=0)
+
+       nom_fichier =StringVar()
+
+       entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+       entry_sauvegarde.grid(row=1)
+
+       cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
+       cadre_btn.grid(row=1)
+       btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
+                       command=lambda: self.sauvegarder_partie(nom_fichier.get()))
+       btn_ok.grid(row=0, column=0)
+       btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
+       btn_cancel.grid(row=0, column=2)
 
     def demander_charger_partie(self):
 
