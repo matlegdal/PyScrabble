@@ -409,14 +409,19 @@ class Scrabble(Tk):
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
             mots_non_permis = [mot for mot in mots if not self.mot_permis(mot)]
 
+            # Si un mot non permis est présent
             if len(mots_non_permis) != 0:
+                msg = "Un ou plusieurs mots ne sont pas permis:\n"
+                for mot in mots_non_permis:
+                    msg = msg + "- " + mot + "\n"
+                # pour la version facile, on notifie le joueur des mots non permis et il peut continuer son tour
                 if self.difficulte == 'facile':
-                    msg = "Un ou plusieurs mots ne sont pas permis:\n"
-                    for mot in mots_non_permis:
-                        msg = msg + "- " + mot + "\n"
                     raise MotNonPermisException(msg)
+                # pour la version officielle (difficile), on reprend tous les jetons et le joueur passe son tour
                 else:
-                    pass #TODO: implémenter la version officielle
+                    self.reprendre_tous_les_jetons()
+                    self.passer_un_tour()
+                    raise MotNonPermisException(msg)
 
             # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
             if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
