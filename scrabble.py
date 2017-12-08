@@ -45,6 +45,7 @@ class Scrabble(Tk):
         self.message = StringVar()
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
+        self.timer = 120
         self.chevalet_actif = None
         self.affichage_joueur = None
 
@@ -59,7 +60,7 @@ class Scrabble(Tk):
         self.content.grid_columnconfigure(0, weight=2)
         self.content.grid_columnconfigure(1, weight=1)
         self.content.grid_rowconfigure(0, weight=1)
-        self.content.grid_rowconfigure(1, weight=2)
+        self.content.grid_rowconfigure(1, weight=1)
         self.content.grid_rowconfigure(2, weight=1)
 
         # Création du menu
@@ -185,13 +186,18 @@ class Scrabble(Tk):
 
         # Set le plateau
         self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE)
-        self.plateau.grid(row=0, column=0, rowspan=3, columnspan=1, sticky=NSEW)
+        self.plateau.grid(row=0, column=0, rowspan=4, columnspan=1, sticky=NSEW)
 
         # Set le tableau d'affichange
-        tableau = Frame(self.content)
-        tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
-        Label(tableau, textvariable=self.message).grid(row=0)
-        Label(tableau, textvariable=self.pointage).grid(row=1)
+        self.tableau = Frame(self.content)
+        self.tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
+        Label(self.tableau, textvariable=self.message).grid(row=0, columnspan=2)
+        Label(self.tableau, textvariable=self.pointage).grid(row=1, columnspan=2)
+
+        if self.difficulte == 'difficile':
+            Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
+            self.timer_label = Label(self.tableau, text='')
+            self.timer_label.grid(row=3, column=1, pady=self.PADY)
 
         # Set les joueurs
         self.affichage_joueur = Frame(self.content)
@@ -607,7 +613,7 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.bind_prendre()
-
+        self.demarrer_clock()
 
     def mot_permis(self, mot):
         """
@@ -673,6 +679,19 @@ class Scrabble(Tk):
 
         # On retourne les jetons tirés
         return jetons_tires
+
+    def demarrer_clock(self):
+        self.timer_label.destroy()
+        self.timer = 120
+        self.timer_label = Label(self.tableau, text='')
+        self.timer_label.grid(row=3, column=1, pady=self.PADY)
+        self.clock()
+
+
+    def clock(self):
+        self.timer -= 1
+        self.timer_label['text'] = self.timer
+        self.timer_label.after(1000, self.clock)
 
     def bind_poser(self):
         """
