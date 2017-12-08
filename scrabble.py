@@ -450,15 +450,16 @@ class Scrabble(Tk):
         - "vider" jeton_actif, positions et jetons placés et binder prendre un jeton
         :return: aucun
         """
-        for (ligne, col) in self.plateau.positions:
-            # Retirer le jeton du plateau
-            jeton_retire = self.plateau.cases[ligne][col].retirer_jeton()
-            self.plateau.delete("jeton_{}_{}".format(ligne, col))
-            # Ajouter le jeton au chevalet
-            pos = self.joueur_actif.chevalet.index(None)
-            self.joueur_actif.ajouter_jeton(jeton_retire, pos)
-            x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, jeton_retire, ('chevalet', 'chevalet{}'.format(pos)))
+        if len(self.plateau.positions) > 0:
+            for (ligne, col) in self.plateau.positions:
+                # Retirer le jeton du plateau
+                jeton_retire = self.plateau.cases[ligne][col].retirer_jeton()
+                self.plateau.delete("jeton_{}_{}".format(ligne, col))
+                # Ajouter le jeton au chevalet
+                pos = self.joueur_actif.chevalet.index(None)
+                self.joueur_actif.ajouter_jeton(jeton_retire, pos)
+                x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+                dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, jeton_retire, ('chevalet', 'chevalet{}'.format(pos)))
 
         # Ajouter le jeton actif au chevalet
         if self.joueur_actif.jeton_actif is not None:
@@ -681,17 +682,27 @@ class Scrabble(Tk):
         return jetons_tires
 
     def demarrer_clock(self):
-        self.timer_label.destroy()
-        self.timer = 120
-        self.timer_label = Label(self.tableau, text='')
-        self.timer_label.grid(row=3, column=1, pady=self.PADY)
-        self.clock()
-
+        try:
+            self.timer_label.destroy()
+        except AttributeError:
+            pass
+        finally:
+            self.timer = 5
+            self.timer_label = Label(self.tableau, text='')
+            self.timer_label.grid(row=3, column=1, pady=self.PADY)
+            self.clock()
 
     def clock(self):
         self.timer -= 1
+        if self.timer == 0:
+            self.temps_ecoule()
         self.timer_label['text'] = self.timer
         self.timer_label.after(1000, self.clock)
+
+    def temps_ecoule(self):
+        messagebox.showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
+        self.reprendre_tous_les_jetons()
+        self.changer_joueur()
 
     def bind_poser(self):
         """
