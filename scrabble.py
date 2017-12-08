@@ -9,6 +9,7 @@ from tkinter import messagebox
 from exception import *
 from math import floor
 from tkinter import Toplevel
+from tkinter import filedialog
 
 class Scrabble(Tk):
     """
@@ -61,7 +62,7 @@ class Scrabble(Tk):
         fichier = Menu(barre_menu, tearoff=0)
         fichier.add_command(label="Nouvelle partie", command=Scrabble)
         fichier.add_command(label="Sauvegarder la partie", command=self.demande_sauvegarder_partie)  # TODO: state active quand une partie est en cours
-        fichier.add_command(label="Charger une partie", state=DISABLED)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
+        fichier.add_command(label="Charger une partie", command=self.demander_charger_partie)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
         fichier.add_command(label="Quitter", command=self.quit)
         barre_menu.add_cascade(label="Fichier", menu=fichier)
@@ -878,27 +879,14 @@ class Scrabble(Tk):
         :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
         """
         try:
-            f = open(nom_fichier, 'w')
-            f.write("{}\n{}\n{}\n{}".format(nom_fichier,Plateau.positions, Plateau.jetons_places))
-            f.close()
-            print("succes")
+            with open(nom_fichier, "wb") as f:
+                pickle.dump(self, f)
+                print(f)
+
         except:
-            print('echec')
-
-        #todo: faire fonctionner ca
-       #  commentaire: es-tu sûr que pickle ne fonctionne pas? pcq si tu veux parser les infos de tous les objets ça va être l'enfer!! vrmt vrmt plus de travail requis!!!
-       #  considérant le nb de points, c'est presqu'assuré qu'on doit juste modifier légèrement la fonction originale
-       #  note -> la var positions n'est pas statique! si tu veux y référer tu dois utiliser self.plateau.positions (différence entre une variable de classe et une var d'instance)
-
-       #try:
-       #    with open(nom_fichier, "wb") as f:
-       #        pickle.dump(self, f)
-       #    print(nom_fichier)
-
-       #except:
-       #    print("echec")
-       #    return False
-       #return True
+            print("echec")
+            return False
+        return True
 
     @staticmethod
     def charger_partie(nom_fichier):
@@ -916,30 +904,39 @@ class Scrabble(Tk):
 
         # Commentaire: pourquoi tu n'utilises pas le module tkFileDialog??
         # Ça va vrmt te simplifier la vie. cherches ça sur google et tu vas trouver. je t'ai envoyé un lien dans skype aussi!
+        self.nom_fichier = filedialog.asksaveasfile(initialdir="/", title="Sélectionnez un fichier",
+                                                    filetypes=(("all files", "*.*"),))
+        print(self.nom_fichier)
 
-        fenetre_sauv = Toplevel(self)
-        fenetre_sauv.title("Sauvegarder")
-        cadre_label_entry = Frame(fenetre_sauv, padx=10, pady=10)
-        cadre_label_entry.grid(row=0)
+        self.sauvegarder_partie(self.nom_fichier)
 
-        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-        label_sauvegarde.grid(row=0)
+       # fenetre_sauv = Toplevel(self)
+       # fenetre_sauv.title("Sauvegarder")
+       # cadre_label_entry = Frame(fenetre_sauv, padx=10, pady=10)
+       # cadre_label_entry.grid(row=0)
+#
+       # label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
+       # label_sauvegarde.grid(row=0)
+#
+       # nom_fichier =StringVar()
+#
+       # entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+       # entry_sauvegarde.grid(row=1)
+#
+       # cadre_btn = Frame(fenetre_sauv, padx=10, pady=10)
+       # cadre_btn.grid(row=1)
+       # btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
+       #                 command=lambda: self.sauvegarder_partie(nom_fichier.get()))
+       # btn_ok.grid(row=0, column=0)
+       # btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=fenetre_sauv.destroy)
+       # btn_cancel.grid(row=0, column=2)
 
-        nom_fichier =StringVar()
+    def demander_charger_partie(self):
 
-        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-        entry_sauvegarde.grid(row=1)
-
-        cadre_btn = Frame(fenetre_sauv, padx=10, pady=10)
-        cadre_btn.grid(row=1)
-        btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-                        command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-        btn_ok.grid(row=0, column=0)
-        btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=fenetre_sauv.destroy)
-        btn_cancel.grid(row=0, column=2)
-
-
-
+        self.nom_fichier = filedialog.askopenfilename(initialdir="/", title="Sélectionnez un fichier",
+                                                      filetypes=(("all files", "*.*"),))
+        print(self.nom_fichier)
+        self.charger_partie(self.nom_fichier)
 
 # if __name__ == '__main__':
 #
