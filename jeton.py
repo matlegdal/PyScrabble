@@ -1,5 +1,3 @@
-from exception import *
-
 
 class Jeton:
     """
@@ -7,7 +5,7 @@ class Jeton:
 
     Les attributs d'un jeton sont:
     - lettre: str, représentant la lettre écrite sur le jeton. Par convention toutes les lettres au scrabble sont en majuscules.
-                Dans ce travail nous ne considérons pas les jetons jokers qui n'ont aucune lettre inscrite.
+                Dans ce travail nous ne considérons pas les data jokers qui n'ont aucune lettre inscrite.
     - valeur: int, compris entre 0 et 20 inclusivement et représentant le nombre de points associé au jeton.
     """
     def __init__(self, lettre, valeur):
@@ -18,16 +16,8 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-
-        # ICI c'est une vérification interne, donc utiliser un assert est plus appropriée
-        # les exceptions c'est vraiment quand on veut afficher un message à l'utilisateur..
-        # dans le cas des jetons, qui instancie et donne les valeurs des jetons??
-        # c'est la classe Scrabble!
-        # Todo: changer pour des asserts
-        if not 0 <= valeur <= 20:
-            raise JetonValeurException("La valeur est inférieur à 0 ou supérieure à 20.")
-        if len(lettre) != 1 and not lettre.isupper() and not lettre.isalpha():
-            raise JetonLettreException("Lettre incorrecte.")
+        assert len(lettre) == 1 and lettre.isupper() and lettre.isalpha()
+        assert 0 <= valeur <=20
 
         self.lettre = lettre
         self.valeur = valeur

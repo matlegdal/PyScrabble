@@ -6,12 +6,12 @@ class Joueur:
     Cette classe permet de représenter un joueur.
 
     La classe joueur possède une variable de classe:
-    - TAILLE_CHEVALET : le nombre de jetons maximum qu'un joueur peut avoir.
+    - TAILLE_CHEVALET : le nombre de data maximum qu'un joueur peut avoir.
 
     Un joueur a 3 attributs:
     - nom (str, public): représente le nom du joueur doit être non vide.
     - __points (entier, privé): représente le nombre de points que le joueur détient.
-    - __chevalet (list, privé): représente le chevalet (l'ensemble des jetons du joueur) du joueur.
+    - __chevalet (list, privé): représente le chevalet (l'ensemble des data du joueur) du joueur.
             Cette liste devrait être en tout temps de taille Joueur.TAILLE_CHEVALET.
             À chaque position du chevalier on peut avoir un jeton ou pas.
             Une position libre devra contenir None. Autrement elle devrait avoir un objet Jeton à cette position.
@@ -58,7 +58,7 @@ class Joueur:
     def chevalet(self):
         """
         Méthode permettant d'obtenir le chevalet du joueur
-        :return: (List) Liste des jetons du joueur
+        :return: (List) Liste des data du joueur
         """
         return self.__chevalet
 
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     assert not joueur.position_est_valide(7)
     assert joueur.position_est_vide(0)
 
-    # valide l'ajout de jetons
+    # valide l'ajout de data
     joueur.ajouter_jeton('jeton1')
     assert not joueur.position_est_vide(0) and joueur.nb_a_tirer == 6
     joueur.ajouter_jeton('jeton2', 3)
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     #     joueur.ajouter_jeton('jeton')
     # joueur.ajouter_jeton('jeton') nous donne une assertion error
 
-    # valide le retrait de jetons
+    # valide le retrait de data
     jet = joueur.retirer_jeton(3)
     assert joueur.position_est_vide(3) and joueur.nb_a_tirer == 6
     assert jet == 'jeton2'
