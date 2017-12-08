@@ -770,22 +770,29 @@ class Scrabble(Tk):
             with open(nom_fichier, "wb") as f:
                 pickle.dump(self.langue, f)
                 pickle.dump(self.joueurs, f)
+                pickle.dump(self.joueur_actif, f)
+                print(self.joueur_actif)
+                pickle.dump(self.jetons_libres, f)
+                print(self.jetons_libres)
                 pickle.dump(self.plateau.cases, f)
+                print(self.plateau.cases)
+                pickle.dump(self.plateau.tour, f)
+                print(self.plateau.tour)
+                pickle.dump(self.plateau.positions, f)
+                print(self.plateau.positions)
+                pickle.dump(self.plateau.jetons_places, f)
+                print(self.plateau.jetons_places)
+                pickle.dump(self.difficulte, f)
+                print(self.difficulte)
+                f.close()
+
             self.fenetre_sauv.destroy()
 
         except:
-            print("echec")  # et ici...
+            print("echec")
             return False
 
-        # ici éventuellement c'est à bouger dans charger évidemment -> je l'ai mis la pour accélerer les tests au début.
-        with open(nom_fichier, "rb") as f:
-            langue = pickle.load(f)
-            joueurs = pickle.load(f)
-            print(langue, joueurs)
-            print(joueurs[0].points)
-
-    @staticmethod
-    def charger_partie(nom_fichier):
+    def charger_partie(self, nom_fichier):
         """ *** Vous n'avez pas à coder cette méthode ***
         Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
         lequel l'objet avait été sauvegardé précédemment. Pensez à utiliser la fonction load du module pickle.
@@ -793,9 +800,27 @@ class Scrabble(Tk):
         :return: Scrabble, l'objet chargé en mémoire.
         """
         with open(nom_fichier, "rb") as f:
-            objet = pickle.load(f)
-            print(objet)
-        return objet
+            self.langue = pickle.load(f)
+            print(self.langue)
+            self.joueurs = pickle.load(f)
+            print(self.joueurs)
+            self.joueur_actif = pickle.load(f)
+            print(self.joueur_actif)
+            self.jetons_libres = pickle.load(f)
+            print(self.jetons_libres)
+            print(pickle.load(f))
+            print(self.plateau.cases)
+            self.plateau.tour = pickle.load(f)
+            print(self.plateau.tour)
+            self.plateau.positions = pickle.load(f)
+            print(self.plateau.positions)
+            self.plateau.jetons_places = pickle.load(f)
+            print(self.plateau.jetons_places)
+            self.difficulte = pickle.load(f)
+            print(self.difficulte)
+            f.close()
+
+        self.demarrer_partie(self, nb_joueurs=len(self.joueurs), langue=self.langue, difficulte=self.difficulte)
 
     def demande_sauvegarder_partie(self):
 
