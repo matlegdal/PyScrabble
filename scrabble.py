@@ -149,6 +149,7 @@ class Scrabble(Tk):
         Pour savoir combien de data créés pour chaque langue vous pouvez regarder à l'adresse:
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
 
+        :param difficulte: str, difficulté de la partie -> facile et difficile. Le mode difficile implémente les règles officielles du jeu de Scrabble
         :exception: Levez une exception avec assert si la langue n'est ni fr ou en ou si nb_joueur < 2 ou > 4.
         """
         assert 2 <= nb_joueurs <= 4
@@ -201,12 +202,14 @@ class Scrabble(Tk):
 
         # Set les boutons d'actions
         btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
+        btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
         btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
         btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
-        btn_jouer.grid(row=2, column=0, columnspan=4, sticky=NSEW, pady=30)
+        btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
+        btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
@@ -405,11 +408,16 @@ class Scrabble(Tk):
         try:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
             mots_non_permis = [mot for mot in mots if not self.mot_permis(mot)]
+
             if len(mots_non_permis) != 0:
-                msg = "Un ou plusieurs mots ne sont pas permis:\n"
-                for mot in mots_non_permis:
-                    msg = msg + "- " + mot + "\n"
-                raise MotNonPermisException(msg)
+                if self.difficulte == 'facile':
+                    msg = "Un ou plusieurs mots ne sont pas permis:\n"
+                    for mot in mots_non_permis:
+                        msg = msg + "- " + mot + "\n"
+                    raise MotNonPermisException(msg)
+                else:
+                    pass #TODO: implémenter la version officielle
+
             # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
             if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
                 messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos data!\nVous obtenez 50 points boni!')
@@ -422,6 +430,37 @@ class Scrabble(Tk):
         self.plateau.positions = []
         self.plateau.jetons_places = []
         self.changer_joueur()
+
+    def reprendre_tous_les_jetons(self):
+        """
+        - retirer les jetons du plateau et effacer la représentation graphique des jetons
+        - ajouter les jetons au chevalet du joueur et dessiner les jetons sur le chevalet
+        - vérifier s'il y a un jeton actif et le replacer aussi
+        - "vider" jeton_actif, positions et jetons placés et binder prendre un jeton
+        :return: aucun
+        """
+        for (ligne, col) in self.plateau.positions:
+            # Retirer le jeton du plateau
+            jeton_retire = self.plateau.cases[ligne][col].retirer_jeton()
+            self.plateau.delete("jeton_{}_{}".format(ligne, col))
+            # Ajouter le jeton au chevalet
+            pos = self.joueur_actif.chevalet.index(None)
+            self.joueur_actif.ajouter_jeton(jeton_retire, pos)
+            x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, jeton_retire, ('chevalet', 'chevalet{}'.format(pos)))
+
+        # Ajouter le jeton actif au chevalet
+        if self.joueur_actif.jeton_actif is not None:
+            pos = self.joueur_actif.chevalet.index(None)
+            self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
+            x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
+            self.joueur_actif.jeton_actif = None
+
+        # réinitialiser les valeurs
+        self.plateau.positions = []
+        self.plateau.jetons_places = []
+        self.bind_prendre()
 
     def passer_un_tour(self):
         """
