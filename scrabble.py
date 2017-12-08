@@ -105,8 +105,8 @@ class Scrabble(Tk):
         Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
 
         # Débuter la partie
-        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=2, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=5, column=2, columnspan=2, pady=self.PADY)
+        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=6, column=0, columnspan=4, pady=self.PADY)
 
 
     def demarrer_partie(self, accueil, nb_joueurs, langue):
@@ -715,12 +715,14 @@ class Scrabble(Tk):
 
     def demande_sauvegarder_partie(self):
 
-        # Commentaire: pourquoi tu n'utilises pas le module tkFileDialog??
-        # Ça va vrmt te simplifier la vie. cherches ça sur google et tu vas trouver. je t'ai envoyé un lien dans skype aussi!
+        # Commentaire: ici on peut utiliser la méthode simple et juste y aller avec ta 1ere méthode
+        # sinon on peut y aller avec la méthode compliquée et utiliser sys.platform du module sys pour déterminer l'OS et proposer la bonne méthode à chaque.
+
         # self.nom_fichier = filedialog.asksaveasfilename(initialdir="/", title="Sélectionnez un fichier", filetypes=(("all files", "*.*"),))
         # print(self.nom_fichier)
         #
         # self.sauvegarder_partie(self.nom_fichier)
+
 
        self.fenetre_sauv = Toplevel(self)
        self.fenetre_sauv.title("Sauvegarder")
