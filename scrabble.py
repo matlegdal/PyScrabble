@@ -25,6 +25,7 @@ class Scrabble(Tk):
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
     PIXELS_PAR_CASE = 40
+
     PADX = 10
     PADY = 10
 
@@ -33,7 +34,8 @@ class Scrabble(Tk):
 
         # Declare parameters
         self.liste_langue = ['fr', 'en']
-        self.langue='fr'    # La langue par défaut est le français.
+        self.langue='fr'
+        self.difficulte = 'facile'
         self.title("Scrabble")
         self.plateau = None
         self.joueur_actif = None
@@ -85,31 +87,38 @@ class Scrabble(Tk):
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 
         # message de bienvenue
-        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0, columnspan=4)
+        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0, columnspan=5)
         # label de la langue
-        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, columnspan=4, pady=self.PADY)
+        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
 
         # Choix des langues
         langue = StringVar()
         langue.set('fr')
-        Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(column=0, row=2, columnspan=2, sticky=E)
-        Radiobutton(accueil, text='English', variable=langue, value='en').grid(column=2, row=2, columnspan=2, sticky=W)
+        Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(row=1, column=1, sticky=W, pady=self.PADY)
+        Radiobutton(accueil, text='English', variable=langue, value='en').grid(row=1, column=2, sticky=W, pady=self.PADY)
 
         # Nombre des joueurs
-        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4, pady=self.PADY)
+        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=2, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
         nb_joueurs = IntVar()
         nb_joueurs.set(2)
-        Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(column=0, row=4)
-        Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(column=1, row=4)
-        Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(column=2, row=4)
-        Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(column=3, row=4)
+        Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(row=2, column=1, sticky=W, pady=self.PADY)
+        Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(row=2, column=2, sticky=W, pady=self.PADY)
+        Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(row=2, column=3, sticky=W, pady=self.PADY)
+        Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2, column=4, sticky=W, pady=self.PADY)
+
+        # Difficulté
+        Label(accueil, text="Choisissez la difficulté:", font=("Times", 16)).grid(row=3, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
+        difficulte = StringVar()
+        difficulte.set('facile')
+        Radiobutton(accueil, text='Facile', variable=difficulte, value='facile').grid(row=3, column=1, sticky=W)
+        Radiobutton(accueil, text='Règles officielles', variable=difficulte, value='difficile').grid(row=3, column=2, sticky=W)
 
         # Débuter la partie
-        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get())).grid(row=5, column=0, columnspan=4, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=6, column=0, columnspan=4, pady=self.PADY)
+        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
 
 
-    def demarrer_partie(self, accueil, nb_joueurs, langue):
+    def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
         Démarre une partie en détruisant la page d'accueil, initialisant la partie et passe le contrôle à jouer().
         :param accueil: (Frame) Page d'accueil
@@ -118,12 +127,12 @@ class Scrabble(Tk):
         :return: aucun return
         """
         accueil.destroy()
-        self.initialiser_partie(nb_joueurs, langue)
+        self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
 
 
-    def initialiser_partie(self, nb_joueurs, langue):
+    def initialiser_partie(self, nb_joueurs, langue, difficulte):
         """
         - La liste des joueurs est créée et chaque joueur porte automatiquement le nom Joueur 1, Joueur 2, ... Joueur n où n est le nombre de joueurs;
         - Le sac à jetons (self.jetons_libres) est créé
@@ -146,6 +155,7 @@ class Scrabble(Tk):
         assert langue.lower() in self.liste_langue
         self.langue = langue.lower()
         self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
+        self.difficulte = difficulte
 
         with open('data/{}.txt'.format(self.langue), 'r') as data:
             self.jetons_libres = []
