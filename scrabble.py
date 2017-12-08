@@ -30,7 +30,8 @@ class Scrabble(Tk):
         super().__init__()
 
         # Declare parameters
-        self.liste_langue = ['FR', 'EN']
+        self.liste_langue = ['fr', 'en']
+        self.langue='fr'    # La langue par défaut est le français.
         self.title("Scrabble")
         self.plateau = None
         self.joueur_actif = None
@@ -88,9 +89,9 @@ class Scrabble(Tk):
 
         # Choix des langues
         langue = StringVar()
-        langue.set('FR')
-        Radiobutton(accueil, text='Français', variable=langue, value='FR').grid(column=0, row=2, columnspan=2, sticky=E)
-        Radiobutton(accueil, text='English', variable=langue, value='EN').grid(column=2, row=2, columnspan=2, sticky=W)
+        langue.set('fr')
+        Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(column=0, row=2, columnspan=2, sticky=E)
+        Radiobutton(accueil, text='English', variable=langue, value='en').grid(column=2, row=2, columnspan=2, sticky=W)
 
         # Nombre des joueurs
         Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4)
@@ -126,43 +127,35 @@ class Scrabble(Tk):
         - Le dictionnaire est ouvert
 
         :param nb_joueurs: int, nombre de joueurs de la partie au minimun 2 au maximum 4.
-        :param langue: str, FR pour la langue française, et EN pour la langue anglaise. Dépendamment de la langue, vous devez ouvrir, lire, charger en mémoire le fichier "dictionnaire_francais.txt" ou "dictionnaire_anglais.txt" ensuite il faudra ensuite extraire les mots contenus pour construire un set avec le mot clé set.
-        Aussi, grâce à la langue vous devez être capable de créer tous les jetons de départ et les mettre dans jetons_libres.
-        Pour savoir combien de jetons créés pour chaque langue vous pouvez regarder à l'adresse:
+        :param langue: str, abbréviation à 2 lettres de la langue
+        Dépendamment de la langue, on doit ouvrir, lire, charger en mémoire le bon dictionnaire.
+        Les dictionnaires sont dans le dossier dic et sont nommés par l'abbéviation à deux lettres de la langue du dictionnaire.
+        Exemple: le chemin d'accès du dictionnaire français est 'dic/fr.txt' et celui du dictionnaire anglais est 'dic/en.txt'
+        Ensuite il suffit d'extraire les mots contenus pour construire un set avec le mot clé set.
+        Aussi, grâce à la langue vous devez être capable de créer tous les data de départ et les mettre dans jetons_libres.
+
+        Pour savoir combien de data créés pour chaque langue vous pouvez regarder à l'adresse:
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-        *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
-        :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
+
+        :exception: Levez une exception avec assert si la langue n'est ni fr ou en ou si nb_joueur < 2 ou > 4.
         """
         assert 2 <= nb_joueurs <= 4
-        assert langue.upper() in self.liste_langue
-
+        assert langue.lower() in self.liste_langue
+        self.langue = langue.lower()
         self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
 
-        if langue.upper() == 'FR':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
-                    ('R', 6, 1), ('S', 6, 1), ('T', 6, 1), ('U', 6, 1), ('L', 5, 1),
-                    ('D', 3, 2), ('M', 3, 2), ('G', 2, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 8), ('K', 1, 10), ('W', 1, 10), ('X', 1, 10), ('Y', 1, 10),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_francais.txt'
-        elif langue.upper() == 'EN':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 12, 1), ('A', 9, 1), ('I', 9, 1), ('N', 6, 1), ('O', 8, 1),
-                    ('R', 6, 1), ('S', 4, 1), ('T', 6, 1), ('U', 4, 1), ('L', 4, 1),
-                    ('D', 4, 2), ('M', 2, 3), ('G', 3, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
+        with open('data/{}.txt'.format(self.langue), 'r') as data:
+            self.jetons_libres = []
+            for line in data.readlines():
+                temp = line.split(',')
+                lettre = str(temp[0])
+                occurences = int(temp[1])
+                valeur = int(temp[2])
+                for _ in range(occurences):
+                    self.jetons_libres.append(Jeton(lettre, valeur))
 
-        # TODO: refactor -> mettre les jetons (data) dans des fichiers à part (pour pouvoir ajouter des langues facilement)
-
-        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
-        with open(nom_fichier_dictionnaire, 'r') as f:
-            self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
-
+        with open('dic/{}.txt'.format(self.langue), 'r') as dic:
+            self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
 
 
     def jouer(self):
@@ -323,15 +316,10 @@ class Scrabble(Tk):
 
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
 
-                # self.chevalet_actif.move()
-                # self.drag(event, self.joueur_actif.jeton_actif)
-
                 self.after(500, self.bind_redeposer)
                 self.bind_poser()
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
-
-        # TODO: à compléter -> ajouter l'image du jeton qui suit la souris genre drag-drop -> fucking compliqué! laissons tomber, surtout pour 5 points supp...
 
     def jeter_jeton(self, event):
         pos = floor(event.x / self.PIXELS_PAR_CASE)
@@ -341,12 +329,6 @@ class Scrabble(Tk):
         x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
         dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
         self.chevalet_actif.delete('chevalet{}'.format(pos))
-
-
-    # def drag(self, event, jeton):
-    #     # jeton_drag = DragJeton(self, self.PIXELS_PAR_CASE, jeton, event)
-    #     # jeton_drag.start_drag()
-    #     dnd_start()
 
     def reprendre_jeton(self, event):
         """
@@ -415,6 +397,10 @@ class Scrabble(Tk):
                 for mot in mots_non_permis:
                     msg = msg + "- " + mot + "\n"
                 raise MotNonPermisException(msg)
+            # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
+            if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
+                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos data!\nVous obtenez 50 points boni!')
+                score += 50
         except MotNonPermisException as e:
             messagebox.showwarning(message=e)
             return
@@ -675,202 +661,6 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    # def demander_positions(self):
-    #     """ *** Vous n'avez pas à coder cette méthode ***
-    #     Demande à l'utilisateur d'entrer les positions sur le chevalet et le plateau
-    #     pour jouer son coup.
-    #     Si les positions entrées sont valides, on retourne les listes de ces positions. On doit
-    #     redemander tant que l'utilisateur ne donne pas des positions valides.
-    #     Valide ici veut dire uniquement dans les limites donc pensez à utilisez valider_positions_avant_ajout et Joueur.position_est_valide.
-    #
-    #     :return: tuple (int list, str list): Deux listes, la première contient les positions du chevalet (plus précisement il s'agit des indexes de ces positions) et l'autre liste contient les positions codées du plateau.
-    #     """
-    #     # Cette méthode devrait être décomposée en 2 méthodes: demander_positions_chevalet() et demander_positions_cases()
-    #     # En effet une méthode devrait faire une seule chose, pas deux comme c'est le cas ici.
-    #     valide = False
-    #     while not valide:
-    #         input_pos_chevalet = input("Entrez les positions du chevalet à jouer séparées par un espace: ").upper().strip()
-    #         pos_chevalet = [int(x) - 1 for x in input_pos_chevalet.split(' ')]
-    #         valide = all([Joueur.position_est_valide(pos) for pos in pos_chevalet])
-    #
-    #     valide = False
-    #     while not valide:
-    #         input_pos_plateau = input("Entrez les cases de chacune de ces lettres séparées par un espace: ").upper().strip()
-    #         pos_plateau = input_pos_plateau.split(' ')
-    #
-    #         if len(pos_chevalet) != len(pos_plateau):
-    #             print("Les nombres de jetons et de positions ne sont pas les mêmes.")
-    #             valide = False
-    #         else:
-    #             # Nous avons refactorée cette partie pour pouvoir afficher un message d'erreur plutôt que juste re-prompter le joueur sans rien dire.
-    #             # ligne originale:
-    #             # valide = self.plateau.valider_positions_avant_ajout(pos_plateau)
-    #             if self.plateau.valider_positions_avant_ajout(pos_plateau):
-    #                 valide = True
-    #             else:
-    #                 print("""Les cases spécifiées ne sont pas valides.
-    #                 Les positions sont valides si:
-    #                     - elles sont toutes vides;
-    #                     - elles sont toutes sur la même ligne ou la même colonne;
-    #                     - si le plateau est vide, le centre du plateau (H8) doit être dans les positions;
-    #                     - sinon, au moins une des positions doit être adjacente à une des cases occupées
-    #                       du plateau""""")
-    #
-    #     return pos_chevalet, pos_plateau
-
-    # def jouer_un_tour(self):
-    #     """
-    #     Faire jouer à un des joueurs son tour entier jusqu'à ce qu'il place un mot valide sur le
-    #     plateau.
-    #     Pour ce faire
-    #     1 - Afficher le plateau puis le joueur;
-    #     2 - Demander les positions à jouer;
-    #     3 - Retirer les jetons du chevalet;
-    #     4 - Valider si les positions sont valides pour un ajout sur le plateau;
-    #     5 - Si oui, placer les jetons sur le plateau, sinon retourner en 1;
-    #     6 - Si tous les mots formés sont dans le dictionnaire, alors ajouter les points au joueur actif;
-    #     7 - Sinon retirer les jetons du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
-    #     8 - Afficher le plateau.
-    #
-    #     :return: Ne retourne rien.
-    #     """
-    #     print(self.plateau)
-    #     print(self.joueur_actif)
-    #
-    #     # Nous avons modifié légèrement la méthode fournie pour la rendre beaucoup plus robuste et éviter la fin abrupte du programme.
-    #     # La seule modification est l'ajout de boucles incluant un try/except pour valider les inputs.
-    #     valide = False
-    #     while not valide:
-    #         while True:
-    #             try:
-    #                 pos_chevalet, pos_plateau = self.demander_positions()
-    #                 break
-    #             except (AssertionError, ValueError) as e:
-    #                 print(e)
-    #                 continue
-    #
-    #         jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
-    #
-    #         while True:
-    #             try:
-    #                 mots, score = self.plateau.placer_mots(jetons, pos_plateau)
-    #                 break
-    #             except AssertionError as e:
-    #                 print(e)
-    #                 continue
-    #
-    #         if any([not self.mot_permis(m) for m in mots]):
-    #             print("Au moins l'un des mots formés est absent du dictionnaire.")
-    #             for pos in pos_plateau:
-    #                 jeton = self.plateau.retirer_jeton(pos)
-    #                 self.joueur_actif.ajouter_jeton(jeton)
-    #             valide = False
-    #         else:
-    #             print("Mots formés:", mots)
-    #             print("Score obtenu:", score)
-    #             self.joueur_actif.ajouter_points(score)
-    #             valide = True
-    #
-    #     print(self.plateau)
-    #
-    # def changer_jetons(self):
-    #     """
-    #     Faire changer au joueur actif ses jetons. La méthode doit demander au joueur de saisir les positions à changer les unes après les autres séparés par un espace.
-    #     Si une position est invalide (utilisez Joueur.position_est_valide) alors redemander.
-    #     Dès que toutes les positions valides les retirer du chevalier du joueur et lui en donner de nouveau.
-    #     Enfin, on remet des jetons pris chez le joueur parmi les jetons libres.
-    #     :return: Ne retourne rien.
-    #     """
-    #     print(self.joueur_actif)
-    #     # On demande au joueur de saisir les positions du chevalet à changer
-    #     valide = False
-    #     while not valide:
-    #         try:
-    #             input_pos_chevalet = input("Entrez les positions du chevalet à changer séparées par un espace: ").strip()
-    #             pos_chevalet = [int(pos) - 1 for pos in input_pos_chevalet.split(' ')]
-    #
-    #             # On vérifie que toutes les positions du chevalet fournies ont un jeton (pas vides)
-    #             valide = all([not self.joueur_actif.position_est_vide(pos) for pos in pos_chevalet])
-    #
-    #             # Si le nb de jetons à changer excède le nb de jetons dispo dans le sac, on lève une exception
-    #             if len(pos_chevalet) > len(self.jetons_libres):
-    #                 raise AssertionError("Le nombre de jeton à changer excède le nombre de jetons restants dans le sac à jetons.")
-    #         except (AssertionError, ValueError) as e:
-    #             print(e)
-    #             continue
-    #
-    #     # On retire les jetons désirés et on les place dans la liste des jetons retirés
-    #     jetons_retires = [self.joueur_actif.retirer_jeton(pos) for pos in pos_chevalet]
-    #
-    #     # On pige les nouveaux jetons dans le sac à jetons et on les ajoute au chevalet du joueur
-    #     jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
-    #     for jeton in jetons_a_ajouter:
-    #         self.joueur_actif.ajouter_jeton(jeton)
-    #
-    #     # On retourne les jetons retirés du joueur dans le sac à jeton
-    #     self.jetons_libres = self.jetons_libres + jetons_retires
-    #
-    #     print("Nouveau plateau du", self.joueur_actif)
-
-    # def jouer(self):
-    #     """
-    #     Cette fonction permet de jouer la partie.
-    #     Tant que la partie n'est pas terminée, on joue un tour.
-    #     À chaque tour :
-    #         - On change le joueur actif et on lui affiche que c'est son tour. ex: Tour du joueur 2.
-    #         - On lui affiche ses options pour qu'il choisisse quoi faire:
-    #             "Entrez (j) pour jouer, (p) pour passer votre tour, (c) pour changer certains jetons,
-    #             (s) pour sauvegarder ou (q) pour quitter"
-    #         Notez que si le joueur fait juste sauvegarder on ne doit pas passer au joueur suivant mais dans tous les autres cas on doit passer au joueur suivant.
-    #         S'il quitte la partie on l'enlève de la liste des joueurs.
-    #     Une fois la partie terminée, on félicite le joueur gagnant!
-    #
-    #     :return Ne retourne rien.
-    #     """
-    #     abandon = False
-    #     changer_joueur = True
-    #     while not self.partie_terminee() and not abandon:
-    #         debut = self.joueur_actif is None
-    #         if changer_joueur:
-    #             self.joueur_suivant()
-    #         if debut:
-    #             self.message = "Le premier joueur sera: {}.".format(self.joueur_actif.nom)
-    #
-    #         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
-    #             self.joueur_actif.ajouter_jeton(jeton)
-    #
-    #         self.message = "Tour du {}.".format(self.joueur_actif.nom)
-            # choix = ''
-            # while choix not in ['j', 'p', 'c', 'q', 's']:
-            #     choix = input("Entrez (j) pour jouer, (p) pour passer votre tour,\n"
-            #                   "(c) pour changer certains jetons, (s) pour sauvegarder\n"
-            #                   "ou (q) pour quitter: ").strip().lower()
-            #     if choix == "j":
-            #         self.jouer_un_tour()
-            #         changer_joueur = True
-            #     elif choix == "p":
-            #         changer_joueur = True
-            #     elif choix == "c":
-            #         self.changer_jetons()
-            #         changer_joueur = True
-            #     elif choix == "q":
-            #         quitter = self.joueur_actif
-            #         self.joueur_suivant()
-            #         self.joueurs.remove(quitter)
-            #         changer_joueur = False
-            #     elif choix == "s":
-            #         valide = False
-            #         while not valide:
-            #             nom_fichier = input("Nom du fichier de sauvegarde: ")
-            #             valide = self.sauvegarder_partie(nom_fichier)
-            #         changer_joueur = False
-            #     else:
-            #         print('Erreur: Entrez un choix valide.')
-
-        # if self.partie_terminee():
-        #     print("Partie terminée.")
-        #     print("{} est le gagnant. Félicitations!!!".format(self.determiner_gagnant().nom))
-
     def sauvegarder_partie(self, nom_fichier):
         """ *** Vous n'avez pas à coder cette méthode ***
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
@@ -938,72 +728,3 @@ class Scrabble(Tk):
         print(self.nom_fichier)
         self.charger_partie(self.nom_fichier)
 
-# if __name__ == '__main__':
-#
-#     scrabble = Scrabble()
-#
-# # mot_permis()
-#     assert scrabble.mot_permis('car')
-#     assert not scrabble.mot_permis('abc')
-#
-# # déterminer_gagnant
-#     scrabble.joueurs[0].ajouter_points(1)
-#     scrabble.joueurs[1].ajouter_points(5)
-#     assert scrabble.determiner_gagnant() == scrabble.joueurs[1]
-#
-#     scrabble.joueurs[2].ajouter_points(5)
-#     print(scrabble.determiner_gagnant().nom)
-#
-# # partie_terminee
-#     assert not scrabble.partie_terminee()
-#
-#     scrabble.jetons_libres = []
-#     assert scrabble.partie_terminee()
-#
-#     scrabble = Scrabble(2)
-#     scrabble.joueurs.pop()
-#     assert scrabble.partie_terminee()
-#
-# # joueur_actif
-#     scrabble = Scrabble(2)
-#     scrabble.joueur_suivant()
-#     assert isinstance(scrabble.joueur_actif, Joueur)
-#
-#     scrabble.joueur_actif = scrabble.joueurs[0]
-#     scrabble.joueur_suivant()
-#     assert scrabble.joueur_actif == scrabble.joueurs[1]
-#     scrabble.joueur_suivant()
-#     assert scrabble.joueur_actif == scrabble.joueurs[0]
-#
-#     scrabble = Scrabble(4)
-#     scrabble.joueur_actif = scrabble.joueurs[0]
-#     scrabble.joueur_suivant()
-#     scrabble.joueur_suivant()
-#     scrabble.joueur_suivant()
-#     assert scrabble.joueur_actif == scrabble.joueurs[3]
-#     scrabble.joueur_suivant()
-#     assert scrabble.joueur_actif == scrabble.joueurs[0]
-#
-# # tirer_jetons
-#     assert len(scrabble.tirer_jetons(2)) == 2 and isinstance(scrabble.tirer_jetons(2)[0], Jeton)
-#     nbr_jetons_libres = len(scrabble.jetons_libres)
-#     scrabble.tirer_jetons(2)
-#     assert len(scrabble.jetons_libres) == nbr_jetons_libres - 2
-
-
-# changer jetons
-    # ici dans le input on doit entrer manuellement.
-    # ça serait possible de faire un test bcp plus robuste avec le module unittest, mais c'est un peu un overkill et on ne doit pas changer les fonctions donc tester cela demanderait bcp de travail pour rien.
-    # il faut aussi ajouter temporairement une propriété chevalet à Joueur pour avoir accès à l'attribut privé.
-
-    # J'ai testé et tout fonctionne. je commente les tests pour les empêcher de rouler à chaque fois.
-
-    # for jeton in scrabble.tirer_jetons(scrabble.joueur_actif.nb_a_tirer):
-    #     scrabble.joueur_actif.ajouter_jeton(jeton)
-    #
-    # ancien_chevalet = list(scrabble.joueur_actif.chevalet)
-    # nbr_jetons_libres = len(scrabble.jetons_libres)
-    # scrabble.changer_jetons()
-    # assert scrabble.joueur_actif.nb_a_tirer == 0
-    # assert scrabble.joueur_actif.chevalet != ancien_chevalet
-    # assert len(scrabble.jetons_libres) == nbr_jetons_libres
