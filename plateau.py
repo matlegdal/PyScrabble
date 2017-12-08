@@ -13,8 +13,8 @@ class Plateau(Canvas):
     - cases: Case list list, une liste de liste de cases.
             Le programmeur peut avoir accès et manipuler les cases du plateau avec des indexes i et j,
             tels que 0 <= i < Plateau.DIMENSION et 0 <= j < Plateau.DIMENSION.
-    - positions: tuple list, Liste des positions sous la forme du tuple (i, j) des cases sur lesquels ont été placés des jetons au cours du tour courant.
-    - jetons_placés: Jeton list, Liste des jetons placés lors du tour courant
+    - positions: tuple list, Liste des positions sous la forme du tuple (i, j) des cases sur lesquels ont été placés des data au cours du tour courant.
+    - jetons_placés: Jeton list, Liste des data placés lors du tour courant
     """
     DIMENSION = 15
 
@@ -77,7 +77,7 @@ class Plateau(Canvas):
         self.delete('case')
         self.delete('jeton')
         self.dessiner()
-        # TODO: corriger le bug avec le redimensionnement lorsqu'on a placé des jetons au cours du tour
+        # TODO: corriger le bug avec le redimensionnement lorsqu'on a placé des data au cours du tour
 
     def case_est_vide(self, ligne, col):
         """
@@ -167,8 +167,8 @@ class Plateau(Canvas):
 
     def valider_positions(self, positions):
         """
-        Étant données des positions où un utilisateur veut placer ses jetons, cette méthode permet de valider
-        s'il peut réelement ajouter les jetons à ces positions.
+        Étant données des positions où un utilisateur veut placer ses data, cette méthode permet de valider
+        s'il peut réelement ajouter les data à ces positions.
         Les positions sont valides si:
          - elles sont toutes sur la même ligne ou la même colonne;
          - une fois qu'elles sont placées sur une même ligne ou une même colonne, il n'y a pas de cases vides entre les cases occupées
@@ -194,7 +194,7 @@ class Plateau(Canvas):
         else:
             au_moins_une_case_adjacente_occupee = any([self.cases_adjacentes_occupees(pos) for pos in positions])
             if not au_moins_une_case_adjacente_occupee:
-                raise PasDeCasesAdjacentes("Au moins un des jetons placés doit être adjacent à un jeton du plateau.")
+                raise PasDeCasesAdjacentes("Au moins un des data placés doit être adjacent à un jeton du plateau.")
 
         # On vérifie qu'il n'y a pas de 'trous' dans les mots placés
         if meme_ligne:
@@ -212,9 +212,9 @@ class Plateau(Canvas):
 
     def mots_score_obtenus(self, positions):
         """
-        Trouver les mots ajoutés et le score total obtenu lorsque le joueur vient juste d'ajouter des jetons aux positions de la liste en argument.
+        Trouver les mots ajoutés et le score total obtenu lorsque le joueur vient juste d'ajouter des data aux positions de la liste en argument.
         :param positions: str list, liste de tuples des positions sous forme (ligne, col)
-        :return: (tuple): L'ensemble des mots formés par l'ajout de jetons aux nouvelles positions et le score obtenu
+        :return: (tuple): L'ensemble des mots formés par l'ajout de data aux nouvelles positions et le score obtenu
         """
         score_total = 0
         lignes, cols = zip(*positions)
@@ -236,7 +236,7 @@ class Plateau(Canvas):
         :param ligne: (int, optionel), index de la ligne d'intérêt
         :param colonne: (int, optionel), index de la colonne d'intérêt
         :return: tuple (str list, int), la liste des mots trouvés sur la ligne ou la colonne et le score total.
-        Plus précisément la liste devra contenir au maximum un élément car un tout nouvel ajout de jetons ne peut pas
+        Plus précisément la liste devra contenir au maximum un élément car un tout nouvel ajout de data ne peut pas
         créer plus d'un mot sur la même ligne ou colonne.
         :exception: Levez une exception avec assert si la ligne et la colonne sont spécifiées ou aucun des deux ne l'est.
         """
@@ -282,7 +282,7 @@ if __name__ == '__main__':
 
     """
     from jeton import Jeton
-    # init de quelques jetons
+    # init de quelques data
     jetonA = Jeton('A', 1)
     jetonB = Jeton('B', 3)
     jetonC = Jeton('C', 3)
@@ -303,7 +303,7 @@ if __name__ == '__main__':
     assert plateau.est_vide()
     assert plateau.case_est_vide('a1')
 
-    # l'ajout des jetons dans places_mots se passe bien.
+    # l'ajout des data dans places_mots se passe bien.
     ret_mot = plateau.placer_mots([jetonC, jetonA, jetonR], ['h8', 'h9', 'h10'])
     assert not plateau.case_est_vide('h8') and not plateau.case_est_vide('h9') and not plateau.case_est_vide('h10')
     assert plateau.cases[Plateau.decode_position('h8')[0]][Plateau.decode_position('h8')[1]].jeton_occupant == jetonC

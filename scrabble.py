@@ -17,9 +17,9 @@ class Scrabble(Tk):
     Les attributs d'un scrabble sont:
     - dictionnaire: set, contient tous les mots qui peuvent être joués sur dans cette partie.
     En gros pour savoir si un mot est permis on va regarder dans le dictionnaire.
-    - plateau: Plateau, un objet de la classe Plateau on y place des jetons et il nous dit le nombre de points gagnés.
-    - jetons_libres: Jeton list, la liste de tous les jetons dans le sac, c'est là que chaque joueur
-                    peut prendre des jetons quand il en a besoin.
+    - plateau: Plateau, un objet de la classe Plateau on y place des data et il nous dit le nombre de points gagnés.
+    - jetons_libres: Jeton list, la liste de tous les data dans le sac, c'est là que chaque joueur
+                    peut prendre des data quand il en a besoin.
     - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
@@ -29,7 +29,8 @@ class Scrabble(Tk):
         super().__init__()
 
         # Declare parameters
-        self.liste_langue = ['FR', 'EN']
+        self.liste_langue = ['fr', 'en']
+        self.langue='fr'    # La langue par défaut est le français.
         self.title("Scrabble")
         self.plateau = None
         self.joueur_actif = None
@@ -87,9 +88,9 @@ class Scrabble(Tk):
 
         # Choix des langues
         langue = StringVar()
-        langue.set('FR')
-        Radiobutton(accueil, text='Français', variable=langue, value='FR').grid(column=0, row=2, columnspan=2, sticky=E)
-        Radiobutton(accueil, text='English', variable=langue, value='EN').grid(column=2, row=2, columnspan=2, sticky=W)
+        langue.set('fr')
+        Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(column=0, row=2, columnspan=2, sticky=E)
+        Radiobutton(accueil, text='English', variable=langue, value='en').grid(column=2, row=2, columnspan=2, sticky=W)
 
         # Nombre des joueurs
         Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=3, column=0, columnspan=4)
@@ -121,46 +122,57 @@ class Scrabble(Tk):
     def initialiser_partie(self, nb_joueurs, langue):
         """
         - La liste des joueurs est créée et chaque joueur porte automatiquement le nom Joueur 1, Joueur 2, ... Joueur n où n est le nombre de joueurs;
-        - Le sac à jetons (self.jetons_libres) est créé
+        - Le sac à data (self.jetons_libres) est créé
         - Le dictionnaire est ouvert
 
         :param nb_joueurs: int, nombre de joueurs de la partie au minimun 2 au maximum 4.
-        :param langue: str, FR pour la langue française, et EN pour la langue anglaise. Dépendamment de la langue, vous devez ouvrir, lire, charger en mémoire le fichier "dictionnaire_francais.txt" ou "dictionnaire_anglais.txt" ensuite il faudra ensuite extraire les mots contenus pour construire un set avec le mot clé set.
-        Aussi, grâce à la langue vous devez être capable de créer tous les jetons de départ et les mettre dans jetons_libres.
-        Pour savoir combien de jetons créés pour chaque langue vous pouvez regarder à l'adresse:
+        :param langue: str, abbréviation à 2 lettres de la langue
+        Dépendamment de la langue, on doit ouvrir, lire, charger en mémoire le bon dictionnaire.
+        Les dictionnaires sont dans le dossier dic et sont nommés par l'abbéviation à deux lettres de la langue du dictionnaire.
+        Exemple: le chemin d'accès du dictionnaire français est 'dic/fr.txt' et celui du dictionnaire anglais est 'dic/en.txt'
+        Ensuite il suffit d'extraire les mots contenus pour construire un set avec le mot clé set.
+        Aussi, grâce à la langue vous devez être capable de créer tous les data de départ et les mettre dans jetons_libres.
+
+        Pour savoir combien de data créés pour chaque langue vous pouvez regarder à l'adresse:
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-        *** Dans notre scrabble, nous n'utiliserons pas les jetons jokers qui ne contienent aucune lettre donc ne les incluez pas dans les jetons libres ***
-        :exception: Levez une exception avec assert si la langue n'est ni fr, FR, en, ou EN ou si nb_joueur < 2 ou > 4.
+
+        :exception: Levez une exception avec assert si la langue n'est ni fr ou en ou si nb_joueur < 2 ou > 4.
         """
         assert 2 <= nb_joueurs <= 4
-        assert langue.upper() in self.liste_langue
-
+        assert langue.lower() in self.liste_langue
+        self.langue = langue.lower()
         self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
 
-        if langue.upper() == 'FR':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
-                    ('R', 6, 1), ('S', 6, 1), ('T', 6, 1), ('U', 6, 1), ('L', 5, 1),
-                    ('D', 3, 2), ('M', 3, 2), ('G', 2, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 8), ('K', 1, 10), ('W', 1, 10), ('X', 1, 10), ('Y', 1, 10),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_francais.txt'
-        elif langue.upper() == 'EN':
-            # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
-            data = [('E', 12, 1), ('A', 9, 1), ('I', 9, 1), ('N', 6, 1), ('O', 8, 1),
-                    ('R', 6, 1), ('S', 4, 1), ('T', 6, 1), ('U', 4, 1), ('L', 4, 1),
-                    ('D', 4, 2), ('M', 2, 3), ('G', 3, 2), ('B', 2, 3), ('C', 2, 3),
-                    ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
-                    ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
-                    ('Z', 1, 10)]
-            nom_fichier_dictionnaire = 'dictionnaire_anglais.txt'
+        # if self.langue == 'fr':
+        #     # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
+        #     data = [('E', 15, 1), ('A', 9, 1), ('I', 8, 1), ('N', 6, 1), ('O', 6, 1),
+        #             ('R', 6, 1), ('S', 6, 1), ('T', 6, 1), ('U', 6, 1), ('L', 5, 1),
+        #             ('D', 3, 2), ('M', 3, 2), ('G', 2, 2), ('B', 2, 3), ('C', 2, 3),
+        #             ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
+        #             ('Q', 1, 8), ('K', 1, 10), ('W', 1, 10), ('X', 1, 10), ('Y', 1, 10),
+        #             ('Z', 1, 10)]
+        # elif self.langue == 'en':
+        #     # Infos disponibles sur https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
+        #     data = [('E', 12, 1), ('A', 9, 1), ('I', 9, 1), ('N', 6, 1), ('O', 8, 1),
+        #             ('R', 6, 1), ('S', 4, 1), ('T', 6, 1), ('U', 4, 1), ('L', 4, 1),
+        #             ('D', 4, 2), ('M', 2, 3), ('G', 3, 2), ('B', 2, 3), ('C', 2, 3),
+        #             ('P', 2, 3), ('F', 2, 4), ('H', 2, 4), ('V', 2, 4), ('J', 1, 8),
+        #             ('Q', 1, 10), ('K', 1, 5), ('W', 2, 4), ('X', 1, 8), ('Y', 2, 4),
+        #             ('Z', 1, 10)]
+        # self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
 
-        # TODO: refactor -> mettre les jetons (data) dans des fichiers à part (pour pouvoir ajouter des langues facilement)
+        with open('data/{}.txt'.format(self.langue), 'r') as data:
+            self.jetons_libres = []
+            for line in data.readlines():
+                temp = line.split(',')
+                lettre = str(temp[0])
+                occurences = int(temp[1])
+                valeur = int(temp[2])
+                for _ in range(occurences):
+                    self.jetons_libres.append(Jeton(lettre, valeur))
 
-        self.jetons_libres = [Jeton(lettre, valeur) for lettre, occurences, valeur in data for _ in range(occurences)]
-        with open(nom_fichier_dictionnaire, 'r') as f:
-            self.dictionnaire = set([x[:-1].upper() for x in f.readlines() if len(x[:-1]) > 1])
+        with open('dic/{}.txt'.format(self.langue), 'r') as dic:
+            self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
 
 
 
@@ -195,7 +207,7 @@ class Scrabble(Tk):
         # Set les boutons d'actions
         btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
+        btn_changer = Button(self.affichage_joueur, text="Changer les data", command=self.demander_jetons_a_changer)
         btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
 
         # Affichage des boutons d'actions
@@ -255,7 +267,7 @@ class Scrabble(Tk):
         - Placer le jeton dans la case
         - Dessiner le jeton dans la case.
         - Ajouter la case à la liste des positions à vérifier
-        - Ajouter le jeton à la liste des jetons placés
+        - Ajouter le jeton à la liste des data placés
         - Unbind redeposer et met jeton_actif à None
         """
         ligne, col, case = self.determiner_case(event)
@@ -388,17 +400,17 @@ class Scrabble(Tk):
         - Vérifier la validité des positions des cases
         - Calculer les mots et le score obtenus et vérifier si tous les mots sont permis
         - Ajouter les points au joueur
-        - Resetter les listes de positions et jetons placés
+        - Resetter les listes de positions et data placés
         - changer de joueur
         :return: Aucun return
         """
-        #Vérifie si le joueur a placé des jetons
+        #Vérifie si le joueur a placé des data
         if len(self.plateau.positions) == 0 or len(self.plateau.jetons_places) == 0:
-            messagebox.showinfo(message="Vous n'avez pas placé de jetons!\nSi vous ne désirez pas jouer ce tour-ci, "
+            messagebox.showinfo(message="Vous n'avez pas placé de data!\nSi vous ne désirez pas jouer ce tour-ci, "
                                            "veuillez sélectionner le bouton 'Passer le tour'")
             return
 
-        # Vérifie la validité des positions des jetons placés
+        # Vérifie la validité des positions des data placés
         try:
             self.plateau.valider_positions(self.plateau.positions)
         except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot, CentreNonUtilise) as e:
@@ -416,7 +428,7 @@ class Scrabble(Tk):
                 raise MotNonPermisException(msg)
             # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
             if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
-                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos jetons!\nVous obtenez 50 points boni!')
+                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos data!\nVous obtenez 50 points boni!')
                 score += 50
         except MotNonPermisException as e:
             messagebox.showwarning(message=e)
@@ -430,14 +442,14 @@ class Scrabble(Tk):
     def passer_un_tour(self):
         """
         Permet à un joueur de passer son tour.
-        - vérifier que le joueur n'a pas placé de jetons sur le plateau
+        - vérifier que le joueur n'a pas placé de data sur le plateau
         - changer de joueur
         :return: aucun retour
         """
-        # Vérifie si le joueur a placé des jetons
+        # Vérifie si le joueur a placé des data
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
-                                        "retirez vos jetons du plateau.\n"
+            messagebox.showinfo(message="Vous avez placé de data!\nSi vous désirez passer votre tour, "
+                                        "retirez vos data du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
@@ -448,10 +460,10 @@ class Scrabble(Tk):
         Retire un joueur de la liste des joueurs
         :return: Aucun return
         """
-        # Vérifie si le joueur a placé des jetons
+        # Vérifie si le joueur a placé des data
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
-                                        "retirez vos jetons du plateau.\n"
+            messagebox.showinfo(message="Vous avez placé de data!\nSi vous désirez abandonner, "
+                                        "retirez vos data du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
@@ -466,17 +478,17 @@ class Scrabble(Tk):
 
     def demander_jetons_a_changer(self):
         """
-        Interface graphique pour changer les jetons
+        Interface graphique pour changer les data
         - unbinder la fonction prendre
         - afficher le sac a jeton et les boutons
         - binder la fonction jeter
         :return: Aucun return
-        :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
+        :exception: Lever une exception si le nombre de data à changer est supérieur au nombre de data restants.
         """
-        # Vérifie si le joueur a placé des jetons
+        # Vérifie si le joueur a placé des data
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
-                                        "retirez vos jetons du plateau.\n"
+            messagebox.showinfo(message="Vous avez placé de data!\nSi vous désirez changer des data, "
+                                        "retirez vos data du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
@@ -487,7 +499,7 @@ class Scrabble(Tk):
         # Affichage de l'interface
         self.bottom_right = Frame(self.content)
         self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        Label(self.bottom_right, text="Sélectionner les data à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
         self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
         self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
         Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
@@ -495,22 +507,22 @@ class Scrabble(Tk):
 
     def changer_jetons(self):
         """
-        Change les jetons sélectionnés par le joueur.
-        - On tire de nouveaux jetons dans le sac à jetons
-        - On ajoute les jetons tirés au chevalet du joueur
-        - On retourne les jetons jetés par le joueur dans le sac à jetons
+        Change les data sélectionnés par le joueur.
+        - On tire de nouveaux data dans le sac à data
+        - On ajoute les data tirés au chevalet du joueur
+        - On retourne les data jetés par le joueur dans le sac à data
         - unbind jeter_jeton et rebind prendre jeton
-        - effacer le frame pour changer les jetons
+        - effacer le frame pour changer les data
         - On passe au joueur suivant
         :return: Aucun return
         """
-        # Piger de nouveaux jetons et retourner les jetons jetés au sac à jetons
+        # Piger de nouveaux data et retourner les data jetés au sac à data
         jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
         for jeton in jetons_a_ajouter:
             self.joueur_actif.ajouter_jeton(jeton)
         self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
-        # Détruire l'interface pour changer les jetons
+        # Détruire l'interface pour changer les data
         self.unbind_jeter()
         self.bind_prendre()
         self.bottom_right.destroy()
@@ -519,17 +531,17 @@ class Scrabble(Tk):
 
     def annuler_changer_jetons(self):
         """
-        - Remettre les jetons dans le chevalet du joueur.
+        - Remettre les data dans le chevalet du joueur.
         - unbind jeter_jeton et rebind prendre_jeton
-        - effacer le frame pour changer les jetons
+        - effacer le frame pour changer les data
         :return:
         """
-        # Remettre les jetons jetés dans le chevalet du joueur
+        # Remettre les data jetés dans le chevalet du joueur
         for jeton in self.joueur_actif.jetons_jetes:
             self.joueur_actif.ajouter_jeton(jeton)
         self.dessiner_chevalet(self.chevalet_actif,self.joueur_actif)
         self.joueur_actif.jetons_jetes = []
-        # Détruire l'interface pour changer les jetons
+        # Détruire l'interface pour changer les data
         self.unbind_jeter()
         self.bind_prendre()
         self.bottom_right.destroy()
@@ -557,7 +569,7 @@ class Scrabble(Tk):
         else:
             msg = "Tour {}\nC'est le tour de {}".format(self.plateau.tour, self.joueur_actif.nom)
 
-        # On pige les jetons
+        # On pige les data
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
             self.joueur_actif.ajouter_jeton(jeton)
 
@@ -594,7 +606,7 @@ class Scrabble(Tk):
 
     def partie_terminee(self):
         """
-        Vérifie si la partie est terminée. Une partie est terminée s'il n'existe plus de jetons libres ou il reste moins de deux (2) joueurs.
+        Vérifie si la partie est terminée. Une partie est terminée s'il n'existe plus de data libres ou il reste moins de deux (2) joueurs.
         C'est la règle que nous avons choisi d'utiliser pour ce travail, donc essayez de négliger les autres que vous connaissez ou avez lu sur Internet.
         :return: bool, True si la partie est terminée, et False autrement.
         """
@@ -616,22 +628,22 @@ class Scrabble(Tk):
 
     def tirer_jetons(self, n):
         """
-        Simule le tirage de n jetons du sac à jetons et renvoie ceux-ci. Il s'agit de prendre au hasard des jetons dans self.jetons_libres et de les retourner.
+        Simule le tirage de n data du sac à data et renvoie ceux-ci. Il s'agit de prendre au hasard des data dans self.jetons_libres et de les retourner.
         Pensez à utiliser la fonction shuffle du module random.
-        :param n: le nombre de jetons à tirer.
-        :return: Jeton list, la liste des jetons tirés.
+        :param n: le nombre de data à tirer.
+        :return: Jeton list, la liste des data tirés.
         :exception: Levez une exception avec assert si n ne respecte pas la condition 0 <= n <= 7.
         """
-        assert 0 <= n <= len(self.jetons_libres), "n doit être compris entre 0 et le nombre total de jetons libres."
+        assert 0 <= n <= len(self.jetons_libres), "n doit être compris entre 0 et le nombre total de data libres."
 
-        # On mélange les jetons dans le sac
+        # On mélange les data dans le sac
         shuffle(self.jetons_libres)
 
-        # On prend n jetons et on les enlève du sac
+        # On prend n data et on les enlève du sac
         jetons_tires = self.jetons_libres[:n]
         self.jetons_libres = self.jetons_libres[n:]
 
-        # On retourne les jetons tirés
+        # On retourne les data tirés
         return jetons_tires
 
     def bind_poser(self):
@@ -660,7 +672,7 @@ class Scrabble(Tk):
 
     def bind_reprendre(self):
         """
-        Fonction utilitaire pour binder le clic de souris aux jetons placés.
+        Fonction utilitaire pour binder le clic de souris aux data placés.
         """
         self.plateau.tag_bind('jeton_place', '<Button-1>', self.reprendre_jeton)
 
@@ -702,7 +714,7 @@ class Scrabble(Tk):
     #         pos_plateau = input_pos_plateau.split(' ')
     #
     #         if len(pos_chevalet) != len(pos_plateau):
-    #             print("Les nombres de jetons et de positions ne sont pas les mêmes.")
+    #             print("Les nombres de data et de positions ne sont pas les mêmes.")
     #             valide = False
     #         else:
     #             # Nous avons refactorée cette partie pour pouvoir afficher un message d'erreur plutôt que juste re-prompter le joueur sans rien dire.
@@ -728,11 +740,11 @@ class Scrabble(Tk):
     #     Pour ce faire
     #     1 - Afficher le plateau puis le joueur;
     #     2 - Demander les positions à jouer;
-    #     3 - Retirer les jetons du chevalet;
+    #     3 - Retirer les data du chevalet;
     #     4 - Valider si les positions sont valides pour un ajout sur le plateau;
-    #     5 - Si oui, placer les jetons sur le plateau, sinon retourner en 1;
+    #     5 - Si oui, placer les data sur le plateau, sinon retourner en 1;
     #     6 - Si tous les mots formés sont dans le dictionnaire, alors ajouter les points au joueur actif;
-    #     7 - Sinon retirer les jetons du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
+    #     7 - Sinon retirer les data du plateau et les remettre sur le chevalet du joueur, puis repartir en 1;
     #     8 - Afficher le plateau.
     #
     #     :return: Ne retourne rien.
@@ -752,11 +764,11 @@ class Scrabble(Tk):
     #                 print(e)
     #                 continue
     #
-    #         jetons = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
+    #         data = [self.joueur_actif.retirer_jeton(p) for p in pos_chevalet]
     #
     #         while True:
     #             try:
-    #                 mots, score = self.plateau.placer_mots(jetons, pos_plateau)
+    #                 mots, score = self.plateau.placer_mots(data, pos_plateau)
     #                 break
     #             except AssertionError as e:
     #                 print(e)
@@ -778,10 +790,10 @@ class Scrabble(Tk):
     #
     # def changer_jetons(self):
     #     """
-    #     Faire changer au joueur actif ses jetons. La méthode doit demander au joueur de saisir les positions à changer les unes après les autres séparés par un espace.
+    #     Faire changer au joueur actif ses data. La méthode doit demander au joueur de saisir les positions à changer les unes après les autres séparés par un espace.
     #     Si une position est invalide (utilisez Joueur.position_est_valide) alors redemander.
     #     Dès que toutes les positions valides les retirer du chevalier du joueur et lui en donner de nouveau.
-    #     Enfin, on remet des jetons pris chez le joueur parmi les jetons libres.
+    #     Enfin, on remet des data pris chez le joueur parmi les data libres.
     #     :return: Ne retourne rien.
     #     """
     #     print(self.joueur_actif)
@@ -795,22 +807,22 @@ class Scrabble(Tk):
     #             # On vérifie que toutes les positions du chevalet fournies ont un jeton (pas vides)
     #             valide = all([not self.joueur_actif.position_est_vide(pos) for pos in pos_chevalet])
     #
-    #             # Si le nb de jetons à changer excède le nb de jetons dispo dans le sac, on lève une exception
+    #             # Si le nb de data à changer excède le nb de data dispo dans le sac, on lève une exception
     #             if len(pos_chevalet) > len(self.jetons_libres):
-    #                 raise AssertionError("Le nombre de jeton à changer excède le nombre de jetons restants dans le sac à jetons.")
+    #                 raise AssertionError("Le nombre de jeton à changer excède le nombre de data restants dans le sac à data.")
     #         except (AssertionError, ValueError) as e:
     #             print(e)
     #             continue
     #
-    #     # On retire les jetons désirés et on les place dans la liste des jetons retirés
+    #     # On retire les data désirés et on les place dans la liste des data retirés
     #     jetons_retires = [self.joueur_actif.retirer_jeton(pos) for pos in pos_chevalet]
     #
-    #     # On pige les nouveaux jetons dans le sac à jetons et on les ajoute au chevalet du joueur
+    #     # On pige les nouveaux data dans le sac à data et on les ajoute au chevalet du joueur
     #     jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
     #     for jeton in jetons_a_ajouter:
     #         self.joueur_actif.ajouter_jeton(jeton)
     #
-    #     # On retourne les jetons retirés du joueur dans le sac à jeton
+    #     # On retourne les data retirés du joueur dans le sac à jeton
     #     self.jetons_libres = self.jetons_libres + jetons_retires
     #
     #     print("Nouveau plateau du", self.joueur_actif)
@@ -822,7 +834,7 @@ class Scrabble(Tk):
     #     À chaque tour :
     #         - On change le joueur actif et on lui affiche que c'est son tour. ex: Tour du joueur 2.
     #         - On lui affiche ses options pour qu'il choisisse quoi faire:
-    #             "Entrez (j) pour jouer, (p) pour passer votre tour, (c) pour changer certains jetons,
+    #             "Entrez (j) pour jouer, (p) pour passer votre tour, (c) pour changer certains data,
     #             (s) pour sauvegarder ou (q) pour quitter"
     #         Notez que si le joueur fait juste sauvegarder on ne doit pas passer au joueur suivant mais dans tous les autres cas on doit passer au joueur suivant.
     #         S'il quitte la partie on l'enlève de la liste des joueurs.
@@ -846,7 +858,7 @@ class Scrabble(Tk):
             # choix = ''
             # while choix not in ['j', 'p', 'c', 'q', 's']:
             #     choix = input("Entrez (j) pour jouer, (p) pour passer votre tour,\n"
-            #                   "(c) pour changer certains jetons, (s) pour sauvegarder\n"
+            #                   "(c) pour changer certains data, (s) pour sauvegarder\n"
             #                   "ou (q) pour quitter: ").strip().lower()
             #     if choix == "j":
             #         self.jouer_un_tour()
@@ -998,7 +1010,7 @@ class Scrabble(Tk):
 #     assert len(scrabble.jetons_libres) == nbr_jetons_libres - 2
 
 
-# changer jetons
+# changer data
     # ici dans le input on doit entrer manuellement.
     # ça serait possible de faire un test bcp plus robuste avec le module unittest, mais c'est un peu un overkill et on ne doit pas changer les fonctions donc tester cela demanderait bcp de travail pour rien.
     # il faut aussi ajouter temporairement une propriété chevalet à Joueur pour avoir accès à l'attribut privé.
