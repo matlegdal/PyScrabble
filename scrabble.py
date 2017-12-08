@@ -881,10 +881,10 @@ class Scrabble(Tk):
         try:
             with open(nom_fichier, "wb") as f:
                 pickle.dump(self, f)
-                print(f) # le code est lu ici
+                print(f)  # le code est lu ici
 
         except:
-            print("echec") # et ici...
+            print("echec")  # et ici...
             return False
         return True
 
