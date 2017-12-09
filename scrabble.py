@@ -1,5 +1,5 @@
 import pickle
-from random import randint, shuffle, seed
+from random import randint, shuffle
 from case import Case
 from joueur import Joueur
 from jeton import Jeton
@@ -10,8 +10,7 @@ from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
 from exception import *
 from math import floor
-from tkinter import Toplevel
-from tkinter import filedialog
+
 
 class Scrabble(Tk):
     """
@@ -55,22 +54,21 @@ class Scrabble(Tk):
         self.grid_rowconfigure(0, weight=1)
         self.minsize(width=800, height=600)
 
-
         # Création du menu
-        barre_menu = Menu(self)
-        fichier = Menu(barre_menu, tearoff=0)
-        fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
-        fichier.add_command(label="Charger une partie", command=self.charger_partie)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
-        fichier.add_separator()
-        fichier.add_command(label="Quitter", command=self.quit)
-        barre_menu.add_cascade(label="Fichier", menu=fichier)
+        self.barre_menu = Menu(self)
+        self.fichier = Menu(self.barre_menu, tearoff=0)
+        self.fichier.add_command(label="Nouvelle partie", command=Scrabble)
+        self.fichier.add_command(label="Sauvegarder la partie", state=DISABLED, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
+        self.fichier.add_separator()
+        self.fichier.add_command(label="Quitter", command=self.quit)
+        self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
 
-        aide = Menu(barre_menu, tearoff=0)
-        aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements ->
-        barre_menu.add_cascade(label="Aide", menu=aide)
+        self.aide = Menu(self.barre_menu, tearoff=0)
+        self.aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements ->
+        self.barre_menu.add_cascade(label="Aide", menu=self.aide)
 
-        self.config(menu=barre_menu)
+        self.config(menu=self.barre_menu)
 
         # On appelle la fenêtre principale et  l'écran d'accueil
         self.config_content()
@@ -128,7 +126,6 @@ class Scrabble(Tk):
         Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
         Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
 
-
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
         Démarre une partie en détruisant la page d'accueil, initialisant la partie et passe le contrôle à jouer().
@@ -141,7 +138,6 @@ class Scrabble(Tk):
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
-
 
     def initialiser_partie(self, nb_joueurs, langue, difficulte, joueurs=None):
         """
@@ -161,9 +157,10 @@ class Scrabble(Tk):
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
 
         :param difficulte: str, difficulté de la partie -> facile et difficile. Le mode difficile implémente les règles officielles du jeu de Scrabble
-        :param joueurs: Liste des joueurs, None par défaut
+        :param joueurs: Liste des joueurs, None par défaut. Passé en argument si on charge une partie.
         :exception: Levez une exception avec assert si la langue n'est ni fr ou en ou si nb_joueur < 2 ou > 4.
         """
+
         assert 2 <= nb_joueurs <= 4
         assert langue.lower() in self.liste_langue
         self.langue = langue.lower()
@@ -174,22 +171,22 @@ class Scrabble(Tk):
 
         self.difficulte = difficulte
 
-        with open('data/{}.txt'.format(self.langue), 'r') as data:
-            self.jetons_libres = []
-            for line in data.read().splitlines():
-                temp = line.split(',')
-                lettre = str(temp[0])
-                occurences = int(temp[1])
-                valeur = int(temp[2])
-                joker = temp[3]
-                for _ in range(occurences):
-                    self.jetons_libres.append(Jeton(lettre, valeur, joker))
+        if self.jetons_libres is None or self.jetons_libres == []:
+            with open('data/{}.txt'.format(self.langue), 'r') as data:
+                self.jetons_libres = []
+                for line in data.read().splitlines():
+                    temp = line.split(',')
+                    lettre = str(temp[0])
+                    occurences = int(temp[1])
+                    valeur = int(temp[2])
+                    joker = temp[3]
+                    for _ in range(occurences):
+                        self.jetons_libres.append(Jeton(lettre, valeur, joker))
 
         with open('dic/{}.txt'.format(self.langue), 'r') as dic:
             self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
 
-
-    def jouer(self):
+    def jouer(self, cases=None, positions=None, jetons_places=None):
         """
         La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -198,10 +195,13 @@ class Scrabble(Tk):
         - Affiche le message du tour en cours
         - Crée le Canvas du chevalet
         - Affiche les boutons d'actions
+        :param cases: Liste des cases, None par défaut, passé en argument quand on charge une partie.
+        :param positions: tuples list, Liste de positions en forme de tuple (i,j),None par défaut, passé en argument quand on charge une partie.
+        :param jetons_places: Liste des jetons placée durant le tour. None par défaut, passé en argument quand on charge une partie.
         """
 
         # Set le plateau
-        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE)
+        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases, positions, jetons_places)
         self.plateau.grid(row=0, column=0, rowspan=4, columnspan=1, sticky=NSEW)
 
         # Set le tableau d'affichange
@@ -239,7 +239,6 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_quitter.grid(row=3, column=2)
 
-
     def dessiner_chevalet(self, master, joueur):
         """
         Cette fonction dessine le chevalet du joueur actif dans un canevas.
@@ -256,7 +255,6 @@ class Scrabble(Tk):
 
             x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
             dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))
-
 
     def msg_points(self):
         """
@@ -945,7 +943,8 @@ class Scrabble(Tk):
         #set param
         self.joueur_actif = joueurs[position_joueur_actif]
         assert self.joueur_actif in joueurs
-
+        self.jetons_libres = jetons_libres
+        print(self.jetons_libres)
         # On initialise la partie
         self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
 
@@ -964,7 +963,7 @@ class Scrabble(Tk):
         # je pensais t'avoir donner une partie facile... erreur. lol
 
         # On lance la partie
-        self.jouer()
+        self.jouer(cases, positions)
 
         self.changer_joueur(charger=True, tour=tour)
         # j'ai ajouté un paramètre pour ne pas faire changer de joueur quand on charge une partie, ainsi que tour

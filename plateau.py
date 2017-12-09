@@ -18,35 +18,45 @@ class Plateau(Canvas):
     """
     DIMENSION = 15
 
-    def __init__(self, master, pixels_par_case):
+    def __init__(self, master, pixels_par_case, cases, positions, jetons_places):
         """Constructeur d'un plateau.
         :param master: Fenêtre principale, de type Tk
         :param pixels_par_case: Taille des cases en pixels
+        :param cases: None par défaut, passé en argument si on charge une partie.
+        :param positions: None par défaut, passé en argument si on charge une partie.
         """
         super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
         self.pixels_par_case = pixels_par_case
-        self.positions = []
-        self.jetons_places = []
+        if positions is None:
+            self.positions = []
+        else:
+            self.positions = positions
+        if jetons_places is None:
+            self.jetons_places = []
+        else:
+            self.jetons_places = jetons_places
         self.tour = 0
-
-        self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
-        for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
-            self.cases[i][j] = Case(3, 'M')
-        for (i, j) in [(1, 5), (1, 9), (5, 1), (5, 5), (5, 9), (5, 13),
-                       (9, 1), (9, 5), (9, 9), (9, 13), (13, 5), (13, 9)]:
-            self.cases[i][j] = Case(3, 'L')
-        for i in [1, 2, 3, 4]:
-            self.cases[i][i] = Case(2, 'M')
-            self.cases[i][Plateau.DIMENSION - i - 1] = Case(2, 'M')
-            self.cases[Plateau.DIMENSION - i - 1][Plateau.DIMENSION - i - 1] = Case(2, 'M')
-            self.cases[Plateau.DIMENSION - i - 1][i] = Case(2, 'M')
-        for i, j in [(1, 1), (4, 0), (0, 4), (5, 1), (1, 5), (7, 4)]:
-            self.cases[7 - i][7 - j] = Case(2, 'L')
-            self.cases[7 + i][7 - j] = Case(2, 'L')
-            self.cases[7 - i][7 + j] = Case(2, 'L')
-            self.cases[7 + i][7 + j] = Case(2, 'L')
-        self.cases[7][7] = Case(2, 'M')
+        if cases is None:
+            self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
+            for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
+                self.cases[i][j] = Case(3, 'M')
+            for (i, j) in [(1, 5), (1, 9), (5, 1), (5, 5), (5, 9), (5, 13),
+                           (9, 1), (9, 5), (9, 9), (9, 13), (13, 5), (13, 9)]:
+                self.cases[i][j] = Case(3, 'L')
+            for i in [1, 2, 3, 4]:
+                self.cases[i][i] = Case(2, 'M')
+                self.cases[i][Plateau.DIMENSION - i - 1] = Case(2, 'M')
+                self.cases[Plateau.DIMENSION - i - 1][Plateau.DIMENSION - i - 1] = Case(2, 'M')
+                self.cases[Plateau.DIMENSION - i - 1][i] = Case(2, 'M')
+            for i, j in [(1, 1), (4, 0), (0, 4), (5, 1), (1, 5), (7, 4)]:
+                self.cases[7 - i][7 - j] = Case(2, 'L')
+                self.cases[7 + i][7 - j] = Case(2, 'L')
+                self.cases[7 - i][7 + j] = Case(2, 'L')
+                self.cases[7 + i][7 + j] = Case(2, 'L')
+            self.cases[7][7] = Case(2, 'M')
+        else:
+            self.cases = cases
 
         self.dessiner()
         self.bind('<Configure>', self.redimensionner)
