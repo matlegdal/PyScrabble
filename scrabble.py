@@ -45,7 +45,6 @@ class Scrabble(Tk):
         self.message = StringVar()
         self.nom_joueur = StringVar()
         self.pointage = StringVar()
-        self.timer = 120
         self.chevalet_actif = None
         self.affichage_joueur = None
 
@@ -84,6 +83,10 @@ class Scrabble(Tk):
 
 
     def accueil(self):
+        """
+        Affichage de l'écran d'accueil.
+        :return: Aucun
+        """
         accueil = Frame(self.content)
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 

@@ -5,7 +5,7 @@ class Jeton:
 
     Les attributs d'un jeton sont:
     - lettre: str, représentant la lettre écrite sur le jeton. Par convention toutes les lettres au scrabble sont en majuscules.
-                Dans ce travail nous ne considérons pas les data jokers qui n'ont aucune lettre inscrite.
+                Dans ce travail nous ne considérons pas les jetons jokers qui n'ont aucune lettre inscrite.
     - valeur: int, compris entre 0 et 20 inclusivement et représentant le nombre de points associé au jeton.
     """
     def __init__(self, lettre, valeur):
