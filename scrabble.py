@@ -143,7 +143,7 @@ class Scrabble(Tk):
         self.changer_joueur()
 
 
-    def initialiser_partie(self, nb_joueurs, langue, difficulte, joueurs=[]):
+    def initialiser_partie(self, nb_joueurs, langue, difficulte, joueurs=None):
         """
         - La liste des joueurs est créée et chaque joueur porte automatiquement le nom Joueur 1, Joueur 2, ... Joueur n où n est le nombre de joueurs;
         - Le sac à jetons (self.jetons_libres) est créé
@@ -167,11 +167,11 @@ class Scrabble(Tk):
         assert 2 <= nb_joueurs <= 4
         assert langue.lower() in self.liste_langue
         self.langue = langue.lower()
-
-        if self.joueurs == []:
+        self.joueurs = joueurs
+        if self.joueurs is None:
             self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
-        else:
-            self.joueurs = joueurs
+        print(self.joueurs)
+
         self.difficulte = difficulte
 
         with open('data/{}.txt'.format(self.langue), 'r') as data:
@@ -632,22 +632,28 @@ class Scrabble(Tk):
         self.bind_prendre()
         self.bottom_right.destroy()
 
-    def changer_joueur(self):
+    def changer_joueur(self, charger=False, tour=0):
         """
         Change le joueur. C'est l'action de passer le tour au prochain joueur. La méthode change le joueur actif et affiche dans l'interface les infos du nouveau joueur.
         La méthode vérifie aussi si la partie est terminée.
-        -
+        :param charger: Bool, False par défaut, True quand une partie est chargée
+        :param tour ; int, 0 par défaut, si on charge une partie le tour sera affecté
         :return: Aucun return
         """
+
         # Vérification si la partie est terminée
         if self.partie_terminee():
             showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
             # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
 
-        # On passe au joueur suivant et on incrémente le tour de la partie
-        self.joueur_suivant()
-        self.plateau.tour += 1
+        # On passe au joueur suivant et on incrémente le tour de la partie, si on ne charge pas une partie
+        if charger is False:
+            self.joueur_suivant()
+        if tour == 0:
+            self.plateau.tour += 1
+        else:
+            self.plateau.tour = tour
 
         # On détermine le message à afficher
         if self.plateau.tour == 1:
@@ -880,7 +886,7 @@ class Scrabble(Tk):
                 print(langue)
 
                 joueurs = pickle.load(f)
-                print(joueurs)
+                print(joueurs,"JOUEURS CHARGÉS")
                 print(joueurs[1].points)
 
                 position_joueur_actif = pickle.load(f)
@@ -938,7 +944,7 @@ class Scrabble(Tk):
 
         #set param
         self.joueur_actif = joueurs[position_joueur_actif]
-
+        assert self.joueur_actif in joueurs
 
         # On initialise la partie
         self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
@@ -959,8 +965,9 @@ class Scrabble(Tk):
 
         # On lance la partie
         self.jouer()
-        self.changer_joueur()
 
+        self.changer_joueur(charger=True, tour=tour)
+        # j'ai ajouté un paramètre pour ne pas faire changer de joueur quand on charge une partie, ainsi que tour
 
     # def demande_sauvegarder_partie(self):
 
