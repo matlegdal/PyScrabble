@@ -198,6 +198,8 @@ class Scrabble(Tk):
             Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
             self.timer_label = Label(self.tableau, text='')
             self.timer_label.grid(row=3, column=1, pady=self.PADY)
+            self.set_clock()
+            self.clock()
 
         # Set les joueurs
         self.affichage_joueur = Frame(self.content)
@@ -614,7 +616,9 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.bind_prendre()
-        self.demarrer_clock()
+
+        if self.difficulte == "difficile":
+            self.set_clock()
 
     def mot_permis(self, mot):
         """
@@ -681,16 +685,8 @@ class Scrabble(Tk):
         # On retourne les jetons tirés
         return jetons_tires
 
-    def demarrer_clock(self):
-        try:
-            self.timer_label.destroy()
-        except AttributeError:
-            pass
-        finally:
-            self.timer = 60
-            self.timer_label = Label(self.tableau, text='')
-            self.timer_label.grid(row=3, column=1, pady=self.PADY)
-            self.clock()
+    def set_clock(self):
+         self.timer = 60
 
     def clock(self):
         self.timer -= 1
