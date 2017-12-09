@@ -33,21 +33,7 @@ class Scrabble(Tk):
     def __init__(self):
         super().__init__()
 
-        # Declare parameters
-        self.liste_langue = ['fr', 'en']
-        self.langue='fr'
-        self.difficulte = 'facile'
-        self.title("Scrabble")
-        self.plateau = None
-        self.joueur_actif = None
-        self.joueurs = []
-        self.jetons_libres = []
-        self.dictionnaire = None
-        self.message = StringVar()
-        self.nom_joueur = StringVar()
-        self.pointage = StringVar()
-        self.chevalet_actif = None
-        self.affichage_joueur = None
+        self.reset_partie()
 
         # Configure
         self.grid_columnconfigure(0, weight=1)
@@ -57,7 +43,7 @@ class Scrabble(Tk):
         # Création du menu
         self.barre_menu = Menu(self)
         self.fichier = Menu(self.barre_menu, tearoff=0)
-        self.fichier.add_command(label="Nouvelle partie", command=Scrabble)
+        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie)
         self.fichier.add_command(label="Sauvegarder la partie", state=DISABLED, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
@@ -73,6 +59,23 @@ class Scrabble(Tk):
         # On appelle la fenêtre principale et  l'écran d'accueil
         self.config_content()
         self.accueil()
+
+    def reset_partie(self):
+        # Declare parameters
+        self.liste_langue = ['fr', 'en']
+        self.langue='fr'
+        self.difficulte = 'facile'
+        self.title("Scrabble")
+        self.plateau = None
+        self.joueur_actif = None
+        self.joueurs = []
+        self.jetons_libres = []
+        self.dictionnaire = None
+        self.message = StringVar()
+        self.nom_joueur = StringVar()
+        self.pointage = StringVar()
+        self.chevalet_actif = None
+        self.affichage_joueur = None
 
     def config_content(self):
         """
@@ -124,7 +127,18 @@ class Scrabble(Tk):
 
         # Débuter la partie
         Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.charger_partie).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+
+    def nouvelle_partie(self):
+        """
+        Détruit la partie en cour et retourne à l'accueil
+        :return: aucun
+        """
+        self.content.destroy()
+        self.reset_partie()
+        self.config_content()
+        self.accueil()
+
 
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
@@ -132,9 +146,10 @@ class Scrabble(Tk):
         :param accueil: (Frame) Page d'accueil
         :param nb_joueurs: (int) Nombre de joueurs
         :param langue: (str) Code de langue à 2 lettres
+        :param difficulte: str, option de difficulté de la partie, 'facile' ou 'difficile'
         :return: aucun return
         """
-        accueil.destroy() # todo: quand on charge une partie, il faut lui laisser le temps de créer sa nouvelle fenêtre
+        accueil.destroy()
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
