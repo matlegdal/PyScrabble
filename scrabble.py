@@ -194,6 +194,7 @@ class Scrabble(Tk):
         Label(self.tableau, textvariable=self.message).grid(row=0, columnspan=2)
         Label(self.tableau, textvariable=self.pointage).grid(row=1, columnspan=2)
 
+        # Timer (version difficile uniquement)
         if self.difficulte == 'difficile':
             Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
             self.timer_label = Label(self.tableau, text='')
@@ -677,18 +678,25 @@ class Scrabble(Tk):
 
         # On mélange les jetons dans le sac
         shuffle(self.jetons_libres)
-
         # On prend n jetons et on les enlève du sac
         jetons_tires = self.jetons_libres[:n]
         self.jetons_libres = self.jetons_libres[n:]
-
         # On retourne les jetons tirés
         return jetons_tires
 
     def set_clock(self):
-         self.timer = 60
+        """
+        Fonction utilitaire simple qui reset le timer au temps permis (difficulté 'difficile' utilisant les règles officielles)
+        :return: Aucun
+        """
+        self.timer = 60
 
     def clock(self):
+        """
+        Fonction responsable de faire fonctionner le timer pour limiter le temps alloué par tour dans la difficulté 'difficile' officielle.
+        Est aussi responsable de l'affichage du timer dans l'interface
+        :return: Aucun
+        """
         self.timer -= 1
         if self.timer == 0:
             self.temps_ecoule()
@@ -696,6 +704,11 @@ class Scrabble(Tk):
         self.timer_label.after(1000, self.clock)
 
     def temps_ecoule(self):
+        """
+        Fonction appelée lorsque le temps par tour alloué est écoulé dans la version 'difficile' utilisant les règles officielles.
+        Reprend tous les jetons placés et les retourne dans le chevalet du joueur avant de changer de joueur.
+        :return: Aucun
+        """
         messagebox.showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
         self.reprendre_tous_les_jetons()
         self.changer_joueur()
