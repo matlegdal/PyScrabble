@@ -49,7 +49,7 @@ class Scrabble(Tk):
         self.fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
-        self.fichier.add_command(label="Quitter", command=self.quit)
+        self.fichier.add_command(label="Quitter", command=self.quitter)
         self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
 
         self.aide = Menu(self.barre_menu, tearoff=0)
@@ -139,11 +139,32 @@ class Scrabble(Tk):
         Détruit la partie en cours et retourne à l'accueil
         :return: aucun
         """
+        self.verifier_avant_de_quitter()
         self.content.destroy()
         self.reset_partie()
         self.config_content()
         self.accueil()
 
+    def verifier_avant_de_quitter(self):
+        """
+        Fonction qui demande au joueur s'il veut sauvegarder la partie avant de quitter. Appelée lors de l'utilisation
+        des commandes Quitter, Charger une partie et Nouvelle partie
+        :return aucun
+        """
+        if self.plateau is not None:
+            sauvegarder = askyesno('Attention', "Voulez-vous sauvegarder la partie en cours avant de quitter?")
+            if sauvegarder:
+                self.sauvegarder_partie()
+            else:
+                return
+
+    def quitter(self):
+        """
+        Fonction qui permet de quitter le jeu de Scrabble de façon sécuritaire en demandant à l'utilisateur s'il souhaite
+        sauvegarder la partie courante avant de quitter.
+        """
+        self.verifier_avant_de_quitter()
+        self.quit()
 
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
@@ -251,14 +272,14 @@ class Scrabble(Tk):
         btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
         btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
-        btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
+        btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
 
         # Affichage des boutons d'actions
         btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
         btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
-        btn_quitter.grid(row=3, column=2)
+        btn_abandonner.grid(row=3, column=2)
 
     def dessiner_chevalet(self, master, joueur):
         """
@@ -560,7 +581,7 @@ class Scrabble(Tk):
 
         self.changer_joueur()
 
-    def quitter(self):
+    def abandonner(self):
         """
         Retire un joueur de la liste des joueurs
         :return: Aucun return
@@ -572,9 +593,9 @@ class Scrabble(Tk):
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
-        quitter = self.joueur_actif
+        abandonner = self.joueur_actif
         self.changer_joueur()
-        self.joueurs.remove(quitter)
+        self.joueurs.remove(abandonner)
 
         # Vérifie si la partie est terminée
         if self.partie_terminee():
@@ -872,6 +893,8 @@ class Scrabble(Tk):
         lequel l'objet avait été sauvegardé précédemment.
         :return:
         """
+        self.verifier_avant_de_quitter()
+
         nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
 
         with open(nom_fichier, "rb") as f:
