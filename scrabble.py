@@ -845,7 +845,18 @@ class Scrabble(Tk):
             #self.plateau.jetons_places = jetons_places
             self.difficulte = difficulte
 
-            self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
+            # self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
+            # ici il est sans doute mieux d'utiliser la fonction initialiser_partie()
+            # demarrer partie est pour aussi détruire l'accueil. ici on ne passe pas par l'accueil... donc ça va bugger pcq il va essayer de détruire qqc qui n'existe pas.
+
+            # Aussi, même si tu voulais utiliser la fonction demarrer_partie, les arguments qu'il faut que tu passes sont ACCUEIL, nb_joueurs, etc. -> self=Scrabble dans ce cas-ci
+            # Forcément ça va bugger! en appelant la fonction démarrer_partie comme tu le fais, ce que tu te retrouves à faire c'est détruire Scrabble pcq tu passes self
+            # à la place de l'accueil donc il détruit self -> donc il s'autodétruit.... haha
+
+            # rappelle toi aussi qu'écrire self.fonction() c'est juste un raccourci pour écrire Class.fonction(self), donc si tu appelles une fonction en écrivant
+            # self.fonction() tu lui passes self en 1er argument de façon implicite. donc c'est bien rare que tu vas écrire self.fonction(self) à moins d'un cas particulier.
+
+            self.initialiser_partie(len(joueurs), self.langue, self.difficulte)
 
 
     def demande_sauvegarder_partie(self):
