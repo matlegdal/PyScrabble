@@ -90,9 +90,9 @@ IMPLANTÉE:
 /5 : Affichage de la liste des mots sur le plateau
      Commentaires :
 
-IMPLANTÉE: oui
+IMPLANTÉE: OUI
 /5 : Permettre d'annuler le dernier mouvement
-     Commentaires : On peut reprendre les jetons déposés sur le plateau sans problème.
+     Commentaires :
 
 IMPLANTÉE:
 /5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
@@ -110,8 +110,8 @@ IMPLANTÉE:
 /5 : "Drag-and-drop" de jetons
      Commentaires :
 
-IMPLANTÉE:
-/10 : TODO: Afficher un compteur de temps de jeu pour chaque joueur
+IMPLANTÉE: OUI
+/10 : Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires :
 
 IMPLANTÉE:
@@ -130,15 +130,15 @@ IMPLANTÉE: Oui
 /5 : Fenêtre de bienvenue, avec explications du jeu et sélection d'options
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: OUI
 /30 : Implémenter toutes les règles offcielles d'une version du scrabble
      Source: Fédération internationale de Scrabble francophone (https://www.fisf.net)
-     Commentaires :
-     TODO: Règles à ajouter
-     - Gestion des jokers
-     - Un joueur qui pose 7 jetons en un seul tour a un bonus de 50 points (Scrabble!) -> OK
-     - Gestion du temps -> OK
-     - Un joueur qui se trompe dans un mot reprend ses lettres et passe son tour -> OK
+     Commentaires : Nous avons implémenté 2 degrés de difficulté, une version facile et une version "difficile" qui suit toutes les règles officielles du scrabble de compétition.
+     Nous listons ci-dessous les règles ajoutées ainsi que le niveau de difficulté qui s'applique:
+     - Gestion des jokers -> facile et difficile
+     - Un joueur qui pose 7 jetons en un seul tour a un bonus de 50 points (Scrabble!) -> facile et difficile
+     - Gestion du temps -> difficile seulement
+     - Un joueur qui se trompe dans un mot reprend ses lettres et passe son tour -> difficile seulement (dans la version facile le joueur est averti des mots erronés, mais peut continuer son tour)
 
 
 IMPLANTÉE:

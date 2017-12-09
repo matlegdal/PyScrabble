@@ -19,7 +19,7 @@ class Jeton:
         """
         assert 0 <= valeur <=20
 
-        assert (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == '[]'
+        assert (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == 'Joker'
         self.lettre = lettre
         self.valeur = valeur
 

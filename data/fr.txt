@@ -1,4 +1,4 @@
-[],20,0,True
+Joker,2,0,True
 E,15,1,False
 A,9,1,False
 I,8,1,False

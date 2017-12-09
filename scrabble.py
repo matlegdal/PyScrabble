@@ -60,8 +60,8 @@ class Scrabble(Tk):
         barre_menu = Menu(self)
         fichier = Menu(barre_menu, tearoff=0)
         fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        fichier.add_command(label="Sauvegarder la partie", command=self.demande_sauvegarder_partie)  # TODO: state active quand une partie est en cours
-        fichier.add_command(label="Charger une partie", command=self.demander_charger_partie)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
+        fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        fichier.add_command(label="Charger une partie", command=self.charger_partie)  # TODO: commande qui ouvre une fenetre avec un text pour charger la partie
         fichier.add_separator()
         fichier.add_command(label="Quitter", command=self.quit)
         barre_menu.add_cascade(label="Fichier", menu=fichier)
@@ -488,10 +488,6 @@ class Scrabble(Tk):
         self.plateau.jetons_places = []
         self.changer_joueur()
 
-    # def demander_lettre(self):
-    #     lettre = askstring('Joker', 'Entrez la lettre que vous souhaitez attribuer au joker.')
-
-
     def reprendre_tous_les_jetons(self):
         """
         - retirer les jetons du plateau et effacer la représentation graphique des jetons
@@ -804,12 +800,11 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    def sauvegarder_partie(self, nom_fichier):
+    def sauvegarder_partie(self):
         """
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
         La sauvegarde se fera grâce à la fonction dump du module pickle.
-        :param nom_fichier: Nom du fichier qui contient un objet scrabble.
-        :return: True si la sauvegarde s'est bien passé, False si une erreur s'est passé durant la sauvegarde.
+        :return: Aucun
         """
 
         # Note: ici la stratégie est de dumper les infos qui sont propres à la partie
@@ -821,6 +816,10 @@ class Scrabble(Tk):
         # self.plateau.tour
         # self.plateau.positions
         # self.plateau.jetons_places
+
+        # Ok j'ai trouvé le moyen le plus simple d'avoir une boite de dialogue pour entrer le nom de fichier c'est dans
+        # le module simpledialog. Plus besoin de demander_sauvegarder_partie
+        nom_fichier = askstring("Sauvegarder", "Entrez le nom de la sauvegarde:")
 
         try:
             with open(nom_fichier, "wb") as f:
@@ -850,13 +849,14 @@ class Scrabble(Tk):
             print("echec")
             return False
 
-    def charger_partie(self, nom_fichier):
+    def charger_partie(self):
         """
         Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
         lequel l'objet avait été sauvegardé précédemment.
-        :param nom_fichier: Nom du fichier qui contient un objet scrabble.
         :return:
         """
+        nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+
         with open(nom_fichier, "rb") as f:
             try:
                 print("DÉBUT LOAD")
@@ -934,7 +934,7 @@ class Scrabble(Tk):
         self.changer_joueur()
 
 
-    def demande_sauvegarder_partie(self):
+    # def demande_sauvegarder_partie(self):
 
         # Commentaire: ici on peut utiliser la méthode simple et juste y aller avec ta 1ere méthode
         # sinon on peut y aller avec la méthode compliquée et utiliser sys.platform du module sys pour déterminer l'OS et proposer la bonne méthode à chaque.
@@ -944,52 +944,54 @@ class Scrabble(Tk):
         #
         # self.sauvegarder_partie(self.nom_fichier)
 
-        self.fenetre_sauv = Toplevel(self)
-        self.fenetre_sauv.title("Sauvegarder")
-        cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
-        cadre_label_entry.grid(row=0)
+        # self.fenetre_sauv = Toplevel(self)
+        # self.fenetre_sauv.title("Sauvegarder")
+        # cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
+        # cadre_label_entry.grid(row=0)
+        #
+        # label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
+        # label_sauvegarde.grid(row=0)
+        #
+        # nom_fichier =StringVar()
+        #
+        # entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+        # entry_sauvegarde.grid(row=1)
+        #
+        # cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
+        # cadre_btn.grid(row=1)
+        # btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
+        #                 command=lambda: self.sauvegarder_partie(nom_fichier.get()))
+        # btn_ok.grid(row=0, column=0)
+        # btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
+        # btn_cancel.grid(row=0, column=2)
 
-        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-        label_sauvegarde.grid(row=0)
 
-        nom_fichier =StringVar()
 
-        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-        entry_sauvegarde.grid(row=1)
-
-        cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
-        cadre_btn.grid(row=1)
-        btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-                        command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-        btn_ok.grid(row=0, column=0)
-        btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
-        btn_cancel.grid(row=0, column=2)
-
-    def demander_charger_partie(self):
-
-        # self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
-        #                                               filetypes=(("all files", "*.*"),))
-        # print(self.nom_fichier)
-        # self.charger_partie(self.nom_fichier)
-
-        self.fenetre_charger = Toplevel(self)
-        self.fenetre_charger.title("Charger une partie")
-        cadre_label_entry = Frame(self.fenetre_charger, padx=10, pady=10)
-        cadre_label_entry.grid(row=0)
-
-        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la partie à charger:", padx=10, pady=10)
-        label_sauvegarde.grid(row=0)
-
-        nom_fichier = StringVar()
-
-        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-        entry_sauvegarde.grid(row=1)
-
-        cadre_btn = Frame(self.fenetre_charger, padx=10, pady=10)
-        cadre_btn.grid(row=1)
-        btn_ok = Button(cadre_btn, text="Charger", padx=10, pady=10,
-                        command=lambda: self.charger_partie(nom_fichier.get()))
-        btn_ok.grid(row=0, column=0)
-        btn_cancel = Button(cadre_btn, text="Annuler", padx=10, pady=10, command=self.fenetre_charger.destroy)
-        btn_cancel.grid(row=0, column=2)
+    # def demander_charger_partie(self):
+    #
+    #     # self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
+    #     #                                               filetypes=(("all files", "*.*"),))
+    #     # print(self.nom_fichier)
+    #     # self.charger_partie(self.nom_fichier)
+    #
+    #     self.fenetre_charger = Toplevel(self)
+    #     self.fenetre_charger.title("Charger une partie")
+    #     cadre_label_entry = Frame(self.fenetre_charger, padx=10, pady=10)
+    #     cadre_label_entry.grid(row=0)
+    #
+    #     label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la partie à charger:", padx=10, pady=10)
+    #     label_sauvegarde.grid(row=0)
+    #
+    #     nom_fichier = StringVar()
+    #
+    #     entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+    #     entry_sauvegarde.grid(row=1)
+    #
+    #     cadre_btn = Frame(self.fenetre_charger, padx=10, pady=10)
+    #     cadre_btn.grid(row=1)
+    #     btn_ok = Button(cadre_btn, text="Charger", padx=10, pady=10,
+    #                     command=lambda: self.charger_partie(nom_fichier.get()))
+    #     btn_ok.grid(row=0, column=0)
+    #     btn_cancel = Button(cadre_btn, text="Annuler", padx=10, pady=10, command=self.fenetre_charger.destroy)
+    #     btn_cancel.grid(row=0, column=2)
 
