@@ -1,5 +1,6 @@
 import pickle
 from random import randint, shuffle, seed
+from case import Case
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
@@ -49,18 +50,10 @@ class Scrabble(Tk):
         self.affichage_joueur = None
 
         # Configure
-        self.content = Frame(self)
-        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
-
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.minsize(width=800, height=600)
 
-        self.content.grid_columnconfigure(0, weight=2)
-        self.content.grid_columnconfigure(1, weight=1)
-        self.content.grid_rowconfigure(0, weight=1)
-        self.content.grid_rowconfigure(1, weight=1)
-        self.content.grid_rowconfigure(2, weight=1)
 
         # Création du menu
         barre_menu = Menu(self)
@@ -78,9 +71,22 @@ class Scrabble(Tk):
 
         self.config(menu=barre_menu)
 
-        # On appelle l'écran d'accueil
+        # On appelle la fenêtre principale et  l'écran d'accueil
+        self.config_content()
         self.accueil()
 
+    def config_content(self):
+        """
+        Configure la fenêtre principale
+        :return: Aucun
+        """
+        self.content = Frame(self)
+        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
+        self.content.grid_columnconfigure(0, weight=2)
+        self.content.grid_columnconfigure(1, weight=1)
+        self.content.grid_rowconfigure(0, weight=1)
+        self.content.grid_rowconfigure(1, weight=1)
+        self.content.grid_rowconfigure(2, weight=1)
 
     def accueil(self):
         """
@@ -780,6 +786,7 @@ class Scrabble(Tk):
 
         try:
             with open(nom_fichier, "wb") as f:
+                print("DÉBUT SAUVEGARDE")
                 pickle.dump(self.langue, f)
                 print(self.langue)
                 pickle.dump(self.joueurs, f)
@@ -806,57 +813,87 @@ class Scrabble(Tk):
             return False
 
     def charger_partie(self, nom_fichier):
-        """ *** Vous n'avez pas à coder cette méthode ***
+        """
         Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
-        lequel l'objet avait été sauvegardé précédemment. Pensez à utiliser la fonction load du module pickle.
+        lequel l'objet avait été sauvegardé précédemment.
         :param nom_fichier: Nom du fichier qui contient un objet scrabble.
-        :return: Scrabble, l'objet chargé en mémoire.
+        :return:
         """
         with open(nom_fichier, "rb") as f:
-            langue = pickle.load(f)
-            print(langue)
-            joueurs = pickle.load(f)
-            print(joueurs)
-            print(joueurs.points)
-            joueur_actif = pickle.load(f)
-            print(joueur_actif)
-            jetons_libres = pickle.load(f)
-            print(jetons_libres)
-            cases = pickle.load(f)
-            print(cases)
-            tour = pickle.load(f)
-            print(tour)
-            positions = pickle.load(f)
-            print(positions)
-            jetons_places = pickle.load(f)
-            print(jetons_places)
-            difficulte = pickle.load(f)
-            print(difficulte)
+            try:
+                print("DÉBUT LOAD")
+                langue = pickle.load(f)
+                print(langue)
+                joueurs = pickle.load(f)
+                print(joueurs)
+                print(joueurs[0].points)
+                joueur_actif = pickle.load(f)
+                print(joueur_actif)
+                jetons_libres = pickle.load(f)
+                print(jetons_libres)
+                cases = pickle.load(f)
+                print(cases)
+                tour = pickle.load(f)
+                print(tour)
+                positions = pickle.load(f)
+                print(positions)
+                jetons_places = pickle.load(f)
+                print(jetons_places)
+                difficulte = pickle.load(f)
+                print(difficulte)
 
-            assert cases is not None
+                assert cases is not None # ça c'est pas forcément utile... c'est trop général utilises plutôt :
+                assert isinstance(cases, list)
+                assert all([isinstance(case, Case) for ligne in cases for case in ligne])
 
-            self.langue = langue
-            Scrabble.joueurs = joueurs
-            Scrabble.joueur_actif = joueur_actif
-            #self.jetons_libres = jetons_libres
-            #self.plateau.cases = cases
-            #self.plateau.tour = tour
-            #self.plateau.positions = positions
-            #self.plateau.jetons_places = jetons_places
-            self.difficulte = difficulte
+            # les assert devraient marcher, mais je ne peux pas tester car l'interface de charger_partie n'apparait pas sous mac.. donc p-e qu'il faudra modifier.
+            # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
-            # self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
-            # ici il est sans doute mieux d'utiliser la fonction initialiser_partie()
-            # demarrer partie est pour aussi détruire l'accueil. ici on ne passe pas par l'accueil... donc ça va bugger pcq il va essayer de détruire qqc qui n'existe pas.
+            except AssertionError as e:
+                print(e)
 
-            # Aussi, même si tu voulais utiliser la fonction demarrer_partie, les arguments qu'il faut que tu passes sont ACCUEIL, nb_joueurs, etc. -> self=Scrabble dans ce cas-ci
-            # Forcément ça va bugger! en appelant la fonction démarrer_partie comme tu le fais, ce que tu te retrouves à faire c'est détruire Scrabble pcq tu passes self
-            # à la place de l'accueil donc il détruit self -> donc il s'autodétruit.... haha
+        # Une fois que tu as vérifié que les données sont bonnes, tu peux sortir de la boucle 'with open' en désindentant comme j'ai fait ici
+        # ça va fermer le fichier car tu n'en a plus besoin.
 
-            # rappelle toi aussi qu'écrire self.fonction() c'est juste un raccourci pour écrire Class.fonction(self), donc si tu appelles une fonction en écrivant
-            # self.fonction() tu lui passes self en 1er argument de façon implicite. donc c'est bien rare que tu vas écrire self.fonction(self) à moins d'un cas particulier.
+        # self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
+        # ici il est sans doute mieux d'utiliser la fonction initialiser_partie()
+        # demarrer partie est pour aussi détruire l'accueil. ici on ne passe pas par l'accueil... donc ça va bugger pcq il va essayer de détruire qqc qui n'existe pas.
 
-            self.initialiser_partie(len(joueurs), self.langue, self.difficulte)
+        # Aussi, même si tu voulais utiliser la fonction demarrer_partie, les arguments qu'il faut que tu passes sont ACCUEIL, nb_joueurs, etc. -> self = Scrabble dans ce cas-ci
+        # Forcément ça va bugger! en appelant la fonction démarrer_partie comme tu le fais, ce que tu te retrouves à faire c'est détruire Scrabble pcq tu passes self
+        # à la place de l'accueil donc il détruit self -> donc il s'autodétruit.... haha
+
+        # rappelle toi aussi qu'écrire self.fonction() c'est juste un raccourci pour écrire Class.fonction(self), donc si tu appelles une fonction en écrivant
+        # self.fonction() tu lui passes self en 1er argument de façon implicite. donc c'est bien rare que tu vas écrire self.fonction(self) à moins d'un cas particulier.
+
+        # Ici je t'ai fait un petit plan de comment faire. Je ne peux pas tester, donc c'est sûr que ça marchera probablement pas du 1er coup.
+        # mais je voulais juste te donner une base...
+
+        # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
+        self.content.destroy()
+        self.config_content()
+
+        # On initialise la partie
+        self.initialiser_partie(len(joueurs), langue, difficulte)
+
+        # On set les paramètres
+        self.joueurs = joueurs
+        self.joueur_actif = joueur_actif
+        self.jetons_libres = jetons_libres
+        self.plateau.cases = cases
+        self.plateau.tour = tour
+        self.plateau.positions = positions
+        self.plateau.jetons_places = jetons_places
+
+        # OK! J'ai compris une partie du problème. Les ids des objets changent on dirait -> regarde le chiffre à côté de object at 0x10390.... entre un save et un load, ça change
+        # d'où l'erreur quand il essaie de changer de joueur par exemple.
+        # peut-être que ça serait mieux de saver le nom ou l'index du joueur actif.. qqc comme ça.
+        # bon je t'ai donné quelques pistes, mais c'est juste des idées, continues la-dessus
+        # je pensais t'avoir donner une partie facile... erreur. lol
+
+        # On lance la partie
+        self.jouer()
+        self.changer_joueur()
 
 
     def demande_sauvegarder_partie(self):
@@ -892,8 +929,29 @@ class Scrabble(Tk):
 
     def demander_charger_partie(self):
 
-        self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
-                                                      filetypes=(("all files", "*.*"),))
-        print(self.nom_fichier)
-        self.charger_partie(self.nom_fichier)
+        # self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
+        #                                               filetypes=(("all files", "*.*"),))
+        # print(self.nom_fichier)
+        # self.charger_partie(self.nom_fichier)
+
+        self.fenetre_charger = Toplevel(self)
+        self.fenetre_charger.title("Charger une partie")
+        cadre_label_entry = Frame(self.fenetre_charger, padx=10, pady=10)
+        cadre_label_entry.grid(row=0)
+
+        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la partie à charger:", padx=10, pady=10)
+        label_sauvegarde.grid(row=0)
+
+        nom_fichier = StringVar()
+
+        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+        entry_sauvegarde.grid(row=1)
+
+        cadre_btn = Frame(self.fenetre_charger, padx=10, pady=10)
+        cadre_btn.grid(row=1)
+        btn_ok = Button(cadre_btn, text="Charger", padx=10, pady=10,
+                        command=lambda: self.charger_partie(nom_fichier.get()))
+        btn_ok.grid(row=0, column=0)
+        btn_cancel = Button(cadre_btn, text="Annuler", padx=10, pady=10, command=self.fenetre_charger.destroy)
+        btn_cancel.grid(row=0, column=2)
 
