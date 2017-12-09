@@ -126,7 +126,7 @@ class Scrabble(Tk):
 
         # Débuter la partie
         Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.demander_charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
 
 
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
@@ -143,7 +143,7 @@ class Scrabble(Tk):
         self.changer_joueur()
 
 
-    def initialiser_partie(self, nb_joueurs, langue, difficulte):
+    def initialiser_partie(self, nb_joueurs, langue, difficulte, joueurs=[]):
         """
         - La liste des joueurs est créée et chaque joueur porte automatiquement le nom Joueur 1, Joueur 2, ... Joueur n où n est le nombre de joueurs;
         - Le sac à jetons (self.jetons_libres) est créé
@@ -161,12 +161,17 @@ class Scrabble(Tk):
         https://fr.wikipedia.org/wiki/Lettres_du_Scrabble
 
         :param difficulte: str, difficulté de la partie -> facile et difficile. Le mode difficile implémente les règles officielles du jeu de Scrabble
+        :param joueurs: Liste des joueurs, None par défaut
         :exception: Levez une exception avec assert si la langue n'est ni fr ou en ou si nb_joueur < 2 ou > 4.
         """
         assert 2 <= nb_joueurs <= 4
         assert langue.lower() in self.liste_langue
         self.langue = langue.lower()
-        self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
+
+        if self.joueurs == []:
+            self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
+        else:
+            self.joueurs = joueurs
         self.difficulte = difficulte
 
         with open('data/{}.txt'.format(self.langue), 'r') as data:
@@ -824,29 +829,39 @@ class Scrabble(Tk):
         try:
             with open(nom_fichier, "wb") as f:
                 print("DÉBUT SAUVEGARDE")
+
                 pickle.dump(self.langue, f)
                 print(self.langue)
+
                 pickle.dump(self.joueurs, f)
                 print(self.joueurs)
-                pickle.dump(self.joueur_actif, f)
-                print(self.joueur_actif)
+
+                for positions in range(len(self.joueurs)):
+                    if self.joueurs[positions] == self.joueur_actif:
+                        position_joueur_actif = positions
+                        print(position_joueur_actif)
+                pickle.dump(position_joueur_actif, f)
+
                 pickle.dump(self.jetons_libres, f)
                 print(self.jetons_libres)
+
                 pickle.dump(self.plateau.cases, f)
                 print(self.plateau.cases)
+
                 pickle.dump(self.plateau.tour, f)
                 print(self.plateau.tour)
+
                 pickle.dump(self.plateau.positions, f)
                 print(self.plateau.positions)
+
                 pickle.dump(self.plateau.jetons_places, f)
                 print(self.plateau.jetons_places)
+
                 pickle.dump(self.difficulte, f)
                 print(self.difficulte)
 
-            self.fenetre_sauv.destroy()
-
         except:
-            print("echec")
+            print("echec de la sauvegarde")
             return False
 
     def charger_partie(self):
@@ -860,29 +875,39 @@ class Scrabble(Tk):
         with open(nom_fichier, "rb") as f:
             try:
                 print("DÉBUT LOAD")
+
                 langue = pickle.load(f)
                 print(langue)
+
                 joueurs = pickle.load(f)
                 print(joueurs)
-                print(joueurs[0].points)
-                joueur_actif = pickle.load(f)
-                print(joueur_actif)
+                print(joueurs[1].points)
+
+                position_joueur_actif = pickle.load(f)
+                print(position_joueur_actif)
+
                 jetons_libres = pickle.load(f)
                 print(jetons_libres)
+
                 cases = pickle.load(f)
                 print(cases)
+
                 tour = pickle.load(f)
                 print(tour)
+
                 positions = pickle.load(f)
                 print(positions)
+
                 jetons_places = pickle.load(f)
                 print(jetons_places)
+
                 difficulte = pickle.load(f)
                 print(difficulte)
 
                 assert cases is not None # ça c'est pas forcément utile... c'est trop général utilises plutôt :
                 assert isinstance(cases, list)
                 assert all([isinstance(case, Case) for ligne in cases for case in ligne])
+                assert isinstance(position_joueur_actif, int)
 
             # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
@@ -911,17 +936,20 @@ class Scrabble(Tk):
         self.content.destroy()
         self.config_content()
 
+        #set param
+        self.joueur_actif = joueurs[position_joueur_actif]
+
+
         # On initialise la partie
-        self.initialiser_partie(len(joueurs), langue, difficulte)
+        self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
 
         # On set les paramètres
-        self.joueurs = joueurs
-        self.joueur_actif = joueur_actif
-        self.jetons_libres = jetons_libres
-        self.plateau.cases = cases
-        self.plateau.tour = tour
-        self.plateau.positions = positions
-        self.plateau.jetons_places = jetons_places
+        #self.joueur_actif = joueur_actif
+        #self.jetons_libres = jetons_libres
+        #self.plateau.cases = cases
+        #self.plateau.tour = tour
+        #self.plateau.positions = positions
+        #self.plateau.jetons_places = jetons_places
 
         # OK! J'ai compris une partie du problème. Les ids des objets changent on dirait -> regarde le chiffre à côté de object at 0x10390.... entre un save et un load, ça change
         # d'où l'erreur quand il essaie de changer de joueur par exemple.
