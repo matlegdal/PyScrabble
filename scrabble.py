@@ -356,8 +356,19 @@ class Scrabble(Tk):
                 print(e)
 
     def jeter_jeton(self, event):
+        """
+        Permet de retirer un jeton du chevalet du joueur et le placer dans le chevalet des jetons à jeter.
+        :param event: Le clic de souris ayant déclenché l'évènement
+        :return: aucun
+        """
         pos = floor(event.x / self.PIXELS_PAR_CASE)
+
+        nb_jetons = len(self.joueur_actif.chevalet)
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
+
+        # assert len(self.joueur_actif.chevalet) < nb_jetons
+        # TODO: régler le bug qui fait que les jetons ne se retirent pas bien du chevalet.
+
         self.joueur_actif.jetons_jetes.append(jeton_retire)
 
         x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
@@ -846,7 +857,6 @@ class Scrabble(Tk):
                 assert isinstance(cases, list)
                 assert all([isinstance(case, Case) for ligne in cases for case in ligne])
 
-            # les assert devraient marcher, mais je ne peux pas tester car l'interface de charger_partie n'apparait pas sous mac.. donc p-e qu'il faudra modifier.
             # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
             except AssertionError as e:

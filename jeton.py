@@ -8,27 +8,40 @@ class Jeton:
                 Dans ce travail nous ne considérons pas les jetons jokers qui n'ont aucune lettre inscrite.
     - valeur: int, compris entre 0 et 20 inclusivement et représentant le nombre de points associé au jeton.
     """
-    def __init__(self, lettre, valeur):
+    def __init__(self, lettre, valeur, joker):
         """
         Constructeur de la classe. Permet de créer un Jeton à partir d'une lettre et d'un nombre de points
         :param lettre: str, représentant la lettre écrite sur le jeton.
         :param valeur: int, > 0 représentant le nombre de points associé au jeton.
+        :param joker: bool, True si c'est un joker, false sinon
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        assert len(lettre) == 1 and lettre.isupper() and lettre.isalpha()
         assert 0 <= valeur <=20
 
+        assert (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == '{ }'
         self.lettre = lettre
         self.valeur = valeur
 
+        self.joker = True if joker == 'True' else False
+
     def __str__(self):
-        """ *** Vous n'avez pas à coder cette méthode ***
+        """
         Formatage d'un jeton. Cette méthode est appelée lorsque vous faites str(v) où v est un jeton.
         :return: str, correspondant au formatage du jeton.
         """
+        # if self.joker is True:
+        #     res = " "
         if self.valeur < 10:
             res = "{}{}".format(self.lettre, chr(0x2080 + self.valeur))
         else:
             res = "{}{}{}".format(self.lettre, chr(0x2080 + int(self.valeur/10)), chr(0x2080 + int(self.valeur%10)))
         return res
+
+
+if __name__ == "__main__":
+    jeton = Jeton('{ }', 0, 'True')
+    print(jeton)
+
+    jetonb = Jeton('B', 3, 'False')
+    print(jetonb)

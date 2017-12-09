@@ -1,26 +1,27 @@
-E, 15, 1
-A, 9, 1
-I, 8, 1
-N, 6, 1
-O, 6, 1
-R, 6, 1
-S, 6, 1
-T, 6, 1
-U, 6, 1
-L, 5, 1
-D, 3, 2
-M, 3, 2
-G, 2, 2
-B, 2, 3
-C, 2, 3
-P, 2, 3
-F, 2, 4
-H, 2, 4
-V, 2, 4
-J, 1, 8
-Q, 1, 8
-K, 1, 10
-W, 1, 10
-X, 1, 10
-Y, 1, 10
-Z, 1, 10
+{ },2,0, True
+E,15,1, False
+A,9,1, False
+I,8,1, False
+N,6,1, False
+O,6,1, False
+R,6,1, False
+S,6,1, False
+T,6,1, False
+U,6,1, False
+L,5,1, False
+D,3,2, False
+M,3,2, False
+G,2,2, False
+B,2,3, False
+C,2,3, False
+P,2,3, False
+F,2,4, False
+H,2,4, False
+V,2,4, False
+J,1,8, False
+Q,1,8, False
+K,1,10, False
+W,1,10, False
+X,1,10, False
+Y,1,10, False
+Z,1,10, False
