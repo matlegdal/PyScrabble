@@ -127,7 +127,7 @@ class Scrabble(Tk):
         :param langue: (str) Code de langue à 2 lettres
         :return: aucun return
         """
-        accueil.destroy()
+        accueil.destroy() # todo: quand on charge une partie, il faut lui laisser le temps de créer sa nouvelle fenêtre
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
@@ -805,6 +805,7 @@ class Scrabble(Tk):
             print(langue)
             joueurs = pickle.load(f)
             print(joueurs)
+            print(joueurs.points)
             joueur_actif = pickle.load(f)
             print(joueur_actif)
             jetons_libres = pickle.load(f)
@@ -823,16 +824,17 @@ class Scrabble(Tk):
             assert cases is not None
 
             self.langue = langue
-            self.joueurs = joueurs
-            self.joueur_actif = joueur_actif
-            self.jetons_libres = jetons_libres
-            self.plateau.cases = cases
-            self.plateau.tour = tour
-            self.plateau.positions = positions
-            self.plateau.jetons_places = jetons_places
+            Scrabble.joueurs = joueurs
+            Scrabble.joueur_actif = joueur_actif
+            #self.jetons_libres = jetons_libres
+            #self.plateau.cases = cases
+            #self.plateau.tour = tour
+            #self.plateau.positions = positions
+            #self.plateau.jetons_places = jetons_places
             self.difficulte = difficulte
 
-            self.demarrer_partie(nb_joueurs=len(self.joueurs), langue=self.langue, difficulte=self.difficulte)
+            self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
+
 
     def demande_sauvegarder_partie(self):
 
@@ -844,26 +846,26 @@ class Scrabble(Tk):
         #
         # self.sauvegarder_partie(self.nom_fichier)
 
-       self.fenetre_sauv = Toplevel(self)
-       self.fenetre_sauv.title("Sauvegarder")
-       cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
-       cadre_label_entry.grid(row=0)
+        self.fenetre_sauv = Toplevel(self)
+        self.fenetre_sauv.title("Sauvegarder")
+        cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
+        cadre_label_entry.grid(row=0)
 
-       label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-       label_sauvegarde.grid(row=0)
+        label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
+        label_sauvegarde.grid(row=0)
 
-       nom_fichier =StringVar()
+        nom_fichier =StringVar()
 
-       entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-       entry_sauvegarde.grid(row=1)
+        entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
+        entry_sauvegarde.grid(row=1)
 
-       cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
-       cadre_btn.grid(row=1)
-       btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-                       command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-       btn_ok.grid(row=0, column=0)
-       btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
-       btn_cancel.grid(row=0, column=2)
+        cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
+        cadre_btn.grid(row=1)
+        btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
+                        command=lambda: self.sauvegarder_partie(nom_fichier.get()))
+        btn_ok.grid(row=0, column=0)
+        btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
+        btn_cancel.grid(row=0, column=2)
 
     def demander_charger_partie(self):
 
