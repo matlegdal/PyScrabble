@@ -3,6 +3,8 @@ Fichier python contenant les classes d'exeption. J'ai pensé à les mettres dans
 
 """
 
+class LettreInvalideException(Exception):
+    pass
 
 class PositionInvalideException(Exception):
     pass

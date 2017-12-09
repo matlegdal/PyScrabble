@@ -19,20 +19,26 @@ class Jeton:
         """
         assert 0 <= valeur <=20
 
-        assert (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == '{ }'
+        assert (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == '[]'
         self.lettre = lettre
         self.valeur = valeur
 
-        self.joker = True if joker == 'True' else False
+        if joker in ['True', 'true', ' true', ' True']:
+            self.joker = True
+        else:
+            self.joker = False
+
+    def est_un_joker(self):
+        return self.joker
 
     def __str__(self):
         """
         Formatage d'un jeton. Cette méthode est appelée lorsque vous faites str(v) où v est un jeton.
         :return: str, correspondant au formatage du jeton.
         """
-        # if self.joker is True:
-        #     res = " "
-        if self.valeur < 10:
+        if self.joker is True:
+            res = "[]{}".format(chr(0x2080+self.valeur))
+        elif self.valeur < 10:
             res = "{}{}".format(self.lettre, chr(0x2080 + self.valeur))
         else:
             res = "{}{}{}".format(self.lettre, chr(0x2080 + int(self.valeur/10)), chr(0x2080 + int(self.valeur%10)))
@@ -40,8 +46,9 @@ class Jeton:
 
 
 if __name__ == "__main__":
-    jeton = Jeton('{ }', 0, 'True')
+    jeton = Jeton('[]', 0, 'True')
     print(jeton)
+    print(jeton.est_un_joker())
 
     jetonb = Jeton('B', 3, 'False')
     print(jetonb)

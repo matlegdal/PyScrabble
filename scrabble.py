@@ -6,7 +6,8 @@ from jeton import Jeton
 from plateau import Plateau
 from utils import *
 from tkinter import *
-from tkinter import messagebox
+from tkinter.messagebox import *
+from tkinter.simpledialog import askstring
 from exception import *
 from math import floor
 from tkinter import Toplevel
@@ -170,13 +171,14 @@ class Scrabble(Tk):
 
         with open('data/{}.txt'.format(self.langue), 'r') as data:
             self.jetons_libres = []
-            for line in data.readlines():
+            for line in data.read().splitlines():
                 temp = line.split(',')
                 lettre = str(temp[0])
                 occurences = int(temp[1])
                 valeur = int(temp[2])
+                joker = temp[3]
                 for _ in range(occurences):
-                    self.jetons_libres.append(Jeton(lettre, valeur))
+                    self.jetons_libres.append(Jeton(lettre, valeur, joker))
 
         with open('dic/{}.txt'.format(self.langue), 'r') as dic:
             self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
@@ -301,7 +303,7 @@ class Scrabble(Tk):
             self.unbind_poser()
             self.after(500, self.bind_reprendre)
         except (CaseOccupeeException, AssertionError) as e:
-            messagebox.showwarning(message=e)
+            showwarning(message=e)
             print(e) # TODO: améliorer la gestion des erreurs!
 
     def redeposer_jeton(self, event):
@@ -422,7 +424,7 @@ class Scrabble(Tk):
         """
         #Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) == 0 or len(self.plateau.jetons_places) == 0:
-            messagebox.showinfo(message="Vous n'avez pas placé de jetons!\nSi vous ne désirez pas jouer ce tour-ci, "
+            showinfo(message="Vous n'avez pas placé de jetons!\nSi vous ne désirez pas jouer ce tour-ci, "
                                            "veuillez sélectionner le bouton 'Passer le tour'")
             return
 
@@ -430,7 +432,28 @@ class Scrabble(Tk):
         try:
             self.plateau.valider_positions(self.plateau.positions)
         except (CasesNonEnLigneException, PasDeCasesAdjacentes, CaseVideDansMot, CentreNonUtilise) as e:
-            messagebox.showwarning(message=e)
+            showwarning(message=e)
+            return
+
+        # Vérifier la présence d'un joker
+        try:
+            jokers = [jeton.est_un_joker() for jeton in self.plateau.jetons_places]
+            if any(jokers):
+                for jeton in range(jokers.count(True)):
+                    lettre = askstring('Joker', "Entrez la lettre que vous souhaitez attribuer au joker.\nSi vous avez mis plusieurs jokers, "
+                                                "entrez les lettres dans l'ordre que vous les avez placés.")
+                    if len(lettre) != 1 or not lettre.isalpha():
+                        raise LettreInvalideException("La lettre entrée n'est pas valide.")
+
+                    # On trouve l'index du premier joker
+                    index_joker = jokers.index(True)
+                    # On met false à ce joker pour éviter qu'il soit repris si on a plusieurs jokers
+                    jokers[index_joker] = False
+                    # On change la lettre du jeton pour la lettre entrée. Pour le reste de la partie, ce jeton sera cette lettre
+                    self.plateau.jetons_places[index_joker].lettre = lettre.upper()
+
+        except LettreInvalideException as e:
+            showwarning(message=e)
             return
 
         # Vérifie si les mots sont permis
@@ -454,16 +477,20 @@ class Scrabble(Tk):
 
             # Si toutes les lettres sont placés, on ajoute 50 points, car c'est un Scrabble!
             if len(self.plateau.jetons_places) == Joueur.TAILLE_CHEVALET:
-                messagebox.showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos jetons!\nVous obtenez 50 points boni!')
+                showinfo('Scrabble!', 'Félicitations! Vous avez placé tous vos jetons!\nVous obtenez 50 points boni!')
                 score += 50
         except MotNonPermisException as e:
-            messagebox.showwarning(message=e)
+            showwarning(message=e)
             return
 
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
         self.plateau.jetons_places = []
         self.changer_joueur()
+
+    # def demander_lettre(self):
+    #     lettre = askstring('Joker', 'Entrez la lettre que vous souhaitez attribuer au joker.')
+
 
     def reprendre_tous_les_jetons(self):
         """
@@ -506,7 +533,7 @@ class Scrabble(Tk):
         """
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
+            showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
                                         "retirez vos jetons du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
@@ -520,7 +547,7 @@ class Scrabble(Tk):
         """
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
+            showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
                                         "retirez vos jetons du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
@@ -531,7 +558,7 @@ class Scrabble(Tk):
 
         # Vérifie si la partie est terminée
         if self.partie_terminee():
-            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
 
     def demander_jetons_a_changer(self):
@@ -545,7 +572,7 @@ class Scrabble(Tk):
         """
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            messagebox.showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
+            showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
                                         "retirez vos jetons du plateau.\n"
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
@@ -613,7 +640,7 @@ class Scrabble(Tk):
         """
         # Vérification si la partie est terminée
         if self.partie_terminee():
-            messagebox.showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
             # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
 
@@ -729,7 +756,7 @@ class Scrabble(Tk):
         Reprend tous les jetons placés et les retourne dans le chevalet du joueur avant de changer de joueur.
         :return: Aucun
         """
-        messagebox.showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
+        showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
         self.reprendre_tous_les_jetons()
         self.changer_joueur()
 
@@ -861,6 +888,7 @@ class Scrabble(Tk):
 
             except AssertionError as e:
                 print(e)
+                return
 
         # Une fois que tu as vérifié que les données sont bonnes, tu peux sortir de la boucle 'with open' en désindentant comme j'ai fait ici
         # ça va fermer le fichier car tu n'en a plus besoin.
