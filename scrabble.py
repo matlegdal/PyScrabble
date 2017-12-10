@@ -45,8 +45,8 @@ class Scrabble(Tk):
         # Création du menu
         self.barre_menu = Menu(self)
         self.fichier = Menu(self.barre_menu, tearoff=0)
-        self.fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        self.fichier.add_command(label="Sauvegarder la partie", state=DISABLED, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie)
+        self.fichier.add_command(label="Sauvegarder la partie", state=ACTIVE, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
         self.fichier.add_command(label="Quitter", command=self.quitter)
@@ -467,10 +467,10 @@ class Scrabble(Tk):
         - changer de joueur
         :return: Aucun return
         """
-        #Vérifie si le joueur a placé des jetons
+        # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) == 0 or len(self.plateau.jetons_places) == 0:
             showinfo(message="Vous n'avez pas placé de jetons!\nSi vous ne désirez pas jouer ce tour-ci, "
-                                           "veuillez sélectionner le bouton 'Passer le tour'")
+                     "veuillez sélectionner le bouton 'Passer le tour'")
             return
 
         # Vérifie la validité des positions des jetons placés
@@ -485,7 +485,8 @@ class Scrabble(Tk):
             jokers = [jeton.est_un_joker() for jeton in self.plateau.jetons_places]
             if any(jokers):
                 for jeton in range(jokers.count(True)):
-                    lettre = askstring('Joker', "Entrez la lettre que vous souhaitez attribuer au joker.\nSi vous avez mis plusieurs jokers, "
+                    lettre = askstring('Joker', "Entrez la lettre que vous souhaitez attribuer au joker.\n"
+                                                "Si vous avez mis plusieurs jokers, "
                                                 "entrez les lettres dans l'ordre que vous les avez placés.")
                     if len(lettre) != 1 or not lettre.isalpha():
                         raise LettreInvalideException("La lettre entrée n'est pas valide.")
@@ -557,7 +558,8 @@ class Scrabble(Tk):
             pos = self.joueur_actif.chevalet.index(None)
             self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
             x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
+            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('chevalet',
+                                                                                                       'chevalet{}'.format(pos)))
             self.joueur_actif.jeton_actif = None
 
         # réinitialiser les valeurs
@@ -575,8 +577,8 @@ class Scrabble(Tk):
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
             showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
-                                        "retirez vos jetons du plateau.\n"
-                                        "Sinon, sélectionnez 'Jouer un tour'")
+                             "retirez vos jetons du plateau.\n"
+                             "Sinon, sélectionnez 'Jouer un tour'")
             return
 
         self.changer_joueur()
@@ -589,8 +591,8 @@ class Scrabble(Tk):
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
             showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
-                                        "retirez vos jetons du plateau.\n"
-                                        "Sinon, sélectionnez 'Jouer un tour'")
+                             "retirez vos jetons du plateau.\n"
+                             "Sinon, sélectionnez 'Jouer un tour'")
             return
 
         abandonner = self.joueur_actif
@@ -614,8 +616,8 @@ class Scrabble(Tk):
         # Vérifie si le joueur a placé des jetons
         if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
             showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
-                                        "retirez vos jetons du plateau.\n"
-                                        "Sinon, sélectionnez 'Jouer un tour'")
+                             "retirez vos jetons du plateau.\n"
+                             "Sinon, sélectionnez 'Jouer un tour'")
             return
 
         # Bindings
@@ -746,7 +748,7 @@ class Scrabble(Tk):
         :return: bool, True si la partie est terminée, et False autrement.
         """
         return len(self.jetons_libres) < 1 or len(self.joueurs) < 2
-        #todo: à voir si on peut améliorer ce qui se passe quand une partie termine
+        # todo: à voir si on peut améliorer ce qui se passe quand une partie termine
 
     def joueur_suivant(self):
         """
@@ -889,7 +891,7 @@ class Scrabble(Tk):
 
     def charger_partie(self):
         """
-        Méthode statique permettant de créer un objet scrabble en lisant le fichier dans
+        Méthode permettant de créer un objet scrabble en lisant le fichier dans
         lequel l'objet avait été sauvegardé précédemment.
         :return:
         """
@@ -906,7 +908,9 @@ class Scrabble(Tk):
                 cases = pickle.load(f)
                 tour = pickle.load(f)
                 positions = pickle.load(f)
-                jetons_places = pickle.load(f)   #TODO: régler les jetons placés. Pour l'instant ils apparaissent sur le plateau si on save/load mais pas dans le tour courant.
+                jetons_places = pickle.load(f)
+                print(jetons_places)
+# TODO: régler les jetons placés. Pour l'instant ils apparaissent, même si le mots n'est pas valide, sur le plateau si on save/load mais pas dans le tour courant.
                 difficulte = pickle.load(f)
 
                 # print("DÉBUT LOAD")
@@ -944,10 +948,7 @@ class Scrabble(Tk):
         self.joueur_actif = self.joueurs[position_joueur_actif]
         assert self.joueur_actif in joueurs
         self.jetons_libres = jetons_libres
-        print(self.jetons_libres)
-
         # On lance la partie
-        self.jouer(cases, positions)
+        self.jouer(cases, positions, jetons_places)
 
         self.changer_joueur(charger=True, tour=tour)
-#pour le push

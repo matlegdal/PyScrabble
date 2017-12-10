@@ -63,6 +63,7 @@ class Case:
         if self.est_vide():
             raise CaseVideException("La case est déjà vide")
 
+
         jeton_retire = self.jeton_occupant
         self.jeton_occupant = None
 
