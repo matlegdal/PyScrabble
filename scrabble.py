@@ -950,3 +950,4 @@ class Scrabble(Tk):
         self.jouer(cases, positions)
 
         self.changer_joueur(charger=True, tour=tour)
+#pour le push
