@@ -33,21 +33,9 @@ class Scrabble(Tk):
     def __init__(self):
         super().__init__()
 
-        # Declare parameters
-        self.liste_langue = ['fr', 'en']
-        self.langue='fr'
-        self.difficulte = 'facile'
+        # Set les variables d'instance
         self.title("Scrabble")
-        self.plateau = None
-        self.joueur_actif = None
-        self.joueurs = []
-        self.jetons_libres = []
-        self.dictionnaire = None
-        self.message = StringVar()
-        self.nom_joueur = StringVar()
-        self.pointage = StringVar()
-        self.chevalet_actif = None
-        self.affichage_joueur = None
+        self.reset_partie()
 
         # Configure
         self.grid_columnconfigure(0, weight=1)
@@ -58,10 +46,10 @@ class Scrabble(Tk):
         self.barre_menu = Menu(self)
         self.fichier = Menu(self.barre_menu, tearoff=0)
         self.fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        self.fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        self.fichier.add_command(label="Sauvegarder la partie", state=DISABLED, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
-        self.fichier.add_command(label="Quitter", command=self.quit)
+        self.fichier.add_command(label="Quitter", command=self.quitter)
         self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
 
         self.aide = Menu(self.barre_menu, tearoff=0)
@@ -74,9 +62,29 @@ class Scrabble(Tk):
         self.config_content()
         self.accueil()
 
+    def reset_partie(self):
+        """
+        Set les variables d'instance à leur valeur initiales par défaut.
+        :return: Aucun
+        """
+        # Declare parameters
+        self.liste_langue = ['fr', 'en']
+        self.langue = None
+        self.difficulte = None
+        self.plateau = None
+        self.joueur_actif = None
+        self.joueurs = []
+        self.jetons_libres = []
+        self.dictionnaire = None
+        self.message = StringVar()
+        self.nom_joueur = StringVar()
+        self.pointage = StringVar()
+        self.chevalet_actif = None
+        self.affichage_joueur = None
+
     def config_content(self):
         """
-        Configure la fenêtre principale
+        Configure la fenêtre principale. Consiste en un Frame qui contient tous les autres éléments.
         :return: Aucun
         """
         self.content = Frame(self)
@@ -124,7 +132,39 @@ class Scrabble(Tk):
 
         # Débuter la partie
         Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=ACTIVE).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.charger_partie).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+
+    def nouvelle_partie(self):
+        """
+        Détruit la partie en cours et retourne à l'accueil
+        :return: aucun
+        """
+        self.verifier_avant_de_quitter()
+        self.content.destroy()
+        self.reset_partie()
+        self.config_content()
+        self.accueil()
+
+    def verifier_avant_de_quitter(self):
+        """
+        Fonction qui demande au joueur s'il veut sauvegarder la partie avant de quitter. Appelée lors de l'utilisation
+        des commandes Quitter, Charger une partie et Nouvelle partie
+        :return aucun
+        """
+        if self.plateau is not None:
+            sauvegarder = askyesno('Attention', "Voulez-vous sauvegarder la partie en cours avant de quitter?")
+            if sauvegarder:
+                self.sauvegarder_partie()
+            else:
+                return
+
+    def quitter(self):
+        """
+        Fonction qui permet de quitter le jeu de Scrabble de façon sécuritaire en demandant à l'utilisateur s'il souhaite
+        sauvegarder la partie courante avant de quitter.
+        """
+        self.verifier_avant_de_quitter()
+        self.quit()
 
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
@@ -132,6 +172,7 @@ class Scrabble(Tk):
         :param accueil: (Frame) Page d'accueil
         :param nb_joueurs: (int) Nombre de joueurs
         :param langue: (str) Code de langue à 2 lettres
+        :param difficulte: str, option de difficulté de la partie, 'facile' ou 'difficile'
         :return: aucun return
         """
         accueil.destroy()
@@ -164,9 +205,11 @@ class Scrabble(Tk):
         assert 2 <= nb_joueurs <= 4
         assert langue.lower() in self.liste_langue
         self.langue = langue.lower()
-        self.joueurs = joueurs
-        if self.joueurs is None:
+
+        if joueurs is None:
             self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
+        else:
+            self.joueurs = joueurs
 
         self.difficulte = difficulte
 
@@ -229,14 +272,14 @@ class Scrabble(Tk):
         btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
         btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
-        btn_quitter = Button(self.affichage_joueur, text="Quitter la partie", command=self.quitter)
+        btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
 
         # Affichage des boutons d'actions
         btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
         btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
-        btn_quitter.grid(row=3, column=2)
+        btn_abandonner.grid(row=3, column=2)
 
     def dessiner_chevalet(self, master, joueur):
         """
@@ -367,7 +410,7 @@ class Scrabble(Tk):
         """
         pos = floor(event.x / self.PIXELS_PAR_CASE)
 
-        nb_jetons = len(self.joueur_actif.chevalet)
+        # nb_jetons = len(self.joueur_actif.chevalet)
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
 
         # assert len(self.joueur_actif.chevalet) < nb_jetons
@@ -538,7 +581,7 @@ class Scrabble(Tk):
 
         self.changer_joueur()
 
-    def quitter(self):
+    def abandonner(self):
         """
         Retire un joueur de la liste des joueurs
         :return: Aucun return
@@ -550,9 +593,9 @@ class Scrabble(Tk):
                                         "Sinon, sélectionnez 'Jouer un tour'")
             return
 
-        quitter = self.joueur_actif
+        abandonner = self.joueur_actif
         self.changer_joueur()
-        self.joueurs.remove(quitter)
+        self.joueurs.remove(abandonner)
 
         # Vérifie si la partie est terminée
         if self.partie_terminee():
@@ -669,6 +712,7 @@ class Scrabble(Tk):
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.bind_prendre()
 
+        # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
             self.set_clock()
 
@@ -814,58 +858,34 @@ class Scrabble(Tk):
         La sauvegarde se fera grâce à la fonction dump du module pickle.
         :return: Aucun
         """
-
-        # Note: ici la stratégie est de dumper les infos qui sont propres à la partie
-        # self.langue
-        # self.joueur_actif
-        # self.joueurs
-        # self.jetons_libres
-        # self.plateau.cases
-        # self.plateau.tour
-        # self.plateau.positions
-        # self.plateau.jetons_places
-
-        # Ok j'ai trouvé le moyen le plus simple d'avoir une boite de dialogue pour entrer le nom de fichier c'est dans
-        # le module simpledialog. Plus besoin de demander_sauvegarder_partie
         nom_fichier = askstring("Sauvegarder", "Entrez le nom de la sauvegarde:")
 
         try:
             with open(nom_fichier, "wb") as f:
-                print("DÉBUT SAUVEGARDE")
-
                 pickle.dump(self.langue, f)
-                print(self.langue)
-
                 pickle.dump(self.joueurs, f)
-                print(self.joueurs)
-
-                for positions in range(len(self.joueurs)):
-                    if self.joueurs[positions] == self.joueur_actif:
-                        position_joueur_actif = positions
-                        print(position_joueur_actif)
+                position_joueur_actif = self.joueurs.index(self.joueur_actif)
                 pickle.dump(position_joueur_actif, f)
-
                 pickle.dump(self.jetons_libres, f)
-                print(self.jetons_libres)
-
                 pickle.dump(self.plateau.cases, f)
-                print(self.plateau.cases)
-
                 pickle.dump(self.plateau.tour, f)
-                print(self.plateau.tour)
-
                 pickle.dump(self.plateau.positions, f)
-                print(self.plateau.positions)
-
                 pickle.dump(self.plateau.jetons_places, f)
-                print(self.plateau.jetons_places)
-
                 pickle.dump(self.difficulte, f)
-                print(self.difficulte)
+
+                # print("DÉBUT SAUVEGARDE")
+                # print(self.langue)
+                # print(self.joueurs)
+                # print(self.jetons_libres)
+                # print(self.plateau.cases)
+                # print(self.plateau.tour)
+                # print(self.plateau.positions)
+                # print(self.plateau.jetons_places)
+                # print(self.difficulte)
 
         except:
-            print("echec de la sauvegarde")
-            return False
+            showwarning("Échec", "Échec de la sauvegarde")
+            return
 
     def charger_partie(self):
         """
@@ -873,150 +893,60 @@ class Scrabble(Tk):
         lequel l'objet avait été sauvegardé précédemment.
         :return:
         """
-        try:
-            nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
-        except:
-            showwarning('Erreur!', 'Le nom de la sauvegarde n\'existe pas!\nEntrez un nom existant.')
-            # todo : gérer les erreurs ici
+        self.verifier_avant_de_quitter()
 
-        try:
-            with open(nom_fichier, "rb") as f:
+        nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+
+        with open(nom_fichier, "rb") as f:
+            try:
                 langue = pickle.load(f)
-
                 joueurs = pickle.load(f)
-
                 position_joueur_actif = pickle.load(f)
-
                 jetons_libres = pickle.load(f)
-
                 cases = pickle.load(f)
-
                 tour = pickle.load(f)
-
                 positions = pickle.load(f)
-
-                jetons_places = pickle.load(f)
-
+                jetons_places = pickle.load(f)   #TODO: régler les jetons placés. Pour l'instant ils apparaissent sur le plateau si on save/load mais pas dans le tour courant.
                 difficulte = pickle.load(f)
-            assert cases is not None # ça c'est pas forcément utile... c'est trop général utilises plutôt :
-            assert isinstance(cases, list)
-            assert all([isinstance(case, Case) for ligne in cases for case in ligne])
-            assert isinstance(position_joueur_actif, int)
+
+                # print("DÉBUT LOAD")
+                # print(langue)
+                # print(joueurs, "JOUEURS CHARGÉS")
+                # print(joueurs[1].points)
+                # print(position_joueur_actif)
+                # print(jetons_libres)
+                # print(cases)
+                # print(tour)
+                # print(positions)
+                # print(jetons_places)
+                # print(difficulte)
+
+                assert isinstance(cases, list)
+                assert all([isinstance(case, Case) for ligne in cases for case in ligne])
+                assert isinstance(position_joueur_actif, int)
 
             # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
-        except FichierInexistant as e:
-            print(e)
+            except FichierInexistant as e:
+                print(e)
 
-            return
-
-        # Une fois que tu as vérifié que les données sont bonnes, tu peux sortir de la boucle 'with open' en désindentant comme j'ai fait ici
-        # ça va fermer le fichier car tu n'en a plus besoin.
-
-        # self.demarrer_partie(self, nb_joueurs=len(joueurs), langue=self.langue, difficulte=self.difficulte)
-        # ici il est sans doute mieux d'utiliser la fonction initialiser_partie()
-        # demarrer partie est pour aussi détruire l'accueil. ici on ne passe pas par l'accueil... donc ça va bugger pcq il va essayer de détruire qqc qui n'existe pas.
-
-        # Aussi, même si tu voulais utiliser la fonction demarrer_partie, les arguments qu'il faut que tu passes sont ACCUEIL, nb_joueurs, etc. -> self = Scrabble dans ce cas-ci
-        # Forcément ça va bugger! en appelant la fonction démarrer_partie comme tu le fais, ce que tu te retrouves à faire c'est détruire Scrabble pcq tu passes self
-        # à la place de l'accueil donc il détruit self -> donc il s'autodétruit.... haha
-
-        # rappelle toi aussi qu'écrire self.fonction() c'est juste un raccourci pour écrire Class.fonction(self), donc si tu appelles une fonction en écrivant
-        # self.fonction() tu lui passes self en 1er argument de façon implicite. donc c'est bien rare que tu vas écrire self.fonction(self) à moins d'un cas particulier.
-
-        # Ici je t'ai fait un petit plan de comment faire. Je ne peux pas tester, donc c'est sûr que ça marchera probablement pas du 1er coup.
-        # mais je voulais juste te donner une base...
+                return
 
         # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
         self.content.destroy()
         self.config_content()
+        self.reset_partie()
 
-        #set param
-        self.joueur_actif = joueurs[position_joueur_actif]
-        assert self.joueur_actif in joueurs
-        self.jetons_libres = jetons_libres
-        self.plateau.jetons_places = jetons_places
         # On initialise la partie
         self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
 
-        # On set les paramètres
-        #self.joueur_actif = joueur_actif
-        #self.jetons_libres = jetons_libres
-        #self.plateau.cases = cases
-        #self.plateau.tour = tour
-        #self.plateau.positions = positions
-        #self.plateau.jetons_places = jetons_places
-
-        # OK! J'ai compris une partie du problème. Les ids des objets changent on dirait -> regarde le chiffre à côté de object at 0x10390.... entre un save et un load, ça change
-        # d'où l'erreur quand il essaie de changer de joueur par exemple.
-        # peut-être que ça serait mieux de saver le nom ou l'index du joueur actif.. qqc comme ça.
-        # bon je t'ai donné quelques pistes, mais c'est juste des idées, continues la-dessus
-        # je pensais t'avoir donner une partie facile... erreur. lol
+        #set param
+        self.joueur_actif = self.joueurs[position_joueur_actif]
+        assert self.joueur_actif in joueurs
+        self.jetons_libres = jetons_libres
+        print(self.jetons_libres)
 
         # On lance la partie
         self.jouer(cases, positions)
 
         self.changer_joueur(charger=True, tour=tour)
-        # j'ai ajouté un paramètre pour ne pas faire changer de joueur quand on charge une partie, ainsi que tour
-
-    # def demande_sauvegarder_partie(self):
-
-        # Commentaire: ici on peut utiliser la méthode simple et juste y aller avec ta 1ere méthode
-        # sinon on peut y aller avec la méthode compliquée et utiliser sys.platform du module sys pour déterminer l'OS et proposer la bonne méthode à chaque.
-
-        # self.nom_fichier = filedialog.asksaveasfilename(initialdir="/", title="Sélectionnez un fichier", filetypes=(("all files", "*.*"),))
-        # print(self.nom_fichier)
-        #
-        # self.sauvegarder_partie(self.nom_fichier)
-
-        # self.fenetre_sauv = Toplevel(self)
-        # self.fenetre_sauv.title("Sauvegarder")
-        # cadre_label_entry = Frame(self.fenetre_sauv, padx=10, pady=10)
-        # cadre_label_entry.grid(row=0)
-        #
-        # label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la sauvegarde:", padx=10, pady=10)
-        # label_sauvegarde.grid(row=0)
-        #
-        # nom_fichier =StringVar()
-        #
-        # entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-        # entry_sauvegarde.grid(row=1)
-        #
-        # cadre_btn = Frame(self.fenetre_sauv, padx=10, pady=10)
-        # cadre_btn.grid(row=1)
-        # btn_ok = Button(cadre_btn, text="Sauvegarder", padx=10, pady=10,
-        #                 command=lambda: self.sauvegarder_partie(nom_fichier.get()))
-        # btn_ok.grid(row=0, column=0)
-        # btn_cancel = Button(cadre_btn, text="Annuler",  padx=10, pady=10, command=self.fenetre_sauv.destroy)
-        # btn_cancel.grid(row=0, column=2)
-
-
-
-    # def demander_charger_partie(self):
-    #
-    #     # self.nom_fichier = filedialog.askopenfilename(initialdir="C:/PROJET_PYTHON/tp4", title="Sélectionnez un fichier",
-    #     #                                               filetypes=(("all files", "*.*"),))
-    #     # print(self.nom_fichier)
-    #     # self.charger_partie(self.nom_fichier)
-    #
-    #     self.fenetre_charger = Toplevel(self)
-    #     self.fenetre_charger.title("Charger une partie")
-    #     cadre_label_entry = Frame(self.fenetre_charger, padx=10, pady=10)
-    #     cadre_label_entry.grid(row=0)
-    #
-    #     label_sauvegarde = Label(cadre_label_entry, text="Entrez le nom de la partie à charger:", padx=10, pady=10)
-    #     label_sauvegarde.grid(row=0)
-    #
-    #     nom_fichier = StringVar()
-    #
-    #     entry_sauvegarde = Entry(cadre_label_entry, textvariable=nom_fichier)
-    #     entry_sauvegarde.grid(row=1)
-    #
-    #     cadre_btn = Frame(self.fenetre_charger, padx=10, pady=10)
-    #     cadre_btn.grid(row=1)
-    #     btn_ok = Button(cadre_btn, text="Charger", padx=10, pady=10,
-    #                     command=lambda: self.charger_partie(nom_fichier.get()))
-    #     btn_ok.grid(row=0, column=0)
-    #     btn_cancel = Button(cadre_btn, text="Annuler", padx=10, pady=10, command=self.fenetre_charger.destroy)
-    #     btn_cancel.grid(row=0, column=2)
-
