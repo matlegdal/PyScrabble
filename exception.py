@@ -3,8 +3,10 @@ Fichier python contenant les classes d'exeption. J'ai pensé à les mettres dans
 
 """
 
+
 class LettreInvalideException(Exception):
     pass
+
 
 class PositionInvalideException(Exception):
     pass
@@ -21,17 +23,22 @@ class CaseOccupeeException(Exception):
 class CaseVideException(Exception):
     pass
 
+
 class CasesNonEnLigneException(Exception):
     pass
+
 
 class CentreNonUtilise(Exception):
     pass
 
+
 class PasDeCasesAdjacentes(Exception):
     pass
 
+
 class CaseVideDansMot(Exception):
     pass
+
 
 class CaseMultiException(Exception):
     pass
@@ -58,5 +65,9 @@ class JetonValeurException(Exception):
 
 
 class AutreException(Exception):
+    pass
+
+
+class FichierInexistant(Exception):
     pass
 

@@ -58,7 +58,7 @@ class Scrabble(Tk):
         self.barre_menu = Menu(self)
         self.fichier = Menu(self.barre_menu, tearoff=0)
         self.fichier.add_command(label="Nouvelle partie", command=Scrabble)
-        self.fichier.add_command(label="Sauvegarder la partie", state=DISABLED, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+        self.fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
         self.fichier.add_command(label="Quitter", command=self.quit)
@@ -124,7 +124,7 @@ class Scrabble(Tk):
 
         # Débuter la partie
         Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=DISABLED).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        Button(accueil, text="Charger une partie existante", command=self.charger_partie, state=ACTIVE).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
 
     def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
         """
@@ -134,7 +134,7 @@ class Scrabble(Tk):
         :param langue: (str) Code de langue à 2 lettres
         :return: aucun return
         """
-        accueil.destroy() # todo: quand on charge une partie, il faut lui laisser le temps de créer sa nouvelle fenêtre
+        accueil.destroy()
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
@@ -167,7 +167,6 @@ class Scrabble(Tk):
         self.joueurs = joueurs
         if self.joueurs is None:
             self.joueurs = [Joueur("Joueur {}".format(i + 1)) for i in range(nb_joueurs)]
-        print(self.joueurs)
 
         self.difficulte = difficulte
 
@@ -874,50 +873,42 @@ class Scrabble(Tk):
         lequel l'objet avait été sauvegardé précédemment.
         :return:
         """
-        nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+        try:
+            nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+        except:
+            showwarning('Erreur!', 'Le nom de la sauvegarde n\'existe pas!\nEntrez un nom existant.')
+            # todo : gérer les erreurs ici
 
-        with open(nom_fichier, "rb") as f:
-            try:
-                print("DÉBUT LOAD")
-
+        try:
+            with open(nom_fichier, "rb") as f:
                 langue = pickle.load(f)
-                print(langue)
 
                 joueurs = pickle.load(f)
-                print(joueurs,"JOUEURS CHARGÉS")
-                print(joueurs[1].points)
 
                 position_joueur_actif = pickle.load(f)
-                print(position_joueur_actif)
 
                 jetons_libres = pickle.load(f)
-                print(jetons_libres)
 
                 cases = pickle.load(f)
-                print(cases)
 
                 tour = pickle.load(f)
-                print(tour)
 
                 positions = pickle.load(f)
-                print(positions)
 
                 jetons_places = pickle.load(f)
-                print(jetons_places)
 
                 difficulte = pickle.load(f)
-                print(difficulte)
-
-                assert cases is not None # ça c'est pas forcément utile... c'est trop général utilises plutôt :
-                assert isinstance(cases, list)
-                assert all([isinstance(case, Case) for ligne in cases for case in ligne])
-                assert isinstance(position_joueur_actif, int)
+            assert cases is not None # ça c'est pas forcément utile... c'est trop général utilises plutôt :
+            assert isinstance(cases, list)
+            assert all([isinstance(case, Case) for ligne in cases for case in ligne])
+            assert isinstance(position_joueur_actif, int)
 
             # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
-            except AssertionError as e:
-                print(e)
-                return
+        except FichierInexistant as e:
+            print(e)
+
+            return
 
         # Une fois que tu as vérifié que les données sont bonnes, tu peux sortir de la boucle 'with open' en désindentant comme j'ai fait ici
         # ça va fermer le fichier car tu n'en a plus besoin.
@@ -944,7 +935,7 @@ class Scrabble(Tk):
         self.joueur_actif = joueurs[position_joueur_actif]
         assert self.joueur_actif in joueurs
         self.jetons_libres = jetons_libres
-        print(self.jetons_libres)
+        self.plateau.jetons_places = jetons_places
         # On initialise la partie
         self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
 
