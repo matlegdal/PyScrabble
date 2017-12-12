@@ -315,8 +315,8 @@ class Scrabble(Tk):
         :param event: l'event de souris
         :return: (tuple) tuple à 3 éléments: ligne du plateau, colonne du plateau, case
         """
-        ligne = floor(event.y / self.plateau.pixels_par_case)
-        col = floor(event.x / self.plateau.pixels_par_case)
+        ligne = event.y // self.plateau.pixels_par_case
+        col = event.x // self.plateau.pixels_par_case
 
         if 0 > ligne >= self.plateau.DIMENSION or 0 > col >= self.plateau.DIMENSION:
             raise PositionInvalideException("La position est invalide")
@@ -436,7 +436,7 @@ class Scrabble(Tk):
 
         # Vérifie que le jeton a bien été placé dans le tour courant
         if (ligne, col) not in self.plateau.positions:
-            return
+            return # todo: ajouter un message?
 
         # Reprend le jeton
         if self.joueur_actif.jeton_actif is None:
@@ -558,8 +558,7 @@ class Scrabble(Tk):
             pos = self.joueur_actif.chevalet.index(None)
             self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
             x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('chevalet',
-                                                                                                       'chevalet{}'.format(pos)))
+            dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
             self.joueur_actif.jeton_actif = None
 
         # réinitialiser les valeurs
@@ -948,6 +947,8 @@ class Scrabble(Tk):
         self.joueur_actif = self.joueurs[position_joueur_actif]
         assert self.joueur_actif in joueurs
         self.jetons_libres = jetons_libres
+        # print(self.jetons_libres)
+
         # On lance la partie
         self.jouer(cases, positions, jetons_places)
 
