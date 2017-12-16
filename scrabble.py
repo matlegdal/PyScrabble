@@ -572,6 +572,13 @@ class Scrabble(Tk):
         self.plateau.jetons_places = []
         self.bind_prendre()
 
+    def verifier_jetons_sur_le_plateau(self):
+        """
+        Vérifie si le joueur a placé des jetons dans le tour courant.
+        :return: bool, True si des jetons ont été placés sur le plateau dans le tour courant, false sinon
+        """
+        return len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0
+
     def passer_un_tour(self):
         """
         Permet à un joueur de passer son tour.
@@ -579,12 +586,13 @@ class Scrabble(Tk):
         - changer de joueur
         :return: aucun retour
         """
-        # Vérifie si le joueur a placé des jetons
-        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            showinfo(message="Vous avez placé de jetons!\nSi vous désirez passer votre tour, "
-                             "retirez vos jetons du plateau.\n"
-                             "Sinon, sélectionnez 'Jouer un tour'")
-            return
+        if self.verifier_jetons_sur_le_plateau():
+            rep = askyesno(message="Vous avez placé des jetons sur le plateau. Êtes-vous certain de vouloir passer votre tour?\n"
+                                   "Les jetons placés seront retournés dans votre jeu.")
+            if rep:
+                self.reprendre_tous_les_jetons()
+            else:
+                return
 
         self.changer_joueur()
 
@@ -593,16 +601,16 @@ class Scrabble(Tk):
         Retire un joueur de la liste des joueurs
         :return: Aucun return
         """
-        # Vérifie si le joueur a placé des jetons
-        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            showinfo(message="Vous avez placé de jetons!\nSi vous désirez abandonner, "
-                             "retirez vos jetons du plateau.\n"
-                             "Sinon, sélectionnez 'Jouer un tour'")
-            return
+        rep = askyesno(message="Êtes-vous certain de vouloir abandonner la partie?")
+        if rep:
+            if self.verifier_jetons_sur_le_plateau():
+                self.reprendre_tous_les_jetons()
 
-        abandonner = self.joueur_actif
-        self.changer_joueur()
-        self.joueurs.remove(abandonner)
+            abandonner = self.joueur_actif
+            self.changer_joueur()
+            self.joueurs.remove(abandonner)
+        else:
+            return
 
         # Vérifie si la partie est terminée
         if self.partie_terminee():
@@ -616,14 +624,17 @@ class Scrabble(Tk):
         - afficher le sac a jeton et les boutons
         - binder la fonction jeter
         :return: Aucun return
-        :exception: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
+        :exception: todo: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
         """
-        # Vérifie si le joueur a placé des jetons
-        if len(self.plateau.positions) != 0 or len(self.plateau.jetons_places) != 0:
-            showinfo(message="Vous avez placé de jetons!\nSi vous désirez changer des jetons, "
-                             "retirez vos jetons du plateau.\n"
-                             "Sinon, sélectionnez 'Jouer un tour'")
-            return
+        if self.verifier_jetons_sur_le_plateau():
+            rep = askyesno(
+                message="Vous avez placé des jetons sur le plateau. "
+                        "Êtes-vous certain de vouloir échanger des jetons et passer votre tour?\n"
+                        "Les jetons placés seront retournés dans votre jeu.")
+            if rep:
+                self.reprendre_tous_les_jetons()
+            else:
+                return
 
         # Bindings
         self.unbind_prendre()
