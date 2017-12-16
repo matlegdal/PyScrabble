@@ -8,8 +8,14 @@ from utils import *
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
+from tkinter.filedialog import *
 from exception import *
 from math import floor
+import os
+import inspect
+
+filename = inspect.getframeinfo(inspect.currentframe()).filename
+path = os.path.dirname(os.path.abspath(filename))
 
 
 class Scrabble(Tk):
@@ -859,7 +865,8 @@ class Scrabble(Tk):
         La sauvegarde se fera grâce à la fonction dump du module pickle.
         :return: Aucun
         """
-        nom_fichier = askstring("Sauvegarder", "Entrez le nom de la sauvegarde:")
+        nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('txt', '*.txt')], initialdir="{}/saves".format(path))
+        # nom_fichier = askstring("Sauvegarder", "Entrez le nom de la sauvegarde:")
 
         try:
             with open(nom_fichier, "wb") as f:
@@ -896,10 +903,11 @@ class Scrabble(Tk):
         """
         self.verifier_avant_de_quitter()
 
-        nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+        # nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.txt')], initialdir="{}/saves".format(path))
 
-        with open(nom_fichier, "rb") as f:
-            try:
+        try:
+            with open(nom_fichier, "rb") as f:
                 langue = pickle.load(f)
                 joueurs = pickle.load(f)
                 position_joueur_actif = pickle.load(f)
@@ -908,7 +916,6 @@ class Scrabble(Tk):
                 tour = pickle.load(f)
                 positions = pickle.load(f)
                 jetons_places = pickle.load(f)
-                print(jetons_places)
 # TODO: régler les jetons placés. Pour l'instant ils apparaissent, même si le mots n'est pas valide, sur le plateau si on save/load mais pas dans le tour courant.
                 difficulte = pickle.load(f)
 
@@ -930,10 +937,13 @@ class Scrabble(Tk):
 
             # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
 
-            except FichierInexistant as e:
-                print(e)
+        except FichierInexistant as e:
+            print(e)
+            return
 
-                return
+        except FileNotFoundError:
+            return
+
 
         # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
         self.content.destroy()
