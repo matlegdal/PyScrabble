@@ -4,6 +4,7 @@ from case import Case
 from joueur import Joueur
 from jeton import Jeton
 from plateau import Plateau
+from reglements import Reglements
 from utils import *
 from tkinter import *
 from tkinter.messagebox import *
@@ -17,7 +18,6 @@ import inspect
 # todo: changer les variables d'instances aux variables de classes.
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 path = os.path.dirname(os.path.abspath(filename))
-print(path)
 
 
 class Scrabble(Tk):
@@ -44,7 +44,7 @@ class Scrabble(Tk):
         super().__init__()
 
         # Set les variables d'instance
-        self.title("Scrabble")
+        self.title("PyScrabble")
         self.reset_partie()
 
         # Configure
@@ -66,7 +66,7 @@ class Scrabble(Tk):
 
         # Menu Aide
         self.aide = Menu(self.barre_menu, tearoff=0)
-        self.aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements ->
+        self.aide.add_command(label="Règlements", command=self.afficher_reglements)
 
         # Config du menu
         self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
@@ -111,6 +111,9 @@ class Scrabble(Tk):
         self.content.grid_rowconfigure(1, weight=1)
         self.content.grid_rowconfigure(2, weight=1)
 
+    def afficher_reglements(self):
+        Reglements(self)
+
     def accueil(self):
         """
         Affichage de l'écran d'accueil.
@@ -125,7 +128,7 @@ class Scrabble(Tk):
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 
         # message de bienvenue
-        Label(accueil, text="Bienvenue dans IFT-1004 Scrabble", font=("Times", 24)).grid(row=0, columnspan=5)
+        Label(accueil, text="PyScrabble", font=("Times", 24)).grid(row=0, columnspan=5)
         # label de la langue
         Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
 
