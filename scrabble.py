@@ -902,7 +902,7 @@ class Scrabble(Tk):
                 # print(self.plateau.jetons_places)
                 # print(self.difficulte)
 
-        except:
+        except SauvegardeEchouee:
             showwarning("Échec", "Échec de la sauvegarde")
             return
 

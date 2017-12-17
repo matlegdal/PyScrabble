@@ -76,3 +76,11 @@ class LigneColonneSpecifiee(Exception):
     pass
 
 
+class SauvegardeEchouee(Exception):
+    pass
+
+
+class ChargeException(Exception):
+    pass
+
+

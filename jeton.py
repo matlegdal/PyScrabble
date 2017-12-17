@@ -18,10 +18,10 @@ class Jeton:
         :exception: Levez une exception avec assert si la valeur ne respecte pas
         la condition suivante 0 <= valeur <= 20 ou si la lettre n'est pas en majuscule.
         """
-        if 0 <= valeur <=20 is False:
+        if 0 <= valeur <= 20 is False:
             raise JetonValeurException("La valeur du jeton est située en dehors de l'intervalle [0, 20].")
 
-        if (len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == 'Joker' is False:
+        if ((len(lettre) == 1 and lettre.isupper() and lettre.isalpha()) or lettre == 'Joker') is False:
             raise JetonLettreException("La lettre du jeton est invalide.")
         self.lettre = lettre
         self.valeur = valeur
