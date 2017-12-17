@@ -18,25 +18,26 @@ class Plateau(Canvas):
     """
     DIMENSION = 15
 
-    def __init__(self, master, pixels_par_case, cases, positions, jetons_places):
+    def __init__(self, master, pixels_par_case, cases=None):
+    # def __init__(self, master, pixels_par_case, cases=None, positions=None, jetons_places=None):
         """Constructeur d'un plateau.
         :param master: Fenêtre principale, de type Tk
         :param pixels_par_case: Taille des cases en pixels
-        :param cases: None par défaut, passé en argument si on charge une partie.
-        :param positions: None par défaut, passé en argument si on charge une partie.
+        :param cases: list, list, cases, Liste des cases du plateau. None par défaut, passé en argument si on charge une partie.
+        :param positions: list, tuple, Liste des positions  sur le plateau des cases où ont été placés des jetons pendant le tour courant.
+        None par défaut, passé en argument si on charge une partie.
+        :param jetons_places: list, jetons, Liste des jetons placés sur le plateau lors du tour courant. None par défaut et passé en argument
+        si on charge une partie.
         """
         super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
         self.pixels_par_case = pixels_par_case
-        if positions is None:
-            self.positions = []
-        else:
-            self.positions = positions
-        if jetons_places is None:
-            self.jetons_places = []
-        else:
-            self.jetons_places = jetons_places
-        self.tour = 0
+
+        # self.positions = [] if positions is None else list(positions)
+        self.positions = []
+        # self.jetons_places = [] if jetons_places is None else list(jetons_places)
+        self.jetons_places = []
+
         if cases is None:
             self.cases = [[Case() for _ in range(Plateau.DIMENSION)] for _ in range(Plateau.DIMENSION)]
             for (i, j) in [(0, 0), (0, 7), (0, 14), (7, 0), (7, 14), (14, 0), (14, 7), (14, 14)]:
@@ -56,7 +57,7 @@ class Plateau(Canvas):
                 self.cases[7 + i][7 + j] = Case(2, 'L')
             self.cases[7][7] = Case(2, 'M')
         else:
-            self.cases = cases
+            self.cases = list(cases)
 
         self.dessiner()
         self.bind('<Configure>', self.redimensionner)

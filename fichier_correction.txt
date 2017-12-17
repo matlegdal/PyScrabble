@@ -124,7 +124,7 @@ IMPLANTÉE:
 
 IMPLANTÉE: OUI
 /5 : Demander si on veut sauvegarder avant de quitter/charger
-     Commentaires :
+     Commentaires : Seulement si le plateau n'est pas vide. Si le plateau est vide, cela veut dire que la partie n'a pas réellement commencé. On ne demande donc pas de sauvegarder.
 
 IMPLANTÉE: Oui
 /5 : Fenêtre de bienvenue, avec explications du jeu et sélection d'options

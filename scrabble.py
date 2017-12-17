@@ -14,8 +14,10 @@ from math import floor
 import os
 import inspect
 
+# todo: changer les variables d'instances aux variables de classes.
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 path = os.path.dirname(os.path.abspath(filename))
+print(path)
 
 
 class Scrabble(Tk):
@@ -32,6 +34,8 @@ class Scrabble(Tk):
     - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
     """
     PIXELS_PAR_CASE = 40
+    LANGUES_DISPONIBLES = ['fr', 'en']
+    DIFFICULTES_DISPONIBLES = ['facile', 'difficile']
 
     PADX = 10
     PADY = 10
@@ -51,7 +55,7 @@ class Scrabble(Tk):
         # Création du menu
         self.barre_menu = Menu(self)
         self.fichier = Menu(self.barre_menu, tearoff=0)
-        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie)
+        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie) # todo: state active seulement dans une partie
         self.fichier.add_command(label="Sauvegarder la partie", state=ACTIVE, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
@@ -74,7 +78,6 @@ class Scrabble(Tk):
         :return: Aucun
         """
         # Declare parameters
-        self.liste_langue = ['fr', 'en']
         self.langue = None
         self.difficulte = None
         self.plateau = None
@@ -87,6 +90,7 @@ class Scrabble(Tk):
         self.pointage = StringVar()
         self.chevalet_actif = None
         self.affichage_joueur = None
+        self.tour = 0
 
     def config_content(self):
         """
@@ -157,12 +161,15 @@ class Scrabble(Tk):
         des commandes Quitter, Charger une partie et Nouvelle partie
         :return aucun
         """
-        if self.plateau is not None:
+        if self.plateau is not None and not self.plateau.est_vide():
             sauvegarder = askyesno('Attention', "Voulez-vous sauvegarder la partie en cours avant de quitter?")
             if sauvegarder:
                 self.sauvegarder_partie()
             else:
                 return
+
+        # todo: on pourrait avoir une condition qui fait que si on n'a pas fait de coups depuis la dernière save, on ne demande pas de saver
+        # todo: on pourrait demander une seule fois le nom du fichier enregistrer/enregistrer sous
 
     def quitter(self):
         """
@@ -209,7 +216,7 @@ class Scrabble(Tk):
         """
 
         assert 2 <= nb_joueurs <= 4
-        assert langue.lower() in self.liste_langue
+        assert langue.lower() in Scrabble.LANGUES_DISPONIBLES
         self.langue = langue.lower()
 
         if joueurs is None:
@@ -234,7 +241,8 @@ class Scrabble(Tk):
         with open('dic/{}.txt'.format(self.langue), 'r') as dic:
             self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
 
-    def jouer(self, cases=None, positions=None, jetons_places=None):
+    def jouer(self, cases=None):
+    # def jouer(self, cases=None, positions=None, jetons_places=None):
         """
         La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -249,7 +257,7 @@ class Scrabble(Tk):
         """
 
         # Set le plateau
-        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases, positions, jetons_places)
+        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases)
         self.plateau.grid(row=0, column=0, rowspan=4, columnspan=1, sticky=NSEW)
 
         # Set le tableau d'affichange
@@ -704,20 +712,22 @@ class Scrabble(Tk):
             showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
             # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
+        # todo: on pourrait avoir une variable d'instance qui dit si la partie est terminée
+        # on pourrait désactiver les boutons lorsque cette variable est settée
 
         # On passe au joueur suivant et on incrémente le tour de la partie, si on ne charge pas une partie
         if charger is False:
             self.joueur_suivant()
         if tour == 0:
-            self.plateau.tour += 1
+            self.tour = 1
         else:
-            self.plateau.tour = tour
+            self.tour = tour
 
         # On détermine le message à afficher
-        if self.plateau.tour == 1:
-            msg = "Tour {}\nLa partie va commencer avec le {}".format(self.plateau.tour, self.joueur_actif.nom)
+        if self.tour == 1:
+            msg = "Tour {}\nLa partie va commencer avec le {}".format(self.tour, self.joueur_actif.nom)
         else:
-            msg = "Tour {}\nC'est le tour de {}".format(self.plateau.tour, self.joueur_actif.nom)
+            msg = "Tour {}\nC'est le tour de {}".format(self.tour, self.joueur_actif.nom)
 
         # On pige les jetons
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
@@ -876,35 +886,33 @@ class Scrabble(Tk):
         La sauvegarde se fera grâce à la fonction dump du module pickle.
         :return: Aucun
         """
+        if self.verifier_jetons_sur_le_plateau():
+            rep = askyesno(message="Vous avez placé des jetons sur le plateau. Êtes-vous certain de vouloir sauvegarder?\n"
+                                   "Les jetons placés seront retournés dans votre chevalet avant la sauvegarde.")
+            if rep:
+                self.reprendre_tous_les_jetons()
+            else:
+                return
+
         nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('txt', '*.txt')], initialdir="{}/saves".format(path))
-        # nom_fichier = askstring("Sauvegarder", "Entrez le nom de la sauvegarde:")
 
-        try:
-            with open(nom_fichier, "wb") as f:
-                pickle.dump(self.langue, f)
-                pickle.dump(self.joueurs, f)
-                position_joueur_actif = self.joueurs.index(self.joueur_actif)
-                pickle.dump(position_joueur_actif, f)
-                pickle.dump(self.jetons_libres, f)
-                pickle.dump(self.plateau.cases, f)
-                pickle.dump(self.plateau.tour, f)
-                pickle.dump(self.plateau.positions, f)
-                pickle.dump(self.plateau.jetons_places, f)
-                pickle.dump(self.difficulte, f)
+        if nom_fichier is not None and nom_fichier != '':
+            try:
+                with open(nom_fichier, "wb") as f:
+                    pickle.dump(self.langue, f)
+                    pickle.dump(self.joueurs, f)
+                    position_joueur_actif = self.joueurs.index(self.joueur_actif)
+                    pickle.dump(position_joueur_actif, f)
+                    pickle.dump(self.jetons_libres, f)
+                    pickle.dump(self.plateau.cases, f)
+                    pickle.dump(self.tour, f)
+                    # pickle.dump(self.plateau.positions, f)
+                    # pickle.dump(self.plateau.jetons_places, f)
+                    pickle.dump(self.difficulte, f)
 
-                # print("DÉBUT SAUVEGARDE")
-                # print(self.langue)
-                # print(self.joueurs)
-                # print(self.jetons_libres)
-                # print(self.plateau.cases)
-                # print(self.plateau.tour)
-                # print(self.plateau.positions)
-                # print(self.plateau.jetons_places)
-                # print(self.difficulte)
-
-        except SauvegardeEchouee:
-            showwarning("Échec", "Échec de la sauvegarde")
-            return
+            except SauvegardeEchouee:
+                showwarning("Échec", "Échec de la sauvegarde")
+                return
 
     def charger_partie(self):
         """
@@ -914,63 +922,62 @@ class Scrabble(Tk):
         """
         self.verifier_avant_de_quitter()
 
+        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", initialdir="{}/saves".format(path))
+        # nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.*')], initialdir="{}/saves".format(path))
         # nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
-        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.*')], initialdir="{}/saves".format(path))
 
-        try:
-            with open(nom_fichier, "rb") as f:
-                langue = pickle.load(f)
-                joueurs = pickle.load(f)
-                position_joueur_actif = pickle.load(f)
-                jetons_libres = pickle.load(f)
-                cases = pickle.load(f)
-                tour = pickle.load(f)
-                positions = pickle.load(f)
-                jetons_places = pickle.load(f)
-# TODO: régler les jetons placés. Pour l'instant ils apparaissent, même si le mots n'est pas valide, sur le plateau si on save/load mais pas dans le tour courant.
-                difficulte = pickle.load(f)
+        if nom_fichier is not None and nom_fichier != '':
+            try:
+                with open(nom_fichier, "rb") as f:
+                    langue = pickle.load(f)
+                    joueurs = pickle.load(f)
+                    position_joueur_actif = pickle.load(f)
+                    jetons_libres = pickle.load(f)
+                    cases = pickle.load(f)
+                    tour = pickle.load(f)
+                    # positions = pickle.load(f)
+                    # jetons_places = pickle.load(f)
+                    difficulte = pickle.load(f)
 
-                # print("DÉBUT LOAD")
-                # print(langue)
-                # print(joueurs, "JOUEURS CHARGÉS")
-                # print(joueurs[1].points)
-                # print(position_joueur_actif)
-                # print(jetons_libres)
-                # print(cases)
-                # print(tour)
-                # print(positions)
-                # print(jetons_places)
-                # print(difficulte)
+                    # Vérification de l'intégrité des données chargées.
+                    assert langue in Scrabble.LANGUES_DISPONIBLES
+                    assert isinstance(joueurs, list) and all([isinstance(joueur, Joueur) for joueur in joueurs])
+                    assert isinstance(position_joueur_actif, int) and position_joueur_actif in range(len(joueurs))
+                    assert isinstance(jetons_libres, list) and all(isinstance(jeton, Jeton) for jeton in jetons_libres)
+                    assert isinstance(cases, list) and all([isinstance(case, Case) for ligne in cases for case in ligne])
+                    assert isinstance(tour, int) and tour >= 0
+                    # assert isinstance(positions, list) and all([isinstance(position, tuple) for position in positions])
+                    # assert all(isinstance(i, int) and 0<=i<=Plateau.DIMENSION for position in positions for i in position)
+                    # assert isinstance(jetons_places, list) and all([isinstance(jeton, Jeton) for jeton in jetons_places])
+                    assert isinstance(difficulte, str) and difficulte in Scrabble.DIFFICULTES_DISPONIBLES
 
-                assert isinstance(cases, list)
-                assert all([isinstance(case, Case) for ligne in cases for case in ligne])
-                assert isinstance(position_joueur_actif, int)
+            except pickle.UnpicklingError:
+                showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
+                return
 
-            # ici tu peux en mettre plusieurs en t'inspirant de ceux que j'ai mis pour vérifier que les données sont bonnes.
+            except AssertionError:
+                showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
+                return
 
-        except FichierInexistant as e:
-            print(e)
-            return
-
-        except FileNotFoundError:
-            return
+            except FileNotFoundError:
+                showwarning(message="Le fichier spécifié est introuvable.")
+                return
 
 
-        # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
-        self.content.destroy()
-        self.config_content()
-        self.reset_partie()
+            # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
+            self.content.destroy()
+            self.config_content()
+            self.reset_partie()
 
-        # On initialise la partie
-        self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
+            # On initialise la partie
+            self.initialiser_partie(len(joueurs), langue, difficulte, joueurs=joueurs)
 
-        #set param
-        self.joueur_actif = self.joueurs[position_joueur_actif]
-        assert self.joueur_actif in joueurs
-        self.jetons_libres = jetons_libres
-        # print(self.jetons_libres)
+            #set param
+            self.joueur_actif = self.joueurs[position_joueur_actif]
+            self.jetons_libres = list(jetons_libres)
 
-        # On lance la partie
-        self.jouer(cases, positions, jetons_places)
+            # On lance la partie
+            # self.jouer(cases, positions, jetons_places)
+            self.jouer(cases)
 
-        self.changer_joueur(charger=True, tour=tour)
+            self.changer_joueur(charger=True, tour=tour)
