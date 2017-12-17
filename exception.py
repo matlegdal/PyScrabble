@@ -71,3 +71,8 @@ class AutreException(Exception):
 class FichierInexistant(Exception):
     pass
 
+
+class LigneColonneSpecifiee(Exception):
+    pass
+
+

@@ -251,6 +251,8 @@ class Plateau(Canvas):
         :exception: Levez une exception avec assert si la ligne et la colonne sont spécifiées ou aucun des deux ne l'est.
         """
         assert (ligne is None) ^ (colonne is None), "Précisez seulement la ligne ou la colonne, pas les deux."
+        if (ligne is None) ^ (colonne is None) is False:
+            raise LigneColonneSpecifiee("Précisez seulement la ligne ou la colonne, pas les deux.")
 
         mots, score_total = [], 0
         mot, score_mot, multiplicateur, pos_mot = "", 0, 1, []
