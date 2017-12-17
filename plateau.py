@@ -19,23 +19,16 @@ class Plateau(Canvas):
     DIMENSION = 15
 
     def __init__(self, master, pixels_par_case, cases=None):
-    # def __init__(self, master, pixels_par_case, cases=None, positions=None, jetons_places=None):
         """Constructeur d'un plateau.
         :param master: Fenêtre principale, de type Tk
         :param pixels_par_case: Taille des cases en pixels
         :param cases: list, list, cases, Liste des cases du plateau. None par défaut, passé en argument si on charge une partie.
-        :param positions: list, tuple, Liste des positions  sur le plateau des cases où ont été placés des jetons pendant le tour courant.
-        None par défaut, passé en argument si on charge une partie.
-        :param jetons_places: list, jetons, Liste des jetons placés sur le plateau lors du tour courant. None par défaut et passé en argument
-        si on charge une partie.
         """
         super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
         self.master = master
         self.pixels_par_case = pixels_par_case
 
-        # self.positions = [] if positions is None else list(positions)
         self.positions = []
-        # self.jetons_places = [] if jetons_places is None else list(jetons_places)
         self.jetons_places = []
 
         if cases is None:

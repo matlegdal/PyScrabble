@@ -54,16 +54,22 @@ class Scrabble(Tk):
 
         # Création du menu
         self.barre_menu = Menu(self)
+
+        # Menu Fichier
         self.fichier = Menu(self.barre_menu, tearoff=0)
-        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie) # todo: state active seulement dans une partie
-        self.fichier.add_command(label="Sauvegarder la partie", state=ACTIVE, command=self.sauvegarder_partie)  # TODO: state active quand une partie est en cours
+
+        self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie)
+        self.fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
         self.fichier.add_command(label="Quitter", command=self.quitter)
-        self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
 
+        # Menu Aide
         self.aide = Menu(self.barre_menu, tearoff=0)
         self.aide.add_command(label="Règlements", state=DISABLED)  # TODO: faire apparaître une fenêtre avec les règlements ->
+
+        # Config du menu
+        self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
         self.barre_menu.add_cascade(label="Aide", menu=self.aide)
 
         self.config(menu=self.barre_menu)
@@ -110,6 +116,11 @@ class Scrabble(Tk):
         Affichage de l'écran d'accueil.
         :return: Aucun
         """
+        # Désactive les options nouvelle partie et sauvegarder partie du menu
+        self.fichier.entryconfig(0, state="disabled")
+        self.fichier.entryconfig(1, state="disabled")
+
+
         accueil = Frame(self.content)
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 
@@ -242,7 +253,6 @@ class Scrabble(Tk):
             self.dictionnaire = set([x[:-1].upper() for x in dic.readlines() if len(x[:-1]) > 1])
 
     def jouer(self, cases=None):
-    # def jouer(self, cases=None, positions=None, jetons_places=None):
         """
         La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
@@ -252,9 +262,10 @@ class Scrabble(Tk):
         - Crée le Canvas du chevalet
         - Affiche les boutons d'actions
         :param cases: Liste des cases, None par défaut, passé en argument quand on charge une partie.
-        :param positions: tuples list, Liste de positions en forme de tuple (i,j),None par défaut, passé en argument quand on charge une partie.
-        :param jetons_places: Liste des jetons placée durant le tour. None par défaut, passé en argument quand on charge une partie.
         """
+        # Active les options "nouvelle partie" et "sauvegarder partie du menu"
+        self.fichier.entryconfig(0, state="normal")
+        self.fichier.entryconfig(1, state="normal")
 
         # Set le plateau
         self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases)
@@ -894,7 +905,7 @@ class Scrabble(Tk):
             else:
                 return
 
-        nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('txt', '*.txt')], initialdir="{}/saves".format(path))
+        nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
 
         if nom_fichier is not None and nom_fichier != '':
             try:
@@ -906,8 +917,6 @@ class Scrabble(Tk):
                     pickle.dump(self.jetons_libres, f)
                     pickle.dump(self.plateau.cases, f)
                     pickle.dump(self.tour, f)
-                    # pickle.dump(self.plateau.positions, f)
-                    # pickle.dump(self.plateau.jetons_places, f)
                     pickle.dump(self.difficulte, f)
 
             except SauvegardeEchouee:
@@ -922,9 +931,7 @@ class Scrabble(Tk):
         """
         self.verifier_avant_de_quitter()
 
-        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", initialdir="{}/saves".format(path))
-        # nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.*')], initialdir="{}/saves".format(path))
-        # nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
+        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
 
         if nom_fichier is not None and nom_fichier != '':
             try:
@@ -935,8 +942,6 @@ class Scrabble(Tk):
                     jetons_libres = pickle.load(f)
                     cases = pickle.load(f)
                     tour = pickle.load(f)
-                    # positions = pickle.load(f)
-                    # jetons_places = pickle.load(f)
                     difficulte = pickle.load(f)
 
                     # Vérification de l'intégrité des données chargées.
@@ -946,9 +951,6 @@ class Scrabble(Tk):
                     assert isinstance(jetons_libres, list) and all(isinstance(jeton, Jeton) for jeton in jetons_libres)
                     assert isinstance(cases, list) and all([isinstance(case, Case) for ligne in cases for case in ligne])
                     assert isinstance(tour, int) and tour >= 0
-                    # assert isinstance(positions, list) and all([isinstance(position, tuple) for position in positions])
-                    # assert all(isinstance(i, int) and 0<=i<=Plateau.DIMENSION for position in positions for i in position)
-                    # assert isinstance(jetons_places, list) and all([isinstance(jeton, Jeton) for jeton in jetons_places])
                     assert isinstance(difficulte, str) and difficulte in Scrabble.DIFFICULTES_DISPONIBLES
 
             except pickle.UnpicklingError:
@@ -977,7 +979,5 @@ class Scrabble(Tk):
             self.jetons_libres = list(jetons_libres)
 
             # On lance la partie
-            # self.jouer(cases, positions, jetons_places)
             self.jouer(cases)
-
             self.changer_joueur(charger=True, tour=tour)
