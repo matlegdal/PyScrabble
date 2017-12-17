@@ -274,7 +274,7 @@ class Scrabble(Tk):
         self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
         # Set les boutons d'actions
-        btn_jouer = Button(self.affichage_joueur, text="Joueur le tour", command=self.jouer_un_tour)
+        btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
         btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
         btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
         btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
@@ -915,7 +915,7 @@ class Scrabble(Tk):
         self.verifier_avant_de_quitter()
 
         # nom_fichier = askstring("Charger une partie", "Entrez le nom du fichier à charger:")
-        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.txt')], initialdir="{}/saves".format(path))
+        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('txt', '*.*')], initialdir="{}/saves".format(path))
 
         try:
             with open(nom_fichier, "rb") as f:
