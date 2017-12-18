@@ -313,6 +313,7 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_abandonner.grid(row=3, column=2)
 
+
     def dessiner_chevalet(self, master, joueur):
         """
         Cette fonction dessine le chevalet du joueur actif dans un canevas.
@@ -757,6 +758,7 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.bind_prendre()
+        self.assistance()
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
@@ -1004,8 +1006,30 @@ class Scrabble(Tk):
             self.jouer(cases)
             self.changer_joueur(charger=True, tour=tour)
 
-    def compteur_temps(self, joueur):
-        pass
-
-
+    def assistance(self):
+        """
+        fonction qui va proposer des mots au joueur actif. En cours...
+        :return:
+        """
+        dico = self.dictionnaire
+        liste_jeton_courant = self.joueur_actif.chevalet
+        liste_suggestion = []
+        for mot in dico:
+            print(mot)
+            for lettre in mot:
+                print(lettre)
+                for index in range(len(liste_jeton_courant)):
+                    print(index)
+                    if liste_jeton_courant[index].lettre == lettre:
+                        print("Liste:", liste_jeton_courant[index].lettre)
+                        suggestion = True
+                    else:
+                        suggestion = False
+                        # dès que ceci arrive, il faut quitter la boucle du mot et passer à un autre mot dans le dico
+            if suggestion:
+                liste_suggestion.append(mot)
+        if len(liste_suggestion) == 0:
+            print("Aucune suggestion")
+        else:
+            print(liste_suggestion)
 
