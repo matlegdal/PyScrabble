@@ -14,6 +14,7 @@ from exception import *
 from math import floor
 import os
 import inspect
+from timeit import default_timer
 
 # todo: changer les variables d'instances aux variables de classes.
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -1002,3 +1003,9 @@ class Scrabble(Tk):
             # On lance la partie
             self.jouer(cases)
             self.changer_joueur(charger=True, tour=tour)
+
+    def compteur_temps(self, joueur):
+        pass
+
+
+
