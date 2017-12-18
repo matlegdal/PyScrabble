@@ -36,7 +36,7 @@ Fonctionnalités obligatoires (70%)
      Commentaires :
 
 /4 : Les déplacements invalides ne sont pas acceptés
-     Commentaires :	
+     Commentaires :	Oui.
 
 /4 : On peut changer d'idée de jeton en le redéposant à une place vide du chevalet
      Commentaires :
@@ -45,13 +45,18 @@ Fonctionnalités obligatoires (70%)
      Commentaires :
 
 /4 : On peut sauvegarder une partie via un bouton
-     Commentaires :
+     Commentaires : Oui, dans le menu. Nous avons désactivé l'option lorsque la partie n'est pas démarrée, car il n'y a rien à sauvegarder.
+     Cette option utilise le module filedialog. Notez que le module filedialog peut causer problème avec certaines versions de macOS high sierra.
+     Si rien ne s'affiche, allez décommenter la version alternative fournie.
 
-/4 : TODO: On peut charger une partie via un bouton -> corriger le bug
-     Commentaires :
+/4 : On peut charger une partie via un bouton
+     Commentaires : Oui dans le menu en tout temps et via un bouton sur la page d'accueil.
+     Cette option utilise le module filedialog. Notez que le module filedialog peut causer problème avec certaines versions de macOS high sierra.
+     Si rien ne s'affiche, allez décommenter la version alternative fournie.
 
 /4 : On peut démarrer une nouvelle partie
-     Commentaires :
+     Commentaires : Oui, dans le menu. Nous avons désactivé l'option quand on est à la page d'accueil, car le joueur est déjà en train
+     de démarrer une nouvelle partie.
 
 /4 :Les informations de partie sont affichées (points des joueurs et nom du joueur courant)
      Commentaires :
@@ -74,9 +79,9 @@ INDIQUEZ PAR OUI/NON SI LA FONCTIONNALITÉ EST IMPLANTÉE
 -------------------------------------------------------
 
 
-IMPLANTÉE: 
-/5 : TODO: Option de lire les règlements du jeu
-     Commentaires :
+IMPLANTÉE: Oui
+/5 : Option de lire les règlements du jeu
+     Commentaires : via l'option Règlements dans le menu Aide.
 
 IMPLANTÉE: oui
 /5 : Permettre de choisir la langue du jeu
@@ -92,7 +97,8 @@ IMPLANTÉE:
 
 IMPLANTÉE: OUI
 /5 : Permettre d'annuler le dernier mouvement
-     Commentaires :
+     Commentaires : Le joueur peut reprendre les jetons du plateau aisément pour les redéposer sur son chevalet.
+     Il y a aussi un bouton annuler qui permet de reprendre tous les jetons placés sur le plateau et les remettre dans le chevalet.
 
 IMPLANTÉE:
 /5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
@@ -110,7 +116,7 @@ IMPLANTÉE:
 /5 : "Drag-and-drop" de jetons
      Commentaires :
 
-IMPLANTÉE: OUI
+IMPLANTÉE: Partiellement todo: implémenter la version complète
 /10 : Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires : Seulement en mode "difficile"
 
@@ -124,7 +130,8 @@ IMPLANTÉE:
 
 IMPLANTÉE: OUI
 /5 : Demander si on veut sauvegarder avant de quitter/charger
-     Commentaires : Seulement si le plateau n'est pas vide. Si le plateau est vide, cela veut dire que la partie n'a pas réellement commencé. On ne demande donc pas de sauvegarder.
+     Commentaires : Seulement si le plateau n'est pas vide. Si le plateau est vide, cela veut dire que la partie n'a pas réellement commencé.
+     On ne demande donc pas de sauvegarder.
 
 IMPLANTÉE: Oui
 /5 : Fenêtre de bienvenue, avec explications du jeu et sélection d'options

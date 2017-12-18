@@ -59,7 +59,8 @@ class Scrabble(Tk):
         self.fichier = Menu(self.barre_menu, tearoff=0)
 
         self.fichier.add_command(label="Nouvelle partie", command=self.nouvelle_partie)
-        self.fichier.add_command(label="Sauvegarder la partie", command=self.sauvegarder_partie)
+        self.fichier.add_command(label="Sauvegarder la partie", command=lambda: self.sauvegarder_partie(nouvelle_sauvegarde=False))
+        self.fichier.add_command(label="Enregistrer sous", command=self.sauvegarder_partie)
         self.fichier.add_command(label="Charger une partie", command=self.charger_partie)
         self.fichier.add_separator()
         self.fichier.add_command(label="Quitter", command=self.quitter)
@@ -86,6 +87,7 @@ class Scrabble(Tk):
         # Declare parameters
         self.langue = None
         self.difficulte = None
+        self.save = None
         self.plateau = None
         self.joueur_actif = None
         self.joueurs = []
@@ -122,6 +124,7 @@ class Scrabble(Tk):
         # Désactive les options nouvelle partie et sauvegarder partie du menu
         self.fichier.entryconfig(0, state="disabled")
         self.fichier.entryconfig(1, state="disabled")
+        self.fichier.entryconfig(2, state="disabled")
 
 
         accueil = Frame(self.content)
@@ -183,7 +186,6 @@ class Scrabble(Tk):
                 return
 
         # todo: on pourrait avoir une condition qui fait que si on n'a pas fait de coups depuis la dernière save, on ne demande pas de saver
-        # todo: on pourrait demander une seule fois le nom du fichier enregistrer/enregistrer sous
 
     def quitter(self):
         """
@@ -269,6 +271,7 @@ class Scrabble(Tk):
         # Active les options "nouvelle partie" et "sauvegarder partie du menu"
         self.fichier.entryconfig(0, state="normal")
         self.fichier.entryconfig(1, state="normal")
+        self.fichier.entryconfig(2, state="normal")
 
         # Set le plateau
         self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases)
@@ -894,10 +897,13 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    def sauvegarder_partie(self):
+    def sauvegarder_partie(self, nouvelle_sauvegarde=True):
         """
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
         La sauvegarde se fera grâce à la fonction dump du module pickle.
+        :param: nouvelle_sauvegarde: bool, True si on souhaite faire une nouvelle sauvegarde (Enregistrer sous).
+        False, si on souhaite enregistrer sous le même nom que la précédante sauvegarde. Ce paramètre permet de sauvegarder plusieurs
+        fois une partie sans avoir à écrire le nom du fichier à chaque fois.
         :return: Aucun
         """
         if self.verifier_jetons_sur_le_plateau():
@@ -908,7 +914,14 @@ class Scrabble(Tk):
             else:
                 return
 
-        nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
+        # On vérifie si on souhaite "saver" ou "saver as".
+        if self.save is None or nouvelle_sauvegarde:
+            nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
+
+            # Version alternative si filedialog est buggy
+            # nom_fichier = askstring("Sauvegarder une partie", "Entrez le nom de la sauvegarde avec l'extension .pkl")
+        else:
+            nom_fichier = self.save
 
         if nom_fichier is not None and nom_fichier != '':
             try:
@@ -925,6 +938,8 @@ class Scrabble(Tk):
             except SauvegardeEchouee:
                 showwarning("Échec", "Échec de la sauvegarde")
                 return
+            else:
+                self.save = nom_fichier
 
     def charger_partie(self):
         """
@@ -935,6 +950,9 @@ class Scrabble(Tk):
         self.verifier_avant_de_quitter()
 
         nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
+
+        # Version alternative si filedialog est buggy
+        # nom_fichier = askstring("Charger une partie", "Entrez le chemin d'accès de la sauvegarde avec l'extension .pkl")
 
         if nom_fichier is not None and nom_fichier != '':
             try:
