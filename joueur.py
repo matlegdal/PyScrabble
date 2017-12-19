@@ -1,5 +1,6 @@
 from random import shuffle
 from exception import *
+from jeton import Jeton
 
 class Joueur:
     """
@@ -122,8 +123,17 @@ class Joueur:
         """
         if self.position_est_vide(pos):
             raise PositionChevaletException("La position du chevalet indiquée est vide.")
+
+        nb_jetons_avant = [jeton is not None for jeton in self.__chevalet].count(True)
+
         jeton_retire = self.__chevalet[pos]
         self.__chevalet[pos] = None
+
+        nb_jetons_apres = [jeton is not None for jeton in self.__chevalet].count(True)
+
+        assert isinstance(jeton_retire, Jeton)
+        assert nb_jetons_apres == nb_jetons_avant - 1
+
         return jeton_retire
 
     def obtenir_jeton(self, pos):

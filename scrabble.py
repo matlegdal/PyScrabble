@@ -322,6 +322,19 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_abandonner.grid(row=3, column=2)
 
+        # Set interface pour changer les jetons
+        self.bottom_right = Frame(self.content)
+        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+
+        self.sac_a_jetons = Chevalet(self.bottom_right, self.PIXELS_PAR_CASE)
+        self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
+
+        Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
+        Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
+
+        self.bottom_right.grid_remove()
+
     def msg_points(self):
         """
         Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
@@ -426,21 +439,6 @@ class Scrabble(Tk):
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
-    def jeter_jeton(self, event):
-        """
-        Permet de retirer un jeton du chevalet du joueur et le placer dans le chevalet des jetons à jeter.
-        :param event: Le clic de souris ayant déclenché l'évènement
-        :return: aucun
-        """
-        pos = event.x // self.PIXELS_PAR_CASE
-
-        jeton_retire = self.joueur_actif.retirer_jeton(pos)
-
-        self.joueur_actif.jetons_jetes.append(jeton_retire)
-
-        x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-        dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
-        self.chevalet_actif.delete('chevalet{}'.format(pos))
 
     def reprendre_jeton(self, event):
         """
@@ -654,13 +652,32 @@ class Scrabble(Tk):
         self.bind_jeter()
 
         # Affichage de l'interface
-        self.bottom_right = Frame(self.content)
-        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-        self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
-        self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-        Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
-        Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
+        self.bottom_right.grid()
+
+        # self.bottom_right = Frame(self.content)
+        # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        # Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        # self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
+        # self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
+        # Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
+        # Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
+
+    def jeter_jeton(self, event):
+        """
+        Permet de retirer un jeton du chevalet du joueur et le placer dans le chevalet des jetons à jeter.
+        :param event: Le clic de souris ayant déclenché l'évènement
+        :return: aucun
+        """
+        pos = event.x // self.PIXELS_PAR_CASE
+        assert 0 <= pos <= self.chevalet_actif.TAILLE_CHEVALET
+
+        jeton_retire = self.joueur_actif.retirer_jeton(pos)
+
+        self.joueur_actif.jetons_jetes.append(jeton_retire)
+
+        x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+        dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
+        self.chevalet_actif.delete('chevalet{}'.format(pos))
 
     def changer_jetons(self):
         """
@@ -682,7 +699,8 @@ class Scrabble(Tk):
         # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
-        self.bottom_right.destroy()
+
+        self.bottom_right.grid_remove()
         # Passer un tour
         self.changer_joueur()
 
@@ -703,7 +721,7 @@ class Scrabble(Tk):
         # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
-        self.bottom_right.destroy()
+        self.bottom_right.grid_remove()
 
     def changer_joueur(self, charger=False, tour=0):
         """
