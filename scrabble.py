@@ -1,19 +1,21 @@
 import pickle
+# import os
+import inspect
 from random import randint, shuffle
-from case import Case
-from joueur import Joueur
-from jeton import Jeton
-from plateau import Plateau
-from reglements import Reglements
-from utils import *
-from tkinter import *
+# from tkinter import *
 from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import *
 from exception import *
-from math import floor
-import os
-import inspect
+
+
+from case import Case
+from joueur import Joueur
+# from jeton import Jeton
+from plateau import Plateau
+from reglements import Reglements
+from utils import *
+
 
 # attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
 # si jamais tu veux l'utiliser, vérifie bien avant et si ça bugge c'est probablement incompatible.
@@ -423,7 +425,7 @@ class Scrabble(Tk):
         :return: Aucun retour
         """
         if self.joueur_actif.jeton_actif is None:
-            pos = floor(event.x / self.PIXELS_PAR_CASE)
+            pos = event.x // self.PIXELS_PAR_CASE
             try:
                 self.joueur_actif.jeton_actif = self.joueur_actif.retirer_jeton(pos)
 
@@ -900,7 +902,7 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    def sauvegarder_partie(self, nouvelle_sauvegarde=True, autosave=True):
+    def sauvegarder_partie(self, nouvelle_sauvegarde=True, autosave=False):
         """
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
         La sauvegarde se fera grâce à la fonction dump du module pickle.
@@ -942,7 +944,8 @@ class Scrabble(Tk):
                 showwarning("Échec", "Échec de la sauvegarde")
                 return
             else:
-                self.save = nom_fichier
+                if not autosave:
+                    self.save = nom_fichier
 
     def charger_partie(self):
         """

@@ -56,6 +56,9 @@ class Plateau(Canvas):
         self.bind('<Configure>', self.redimensionner)
 
     def dessiner(self):
+        """
+        Dessine les cases et les jetons sur le canevas du plateau.
+        """
         self.delete('case')
         self.delete('jeton')
 
@@ -84,6 +87,10 @@ class Plateau(Canvas):
 
 
     def redimensionner(self, event):
+        """
+        Fonction qui calcule la nouvelle dimension des cases et redessine le plateau lors d'un redimenstionnement de la fenêtre.
+        :param event: événement de redimensionnement à l'origine du callback
+        """
         new_dim = min(event.width, event.height)
         self.pixels_par_case = new_dim//Plateau.DIMENSION
         self.delete('case')
