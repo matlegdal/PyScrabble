@@ -15,6 +15,7 @@ from joueur import Joueur
 from plateau import Plateau
 from reglements import Reglements
 from utils import *
+from chevalet import Chevalet
 
 
 # attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
@@ -37,6 +38,8 @@ class Scrabble(Tk):
     PIXELS_PAR_CASE = 40
     LANGUES_DISPONIBLES = ['fr', 'en']
     DIFFICULTES_DISPONIBLES = ['facile', 'difficile']
+    TAILLE_CHEVALET = 7
+    # todo: refactorer -> bouger taille_chevalet et pixels par case
 
     PADX = 10
     PADY = 10
@@ -300,7 +303,9 @@ class Scrabble(Tk):
         self.affichage_joueur = Frame(self.content)
         self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
-        self.chevalet_actif = Canvas(self.affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
+
+        # Initialise le chevalet
+        self.chevalet_actif = Chevalet(self.affichage_joueur, self.PIXELS_PAR_CASE)
         self.chevalet_actif.grid(row=1, column=0, columnspan=3)
 
         # Set les boutons d'actions
@@ -316,24 +321,6 @@ class Scrabble(Tk):
         btn_passer.grid(row=3, column=0)
         btn_changer.grid(row=3, column=1)
         btn_abandonner.grid(row=3, column=2)
-
-
-    def dessiner_chevalet(self, master, joueur):
-        """
-        Cette fonction dessine le chevalet du joueur actif dans un canevas.
-        :param master: (obj Canvas) Le canvas parent.
-        :param joueur: (obj Joueur) Joueur actif
-        :return: Aucun
-        """
-        assert isinstance(master, Canvas)
-        assert isinstance(joueur, Joueur)
-
-        for pos in range(Joueur.TAILLE_CHEVALET):
-            if joueur.chevalet[pos] is None:
-                continue
-
-            x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-            dessiner_jeton(master, x1, y1, x2, y2, delta, joueur.chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))
 
     def msg_points(self):
         """
@@ -755,7 +742,7 @@ class Scrabble(Tk):
         self.message.set(msg)
         self.pointage.set(self.msg_points())
         self.nom_joueur.set(self.joueur_actif.nom)
-        self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
+        self.chevalet_actif.dessiner(self.joueur_actif)
         self.bind_prendre()
         self.assistance()
 
