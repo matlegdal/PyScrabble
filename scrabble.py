@@ -1,3 +1,4 @@
+import tkinter.ttk as ttk
 import pickle
 import os
 import inspect
@@ -16,6 +17,13 @@ from plateau import Plateau
 from reglements import Reglements
 from utils import *
 from chevalet import Chevalet
+
+# style = ttk.Style().configure('TButton', foreground="blue")
+# style.theme_settings('default',{
+#     'TButton': {
+#         'configure': {'padding': 50}
+#     }
+# })
 
 
 class Scrabble(Tk):
@@ -109,7 +117,7 @@ class Scrabble(Tk):
         :return: Aucun
         """
         self.content = Frame(self)
-        self.content.grid(row=0, column=0, rowspan=2, columnspan=2, sticky=NSEW, padx=5, pady=5)
+        self.content.grid(row=0, column=0, sticky=NSEW, padx=5, pady=5)
         self.content.grid_columnconfigure(0, weight=2)
         self.content.grid_columnconfigure(1, weight=1)
         self.content.grid_rowconfigure(0, weight=1)
