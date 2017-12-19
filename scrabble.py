@@ -1027,7 +1027,7 @@ class Scrabble(Tk):
 
     def assistance(self):
         """
-        fonction qui va proposer des mots au joueur actif. En cours...
+        fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
         :return: str: suggestion des mots prêt à afficher
         """
 
@@ -1075,7 +1075,7 @@ class Scrabble(Tk):
     def afficher_suggestion(self, mot):
         """
         Fonction qui va permettre d'afficher la/les suggestion(s) de mot(s) dans la fenêtre de jeu.
-        :param mot: tuple, consitué du mot suggéré et des points
+        :param mot: str, consitué du mot suggéré et des points
         :return: rien
         """
         # affichage des suggestions de mots
