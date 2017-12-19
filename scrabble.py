@@ -690,6 +690,8 @@ class Scrabble(Tk):
         - On passe au joueur suivant
         :return: Aucun return
         """
+        self.unbind_jeter()
+
         # Piger de nouveaux jetons et retourner les jetons jetés au sac à jetons
         jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
         for jeton in jetons_a_ajouter:
@@ -697,11 +699,11 @@ class Scrabble(Tk):
         self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
         # Détruire l'interface pour changer les jetons
-        self.unbind_jeter()
         self.bind_prendre()
-
         self.bottom_right.grid_remove()
+
         # Passer un tour
+        self.joueur_actif.jetons_jetes = []
         self.changer_joueur()
 
     def annuler_changer_jetons(self):
@@ -722,6 +724,7 @@ class Scrabble(Tk):
         self.unbind_jeter()
         self.bind_prendre()
         self.bottom_right.grid_remove()
+
 
     def changer_joueur(self, charger=False, tour=0):
         """
@@ -764,7 +767,7 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
         self.bind_prendre()
-        self.assistance()
+        # self.assistance()
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":

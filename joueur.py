@@ -101,6 +101,8 @@ class Joueur:
                     pas vide pour y déposer un jeton. Pensez à réutiliser Joueur.position_est_valide et position_est_vide.
                     On lève aussi une exception si la position n'est pas spécifiée, mais il n'y a pas de place vide dans le chevalet
         """
+        # print(self.chevalet)
+        # print(jeton)
         # Si la position est spécifiée, on place le jeton à cette position
         if pos is not None:
             if not self.position_est_vide(pos):
