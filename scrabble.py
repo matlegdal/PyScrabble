@@ -331,6 +331,8 @@ class Scrabble(Tk):
 
         self.bottom_right.grid_remove()
 
+
+
     def msg_points(self):
         """
         Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
@@ -541,6 +543,8 @@ class Scrabble(Tk):
         except MotNonPermisException as e:
             showwarning(message=e)
             return
+        # destruction du frame suggestion
+        self.frame_affichage_suggestion.destroy()
 
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
@@ -779,8 +783,11 @@ class Scrabble(Tk):
         bind_prendre(self)
 
         self.assistance()
-        # affichage des suggestions de mots
-        self.afficher_suggestion(self.suggestion_str)
+
+        # set un bouton pour afficher les suggestions
+        self.btn_afficher_suggestion = Button(self.content, text="Afficher les suggestions de mots",
+                                              command=lambda: self.afficher_suggestion(self.suggestion_str))
+        self.btn_afficher_suggestion.grid(row=3, column=1)
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
@@ -1050,15 +1057,18 @@ class Scrabble(Tk):
         :param mot: str, consitué du mot suggéré et des points
         :return: rien
         """
-        # affichage des suggestions de mots
-        self.affichage_suggestion = Frame(self.content)
-        self.affichage_suggestion.grid(row=2, column=1)
-        Label(self.affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
 
-        text = Text(self.affichage_suggestion, width=20, height=7)
+        # destruction du bouton d'affichage
+        self.btn_afficher_suggestion.destroy()
+        # affichage des suggestions de mots
+        self.frame_affichage_suggestion = Frame(self.content)
+        self.frame_affichage_suggestion.grid(row=3, column=1)
+        Label(self.frame_affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
+
+        text = Text(self.frame_affichage_suggestion, width=20, height=7)
         text.pack(side=LEFT, fill=BOTH, expand=YES, padx=5, pady=5)
 
-        scroll = Scrollbar(self.affichage_suggestion, command=text.yview)
+        scroll = Scrollbar(self.frame_affichage_suggestion, command=text.yview)
         scroll.pack(side=RIGHT, fill=Y)
 
         text.config(yscrollcommand=scroll.set)
