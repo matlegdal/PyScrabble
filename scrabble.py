@@ -317,7 +317,6 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_abandonner.grid(row=3, column=2)
 
-
     def dessiner_chevalet(self, master, joueur):
         """
         Cette fonction dessine le chevalet du joueur actif dans un canevas.
@@ -757,7 +756,10 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.dessiner_chevalet(self.chevalet_actif, self.joueur_actif)
         self.bind_prendre()
+
         self.assistance()
+        # affichage des suggestions de mots
+        self.afficher_suggestion(self.suggestion_str)
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
@@ -1026,7 +1028,7 @@ class Scrabble(Tk):
     def assistance(self):
         """
         fonction qui va proposer des mots au joueur actif. En cours...
-        :return:
+        :return: str: suggestion des mots prêt à afficher
         """
 
         lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
@@ -1047,9 +1049,14 @@ class Scrabble(Tk):
                 suggestions.append(self.calculer_points(mot))
 
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
-        print("Suggestions:")
+
+        self.suggestion_str = ''
+
         for mot in suggestions:
-            print(mot)
+            mot_str = '{}, {} points'.format(mot[0], mot[1])
+            self.suggestion_str += mot_str
+            self.suggestion_str += '\n'
+        return self.suggestion_str
 
     def calculer_points(self, mot):
         """
@@ -1064,3 +1071,26 @@ class Scrabble(Tk):
             points += self.lettres_def[lettre]
 
         return mot, points
+
+    def afficher_suggestion(self, mot):
+        """
+        Fonction qui va permettre d'afficher la/les suggestion(s) de mot(s) dans la fenêtre de jeu.
+        :param mot: tuple, consitué du mot suggéré et des points
+        :return: rien
+        """
+        # affichage des suggestions de mots
+        self.affichage_suggestion = Frame(self.content)
+        self.affichage_suggestion.grid(row=2, column=1)
+        Label(self.affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
+
+        text = Text(self.affichage_suggestion, width=20, height=7)
+        text.pack(side=LEFT, fill=BOTH, expand=YES, padx=5, pady=5)
+
+        scroll = Scrollbar(self.affichage_suggestion, command=text.yview)
+        scroll.pack(side=RIGHT, fill=Y)
+
+        text.config(yscrollcommand=scroll.set)
+
+        text.insert(END, mot)
+
+        text.config(state="disabled")
