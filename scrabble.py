@@ -1,17 +1,26 @@
 import pickle
+# import os
 import inspect
 from random import randint, shuffle
+# from tkinter import *
 from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import *
 from exception import *
+
+
 from case import Case
 from joueur import Joueur
+# from jeton import Jeton
 from plateau import Plateau
 from reglements import Reglements
 from utils import *
 from chevalet import Chevalet
 
+
+# attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
+# si jamais tu veux l'utiliser, vérifie bien avant et si ça bugge c'est probablement incompatible.
+# from timeit import default_timer
 
 class Scrabble(Tk):
     """
@@ -112,11 +121,7 @@ class Scrabble(Tk):
         self.content.grid_rowconfigure(2, weight=1)
 
     def afficher_reglements(self):
-        """
-        Fonction qui affiche les règlements dans une nouvelle fenêtre.
-        """
         Reglements(self)
-
 
     def accueil(self):
         """
@@ -127,6 +132,7 @@ class Scrabble(Tk):
         self.fichier.entryconfig(0, state="disabled")
         self.fichier.entryconfig(1, state="disabled")
         self.fichier.entryconfig(2, state="disabled")
+
 
         accueil = Frame(self.content)
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
@@ -316,10 +322,6 @@ class Scrabble(Tk):
         btn_changer.grid(row=3, column=1)
         btn_abandonner.grid(row=3, column=2)
 
-        # Set un frame vide qui contiendra éventuellement le sac à jetons
-        self.bottom_right = Frame(self.content)
-        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-
     def msg_points(self):
         """
         Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
@@ -357,16 +359,14 @@ class Scrabble(Tk):
         """
         ligne, col, case = self.determiner_case(event)
         try:
-            # Ajoute le jeton à la case et aux listes des jetons et positions placés
             case.placer_jeton(self.joueur_actif.jeton_actif)
             self.plateau.positions.append((ligne, col))
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
 
-            # Redessine le plateau et reset le jeton actif à None
             self.plateau.dessiner()
+
             self.joueur_actif.jeton_actif = None
 
-            # Met à jour les bindings
             self.unbind_redeposer()
             self.unbind_poser()
             self.after(500, self.bind_reprendre)
@@ -387,20 +387,18 @@ class Scrabble(Tk):
         """
         if self.joueur_actif.jeton_actif is not None:
             try:
-                # ajoute le jeton au chevalet
                 pos = self.joueur_actif.chevalet.index(None)
                 self.joueur_actif.ajouter_jeton(self.joueur_actif.jeton_actif, pos)
 
-                # Redessine le chevalet et retire le jeton actif
-                self.chevalet_actif.dessiner(self.joueur_actif.chevalet)
+                x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+
+                dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
                 self.joueur_actif.jeton_actif = None
 
-                # Met à jour les bindings
                 self.unbind_redeposer()
                 self.unbind_poser()
-
             except PositionChevaletException as e:
-                print(e) #todo: améliorer la gestion exception
+                print(e)
 
     def prendre_jeton(self, event):
         """
@@ -418,15 +416,13 @@ class Scrabble(Tk):
             try:
                 self.joueur_actif.jeton_actif = self.joueur_actif.retirer_jeton(pos)
 
-                # todo: refactor to exception handling
                 assert isinstance(self.joueur_actif.jeton_actif, Jeton)
                 assert self.joueur_actif.chevalet[pos] is None
 
-                self.chevalet_actif.dessiner(self.joueur_actif.chevalet)
+                self.chevalet_actif.delete('chevalet{}'.format(pos))
 
                 self.after(500, self.bind_redeposer)
                 self.bind_poser()
-
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
@@ -438,20 +434,13 @@ class Scrabble(Tk):
         """
         pos = event.x // self.PIXELS_PAR_CASE
 
-        assert 0 <= pos <= self.chevalet_actif.TAILLE_CHEVALET
-
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
-        self.joueur_actif.chevalet_a_jeter[pos] = jeton_retire
 
-        print(self.joueur_actif.chevalet)
-        print(self.joueur_actif.chevalet_a_jeter)
+        self.joueur_actif.jetons_jetes.append(jeton_retire)
 
-        self.chevalet_actif.dessiner(self.joueur_actif.chevalet)
-        self.sac_a_jetons.dessiner(self.joueur_actif.chevalet_a_jeter)
-
-        # x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
-        # dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
-        # self.chevalet_actif.delete('chevalet{}'.format(pos))
+        x1, y1, x2, y2, delta = coord_pos(pos, self.PIXELS_PAR_CASE)
+        dessiner_jeton(self.sac_a_jetons, x1, y1, x2, y2, delta, jeton_retire, 'chevalet{}'.format(pos))
+        self.chevalet_actif.delete('chevalet{}'.format(pos))
 
     def reprendre_jeton(self, event):
         """
@@ -665,13 +654,11 @@ class Scrabble(Tk):
         self.bind_jeter()
 
         # Affichage de l'interface
-        # self.bottom_right = Frame(self.content)
-        # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        self.bottom_right = Frame(self.content)
+        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-
-        self.sac_a_jetons = Chevalet(self.bottom_right, self.PIXELS_PAR_CASE)
+        self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
         self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-
         Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
         Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
 
@@ -690,15 +677,12 @@ class Scrabble(Tk):
         jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
         for jeton in jetons_a_ajouter:
             self.joueur_actif.ajouter_jeton(jeton)
-        self.jetons_libres = self.jetons_libres + self.joueur_actif.chevalet_a_jeter
-
-
+        self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
         # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
-        # self.bottom_right.destroy()
-
+        self.bottom_right.destroy()
         # Passer un tour
         self.changer_joueur()
 
@@ -710,18 +694,14 @@ class Scrabble(Tk):
         :return:
         """
         # Remettre les jetons jetés dans le chevalet du joueur
-        for jeton in self.joueur_actif.chevalet_a_jeter:
+        for jeton in self.joueur_actif.jetons_jetes:
             self.joueur_actif.ajouter_jeton(jeton)
-
-        self.chevalet_actif.dessiner(self.joueur_actif.chevalet)
-
-        self.joueur_actif.chevalet_a_jeter = []
-
+        self.dessiner_chevalet(self.chevalet_actif,self.joueur_actif)
+        self.joueur_actif.jetons_jetes = []
         # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
-
-        # self.bottom_right.destroy()
+        self.bottom_right.destroy()
 
     def changer_joueur(self, charger=False, tour=0):
         """
@@ -762,7 +742,7 @@ class Scrabble(Tk):
         self.message.set(msg)
         self.pointage.set(self.msg_points())
         self.nom_joueur.set(self.joueur_actif.nom)
-        self.chevalet_actif.dessiner(self.joueur_actif.chevalet)
+        self.chevalet_actif.dessiner(self.joueur_actif)
         self.bind_prendre()
         self.assistance()
 
