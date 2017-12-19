@@ -376,9 +376,9 @@ class Scrabble(Tk):
 
             self.joueur_actif.jeton_actif = None
 
-            self.unbind_redeposer()
-            self.unbind_poser()
-            self.after(500, self.bind_reprendre)
+            unbind_redeposer(self)
+            unbind_poser(self)
+            self.after(500, lambda : bind_reprendre(self))
 
         except (CaseOccupeeException, AssertionError) as e:
             showwarning(message=e)
@@ -404,8 +404,8 @@ class Scrabble(Tk):
                 dessiner_jeton(self.chevalet_actif, x1, y1, x2, y2, delta,self.joueur_actif.jeton_actif, ('chevalet', 'chevalet{}'.format(pos)))
                 self.joueur_actif.jeton_actif = None
 
-                self.unbind_redeposer()
-                self.unbind_poser()
+                unbind_redeposer(self)
+                unbind_poser(self)
             except PositionChevaletException as e:
                 print(e)
 
@@ -430,8 +430,8 @@ class Scrabble(Tk):
 
                 self.chevalet_actif.delete('chevalet{}'.format(pos))
 
-                self.after(500, self.bind_redeposer)
-                self.bind_poser()
+                self.after(500, lambda : bind_redeposer(self))
+                bind_poser(self)
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
@@ -463,8 +463,8 @@ class Scrabble(Tk):
 
                 self.plateau.dessiner()
 
-                self.bind_redeposer()
-                self.bind_poser()
+                bind_redeposer(self)
+                bind_poser(self)
             except CaseVideException as e:
                 print(e)
 
@@ -577,7 +577,7 @@ class Scrabble(Tk):
         # réinitialiser les valeurs
         self.plateau.positions = []
         self.plateau.jetons_places = []
-        self.bind_prendre()
+        bind_prendre(self)
 
     def verifier_jetons_sur_le_plateau(self):
         """
@@ -644,8 +644,8 @@ class Scrabble(Tk):
                 return
 
         # Bindings
-        self.unbind_prendre()
-        self.bind_jeter()
+        unbind_prendre(self)
+        bind_jeter(self)
 
         # Affichage de l'interface
         self.bottom_right.grid()
@@ -685,7 +685,7 @@ class Scrabble(Tk):
         - On passe au joueur suivant
         :return: Aucun return
         """
-        self.unbind_jeter()
+        unbind_jeter(self)
 
         # Piger de nouveaux jetons et retourner les jetons jetés au sac à jetons
         jetons_a_ajouter = self.tirer_jetons(self.joueur_actif.nb_a_tirer)
@@ -694,7 +694,7 @@ class Scrabble(Tk):
         self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
         # Détruire l'interface pour changer les jetons
-        self.bind_prendre()
+        bind_prendre(self)
         self.bottom_right.grid_remove()
 
         # Réactive les boutons d'actions
@@ -724,8 +724,8 @@ class Scrabble(Tk):
         self.joueur_actif.jetons_jetes = []
 
         # Détruire l'interface pour changer les jetons
-        self.unbind_jeter()
-        self.bind_prendre()
+        unbind_jeter(self)
+        bind_prendre(self)
         self.bottom_right.grid_remove()
 
         # Réactive les boutons d'actions
@@ -776,7 +776,7 @@ class Scrabble(Tk):
         self.pointage.set(self.msg_points())
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
-        self.bind_prendre()
+        bind_prendre(self)
 
         self.assistance()
         # affichage des suggestions de mots
@@ -872,50 +872,6 @@ class Scrabble(Tk):
         showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
         self.reprendre_tous_les_jetons()
         self.changer_joueur()
-
-    def bind_poser(self):
-        """
-        Fonction utilitaire pour binder le clic de souris à la pose d'un jeton sur une case
-        """
-        self.plateau.tag_bind('case', '<Button-1>', self.poser_jeton)
-
-    def unbind_poser(self):
-        """
-        Fonction utilitaire pour unbinder le clic de souris à la pose d'un jeton sur une case
-        """
-        self.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
-
-    def bind_prendre(self):
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.prendre_jeton)
-
-    def unbind_prendre(self):
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', lambda e: "break")
-
-    def bind_jeter(self):
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', self.jeter_jeton)
-
-    def unbind_jeter(self):
-        self.chevalet_actif.tag_bind('chevalet', '<Button-1>', lambda e: "break")
-
-    def bind_reprendre(self):
-        """
-        Fonction utilitaire pour binder le clic de souris aux jetons placés.
-        """
-        self.plateau.tag_bind('jeton_place', '<Button-1>', self.reprendre_jeton)
-
-    def bind_redeposer(self):
-        """
-        Fonction utilitaire pour binder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
-        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
-        """
-        self.chevalet_actif.bind('<Button-1>', self.redeposer_jeton)
-
-    def unbind_redeposer(self):
-        """
-        Fonction utilitaire pour unbinder le clic de souris au chevalet. Utilisé pour éviter que les événements de prendre un jeton
-        et de redéposer un jeton ne soient déclenchés par le même clic de souris.
-        """
-        self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
     def sauvegarder_partie(self, nouvelle_sauvegarde=True, autosave=False):
         """
