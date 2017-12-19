@@ -1040,6 +1040,9 @@ class Scrabble(Tk):
             if mot == '':
                 break
             for letter in mot:
+                #if 'Joker' in lettres_a_verifier:
+                    #dire au programme de prendre n'importe quelle lettre?
+
                 if letter not in lettres_a_verifier:
                     pas_trouve = True
                     break
