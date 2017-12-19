@@ -309,18 +309,18 @@ class Scrabble(Tk):
         self.chevalet_actif.grid(row=1, column=0, columnspan=3)
 
         # Set les boutons d'actions
-        btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
-        btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
-        btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
-        btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
+        self.btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
+        self.btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
+        self.btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
+        self.btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
+        self.btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
 
         # Affichage des boutons d'actions
-        btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
-        btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
-        btn_passer.grid(row=3, column=0)
-        btn_changer.grid(row=3, column=1)
-        btn_abandonner.grid(row=3, column=2)
+        self.btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
+        self.btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
+        self.btn_passer.grid(row=3, column=0)
+        self.btn_changer.grid(row=3, column=1)
+        self.btn_abandonner.grid(row=3, column=2)
 
         # Set interface pour changer les jetons
         self.bottom_right = Frame(self.content)
@@ -654,6 +654,13 @@ class Scrabble(Tk):
         # Affichage de l'interface
         self.bottom_right.grid()
 
+        # Désactive les boutons d'actions
+        self.btn_jouer.config(state="disabled")
+        self.btn_annuler.config(state="disabled")
+        self.btn_passer.config(state="disabled")
+        self.btn_changer.config(state="disabled")
+        self.btn_abandonner.config(state="disabled")
+
         # self.bottom_right = Frame(self.content)
         # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         # Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
@@ -702,9 +709,17 @@ class Scrabble(Tk):
         self.bind_prendre()
         self.bottom_right.grid_remove()
 
+        # Réactive les boutons d'actions
+        self.btn_jouer.config(state="normal")
+        self.btn_annuler.config(state="normal")
+        self.btn_passer.config(state="normal")
+        self.btn_changer.config(state="normal")
+        self.btn_abandonner.config(state="normal")
+
         # Passer un tour
         self.joueur_actif.jetons_jetes = []
         self.changer_joueur()
+
 
     def annuler_changer_jetons(self):
         """
@@ -724,6 +739,13 @@ class Scrabble(Tk):
         self.unbind_jeter()
         self.bind_prendre()
         self.bottom_right.grid_remove()
+
+        # Réactive les boutons d'actions
+        self.btn_jouer.config(state="normal")
+        self.btn_annuler.config(state="normal")
+        self.btn_passer.config(state="normal")
+        self.btn_changer.config(state="normal")
+        self.btn_abandonner.config(state="normal")
 
 
     def changer_joueur(self, charger=False, tour=0):
