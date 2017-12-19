@@ -696,8 +696,10 @@ class Scrabble(Tk):
         # Remettre les jetons jetés dans le chevalet du joueur
         for jeton in self.joueur_actif.jetons_jetes:
             self.joueur_actif.ajouter_jeton(jeton)
-        self.dessiner_chevalet(self.chevalet_actif,self.joueur_actif)
+
+        self.chevalet_actif.dessiner(self.joueur_actif)
         self.joueur_actif.jetons_jetes = []
+
         # Détruire l'interface pour changer les jetons
         self.unbind_jeter()
         self.bind_prendre()
