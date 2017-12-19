@@ -48,9 +48,15 @@ def unbind_poser(master):
     master.plateau.tag_bind('case', '<Button-1>', lambda e: "break")
 
 def bind_prendre(master):
+    """
+    Permet de binder la prise d'un jeton dans le chevalet
+    """
     master.chevalet_actif.tag_bind('chevalet', '<Button-1>', master.prendre_jeton)
 
 def unbind_prendre(master):
+    """
+    Permet de unbinder la prise d'un jeton dans le chevalet
+    """
     master.chevalet_actif.tag_bind('chevalet', '<Button-1>', lambda e: "break")
 
 def bind_jeter(master):
