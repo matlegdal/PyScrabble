@@ -61,18 +61,26 @@ class Plateau(Canvas):
 
         for ligne in range(Plateau.DIMENSION):
             for col in range(Plateau.DIMENSION):
+                # Dessin des cases
                 x1, y1, x2, y2, delta = coord_case(ligne, col, self.pixels_par_case)
                 self.create_rectangle(x1, y1, x2, y2, fill=self.cases[ligne][col].code_couleur, tags="case")
 
+                # Cases spéciales
                 if ligne == col and ligne == 7:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER, text='\u2605', font=("Times", delta), tags='case')
-
                 else:
                     self.create_text((x1 + delta, y1 + delta), justify=CENTER,
                                      text="{}".format(self.cases[ligne][col].text_case()),
                                      font=("Times", int(delta/2)), tags='case')
+
+                # Dessin des jetons
                 if not self.cases[ligne][col].est_vide():
-                    dessiner_jeton(self, x1, y1, x2, y2, delta, self.cases[ligne][col].jeton_occupant, 'jeton')
+                    tags=['jeton']
+                    if self.cases[ligne][col].jeton_occupant in self.jetons_places:
+                        tags.append('jeton_place')
+                        tags.append('jeton_{}_{}'.format(ligne, col))
+
+                    dessiner_jeton(self, x1, y1, x2, y2, delta, self.cases[ligne][col].jeton_occupant, tags=tuple(tags))
 
 
     def redimensionner(self, event):
@@ -81,7 +89,6 @@ class Plateau(Canvas):
         self.delete('case')
         self.delete('jeton')
         self.dessiner()
-        # TODO: corriger le bug avec le redimensionnement lorsqu'on a placé des jetons au cours du tour
 
     def case_est_vide(self, ligne, col):
         """

@@ -299,7 +299,7 @@ class Scrabble(Tk):
         self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
         Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
         self.chevalet_actif = Canvas(self.affichage_joueur, height=self.PIXELS_PAR_CASE, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, bg='#f5ebdc')
-        self.chevalet_actif.grid(row=1, column=0, columnspan=3, sticky=NSEW)
+        self.chevalet_actif.grid(row=1, column=0, columnspan=3)
 
         # Set les boutons d'actions
         btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
@@ -374,14 +374,14 @@ class Scrabble(Tk):
             self.plateau.positions.append((ligne, col))
             self.plateau.jetons_places.append(self.joueur_actif.jeton_actif)
 
-            x1, y1, x2, y2, delta = coord_case(ligne, col, self.plateau.pixels_par_case)
-            dessiner_jeton(self.plateau, x1, y1, x2, y2, delta, self.joueur_actif.jeton_actif, ('jeton','jeton_place', "jeton_{}_{}".format(ligne, col)))
+            self.plateau.dessiner()
 
             self.joueur_actif.jeton_actif = None
 
             self.unbind_redeposer()
             self.unbind_poser()
             self.after(500, self.bind_reprendre)
+
         except (CaseOccupeeException, AssertionError) as e:
             showwarning(message=e)
             print(e) # TODO: améliorer la gestion des erreurs!
@@ -443,7 +443,7 @@ class Scrabble(Tk):
         :param event: Le clic de souris ayant déclenché l'évènement
         :return: aucun
         """
-        pos = floor(event.x / self.PIXELS_PAR_CASE)
+        pos = event.x // self.PIXELS_PAR_CASE
 
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
 
@@ -473,11 +473,12 @@ class Scrabble(Tk):
         if self.joueur_actif.jeton_actif is None:
             try:
                 jeton = case.retirer_jeton()
-                self.plateau.delete("jeton_{}_{}".format(ligne, col))
 
                 self.plateau.jetons_places.remove(jeton)
                 self.joueur_actif.jeton_actif = jeton
                 self.plateau.positions.remove((ligne, col))
+
+                self.plateau.dessiner()
 
                 self.bind_redeposer()
                 self.bind_poser()
