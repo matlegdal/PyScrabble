@@ -129,7 +129,6 @@ class Scrabble(Tk):
         self.fichier.entryconfig(1, state="disabled")
         self.fichier.entryconfig(2, state="disabled")
 
-
         accueil = Frame(self.content)
         accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
 
@@ -621,7 +620,6 @@ class Scrabble(Tk):
 
         # Vérifie si la partie est terminée
         if self.partie_terminee():
-            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
 
     def demander_jetons_a_changer(self):
@@ -651,11 +649,21 @@ class Scrabble(Tk):
         self.bottom_right.grid()
 
         # Désactive les boutons d'actions
+        self.desactiver_btn_actions()
+
+    def desactiver_btn_actions(self):
         self.btn_jouer.config(state="disabled")
         self.btn_annuler.config(state="disabled")
         self.btn_passer.config(state="disabled")
         self.btn_changer.config(state="disabled")
         self.btn_abandonner.config(state="disabled")
+
+    def activer_btn_actions(self):
+        self.btn_jouer.config(state="normal")
+        self.btn_annuler.config(state="normal")
+        self.btn_passer.config(state="normal")
+        self.btn_changer.config(state="normal")
+        self.btn_abandonner.config(state="normal")
 
     def jeter_jeton(self, event):
         """
@@ -698,11 +706,7 @@ class Scrabble(Tk):
         self.bottom_right.grid_remove()
 
         # Réactive les boutons d'actions
-        self.btn_jouer.config(state="normal")
-        self.btn_annuler.config(state="normal")
-        self.btn_passer.config(state="normal")
-        self.btn_changer.config(state="normal")
-        self.btn_abandonner.config(state="normal")
+        self.activer_btn_actions()
 
         # Passer un tour
         self.joueur_actif.jetons_jetes = []
@@ -729,11 +733,7 @@ class Scrabble(Tk):
         self.bottom_right.grid_remove()
 
         # Réactive les boutons d'actions
-        self.btn_jouer.config(state="normal")
-        self.btn_annuler.config(state="normal")
-        self.btn_passer.config(state="normal")
-        self.btn_changer.config(state="normal")
-        self.btn_abandonner.config(state="normal")
+        self.activer_btn_actions()
 
 
     def changer_joueur(self, charger=False, tour=0):
@@ -744,14 +744,8 @@ class Scrabble(Tk):
         :param tour ; int, 0 par défaut, si on charge une partie le tour sera affecté
         :return: Aucun return
         """
-
-        # Vérification si la partie est terminée
         if self.partie_terminee():
-            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
             return
-            # TODO: vérifier pour cette condition si l'exécution se fait bien et potentiellement améliorer l'action
-        # todo: on pourrait avoir une variable d'instance qui dit si la partie est terminée
-        # on pourrait désactiver les boutons lorsque cette variable est settée
 
         # On passe au joueur suivant et on incrémente le tour de la partie, si on ne charge pas une partie
         if charger is False:
@@ -810,8 +804,14 @@ class Scrabble(Tk):
         C'est la règle que nous avons choisi d'utiliser pour ce travail, donc essayez de négliger les autres que vous connaissez ou avez lu sur Internet.
         :return: bool, True si la partie est terminée, et False autrement.
         """
-        return len(self.jetons_libres) < 1 or len(self.joueurs) < 2
-        # todo: à voir si on peut améliorer ce qui se passe quand une partie termine
+        if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
+            self.desactiver_btn_actions()
+            unbind_prendre(self)
+            self.message.set("Partie terminée, {} est le gagant!".format(self.determiner_gagnant().nom))
+            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            return True
+        else:
+            return False
 
     def joueur_suivant(self):
         """
