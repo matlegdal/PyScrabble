@@ -1,8 +1,6 @@
-from case import Case
 from joueur import Joueur
 from utils import *
-from tkinter import Canvas, CENTER, Tk, NSEW
-from exception import *
+from tkinter import Canvas
 
 
 class Chevalet(Canvas):

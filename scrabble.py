@@ -1,8 +1,8 @@
 import pickle
-# import os
+import os
 import inspect
 from random import randint, shuffle
-# from tkinter import *
+from tkinter import *
 from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import *
@@ -11,16 +11,12 @@ from exception import *
 
 from case import Case
 from joueur import Joueur
-# from jeton import Jeton
+from jeton import Jeton
 from plateau import Plateau
 from reglements import Reglements
 from utils import *
 from chevalet import Chevalet
 
-
-# attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
-# si jamais tu veux l'utiliser, vérifie bien avant et si ça bugge c'est probablement incompatible.
-# from timeit import default_timer
 
 class Scrabble(Tk):
     """
@@ -522,7 +518,7 @@ class Scrabble(Tk):
         # Vérifie si les mots sont permis
         try:
             mots, score = self.plateau.mots_score_obtenus(self.plateau.positions)
-            mots_non_permis = [mot for mot in mots if not self.mot_permis(mot)]
+            mots_non_permis = [mot for mot in mots if not mot_permis(mot, self.dictionnaire)]
 
             # Si un mot non permis est présent
             if len(mots_non_permis) != 0:
@@ -661,14 +657,6 @@ class Scrabble(Tk):
         self.btn_changer.config(state="disabled")
         self.btn_abandonner.config(state="disabled")
 
-        # self.bottom_right = Frame(self.content)
-        # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        # Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-        # self.sac_a_jetons = Canvas(self.bottom_right, width=self.PIXELS_PAR_CASE*Joueur.TAILLE_CHEVALET, height=self.PIXELS_PAR_CASE, bg="#f5ebdc")
-        # self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-        # Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
-        # Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
-
     def jeter_jeton(self, event):
         """
         Permet de retirer un jeton du chevalet du joueur et le placer dans le chevalet des jetons à jeter.
@@ -797,14 +785,6 @@ class Scrabble(Tk):
 
         # Autosave
         self.sauvegarder_partie(autosave=True)
-
-    def mot_permis(self, mot):
-        """
-        Permet de savoir si un mot est permis dans la partie ou pas en regardant dans le dictionnaire.
-        :param mot: str, mot à vérifier.
-        :return: bool, True si le mot est dans le dictionnaire, False sinon.
-        """
-        return mot.upper() in self.dictionnaire
 
     def determiner_gagnant(self):
         """

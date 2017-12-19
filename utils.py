@@ -25,3 +25,12 @@ def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tags):
 
     master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tags)
     master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tags)
+
+def mot_permis(mot, dict):
+    """
+    Permet de savoir si un mot est permis dans la partie ou pas en regardant dans le dictionnaire.
+    :param mot: str, mot à vérifier.
+    :param dict: set, Dictionnaire des mots.
+    :return: bool, True si le mot est dans le dictionnaire, False sinon.
+    """
+    return mot.upper() in dict
