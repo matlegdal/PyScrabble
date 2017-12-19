@@ -17,12 +17,7 @@ import inspect
 
 # attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
 # si jamais tu veux l'utiliser, vérifie bien avant et si ça bugge c'est probablement incompatible.
-from timeit import default_timer
-
-# todo: changer les variables d'instances aux variables de classes.
-filename = inspect.getframeinfo(inspect.currentframe()).filename
-path = os.path.dirname(os.path.abspath(filename))
-
+# from timeit import default_timer
 
 class Scrabble(Tk):
     """
@@ -49,6 +44,8 @@ class Scrabble(Tk):
 
         # Set les variables d'instance
         self.title("PyScrabble")
+        self.filename = inspect.getframeinfo(inspect.currentframe()).filename
+        self.path = os.path.dirname(os.path.abspath(self.filename))
         self.reset_partie()
 
         # Configure
@@ -926,9 +923,9 @@ class Scrabble(Tk):
                 return
 
         if autosave:
-            nom_fichier = "{}/saves/autosave.pkl".format(path)
+            nom_fichier = "{}/saves/autosave.pkl".format(self.path)
         elif self.save is None or nouvelle_sauvegarde:
-            nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
+            nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(self.path))
             # Version alternative si filedialog est buggy
             # nom_fichier = askstring("Sauvegarder une partie", "Entrez le nom de la sauvegarde avec l'extension .pkl")
         else:
@@ -960,7 +957,7 @@ class Scrabble(Tk):
         """
         self.verifier_avant_de_quitter()
 
-        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
+        nom_fichier = askopenfilename(title="Charger une partie sauvegardée", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(self.path))
 
         # Version alternative si filedialog est buggy
         # nom_fichier = askstring("Charger une partie", "Entrez le chemin d'accès de la sauvegarde avec l'extension .pkl")
@@ -1004,11 +1001,7 @@ class Scrabble(Tk):
                     if difficulte not in Scrabble.DIFFICULTES_DISPONIBLES:
                         raise FichierCorrompu
 
-            except pickle.UnpicklingError:
-                showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
-                return
-
-            except FichierCorrompu:
+            except (pickle.UnpicklingError, FichierCorrompu):
                 showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
                 return
 
