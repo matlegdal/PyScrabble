@@ -445,11 +445,7 @@ class Scrabble(Tk):
         """
         pos = floor(event.x / self.PIXELS_PAR_CASE)
 
-        # nb_jetons = len(self.joueur_actif.chevalet)
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
-
-        # assert len(self.joueur_actif.chevalet) < nb_jetons
-        # TODO: régler le bug qui fait que les jetons ne se retirent pas bien du chevalet.
 
         self.joueur_actif.jetons_jetes.append(jeton_retire)
 
@@ -471,12 +467,10 @@ class Scrabble(Tk):
 
         # Vérifie que le jeton a bien été placé dans le tour courant
         if (ligne, col) not in self.plateau.positions:
-            return # todo: ajouter un message?
+            return
 
         # Reprend le jeton
         if self.joueur_actif.jeton_actif is None:
-            # Todo: vérifier -> le try/except est pas vrmt utile ici je crois, car le cases vides ne sont même pas bindées à la souris...
-            # donc aucun moyen d'arriver ici à partir d'une case vide...
             try:
                 jeton = case.retirer_jeton()
                 self.plateau.delete("jeton_{}_{}".format(ligne, col))
@@ -1008,7 +1002,6 @@ class Scrabble(Tk):
             except FileNotFoundError:
                 showwarning(message="Le fichier spécifié est introuvable.")
                 return
-
 
             # on détruit la fenêtre principale et on la recrée pour être sûr qu'elle est "propre"
             self.content.destroy()
