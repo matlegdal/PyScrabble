@@ -769,6 +769,9 @@ class Scrabble(Tk):
         if self.difficulte == "difficile":
             self.set_clock()
 
+        # Autosave
+        self.sauvegarder_partie(autosave=True)
+
     def mot_permis(self, mot):
         """
         Permet de savoir si un mot est permis dans la partie ou pas en regardant dans le dictionnaire.
@@ -905,7 +908,7 @@ class Scrabble(Tk):
         """
         self.chevalet_actif.bind('<Button-1>', lambda e: "break")
 
-    def sauvegarder_partie(self, nouvelle_sauvegarde=True):
+    def sauvegarder_partie(self, nouvelle_sauvegarde=True, autosave=True):
         """
         Permet de sauvegarder l'objet courant dans le fichier portant le nom spécifié.
         La sauvegarde se fera grâce à la fonction dump du module pickle.
@@ -922,10 +925,10 @@ class Scrabble(Tk):
             else:
                 return
 
-        # On vérifie si on souhaite "saver" ou "saver as".
-        if self.save is None or nouvelle_sauvegarde:
+        if autosave:
+            nom_fichier = "{}/saves/autosave.pkl".format(path)
+        elif self.save is None or nouvelle_sauvegarde:
             nom_fichier = asksaveasfilename(title="Sauvegarder une partie", filetypes=[('pkl', '*.pkl'), ('txt', '*.txt')], initialdir="{}/saves".format(path))
-
             # Version alternative si filedialog est buggy
             # nom_fichier = askstring("Sauvegarder une partie", "Entrez le nom de la sauvegarde avec l'extension .pkl")
         else:
@@ -943,7 +946,7 @@ class Scrabble(Tk):
                     pickle.dump(self.tour, f)
                     pickle.dump(self.difficulte, f)
 
-            except SauvegardeEchouee:
+            except:
                 showwarning("Échec", "Échec de la sauvegarde")
                 return
             else:
@@ -1000,14 +1003,6 @@ class Scrabble(Tk):
                         raise FichierCorrompu
                     if difficulte not in Scrabble.DIFFICULTES_DISPONIBLES:
                         raise FichierCorrompu
-
-                    # assert langue in Scrabble.LANGUES_DISPONIBLES
-                    # assert isinstance(joueurs, list) and all([isinstance(joueur, Joueur) for joueur in joueurs])
-                    # assert isinstance(position_joueur_actif, int) and position_joueur_actif in range(len(joueurs))
-                    # assert isinstance(jetons_libres, list) and all(isinstance(jeton, Jeton) for jeton in jetons_libres)
-                    # assert isinstance(cases, list) and all([isinstance(case, Case) for ligne in cases for case in ligne])
-                    # assert isinstance(tour, int) and tour >= 0
-                    # assert isinstance(difficulte, str) and difficulte in Scrabble.DIFFICULTES_DISPONIBLES
 
             except pickle.UnpicklingError:
                 showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
