@@ -1,8 +1,6 @@
-from case import Case
 from joueur import Joueur
 from utils import *
-from tkinter import Canvas, CENTER, Tk, NSEW
-from exception import *
+from tkinter import Canvas
 
 
 class Chevalet(Canvas):
@@ -17,17 +15,19 @@ class Chevalet(Canvas):
         self.pixels_par_case = pixels_par_case
 
 
-    def dessiner(self, joueur):
+    def dessiner(self, chevalet):
         """
         Cette fonction dessine le chevalet du joueur actif dans le chevalet actif.
-        :param joueur: (obj Joueur) Joueur actif
+        :param chevalet: list, Jeton, Une liste des jetons à dessiner. Peut-être le chevalet d'un joueur ou les jetons à jeter.
         :return: Aucun
         """
-        assert isinstance(joueur, Joueur)
+        self.delete('chevalet')
+        assert isinstance(chevalet, list)
+        assert all([(isinstance(jeton, Jeton) or jeton is None) for jeton in chevalet])
 
         for pos in range(self.TAILLE_CHEVALET):
-            if joueur.chevalet[pos] is None:
+            if chevalet[pos] is None:
                 continue
 
             x1, y1, x2, y2, delta = coord_pos(pos, self.pixels_par_case)
-            dessiner_jeton(self, x1, y1, x2, y2, delta, joueur.chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))
+            dessiner_jeton(self, x1, y1, x2, y2, delta, chevalet[pos], ('chevalet', 'chevalet{}'.format(pos)))

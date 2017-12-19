@@ -11,9 +11,9 @@ class Joueur:
     Un joueur a 3 attributs:
     - nom (str, public): représente le nom du joueur doit être non vide.
     - __points (entier, privé): représente le nombre de points que le joueur détient.
-    - __chevalet (list, privé): représente le chevalet (l'ensemble des jetons du joueur) du joueur.
+    - chevalet (list): représente le chevalet (l'ensemble des jetons du joueur) du joueur.
             Cette liste devrait être en tout temps de taille Joueur.TAILLE_CHEVALET.
-            À chaque position du chevalier on peut avoir un jeton ou pas.
+            À chaque position du chevalet on peut avoir un jeton ou pas.
             Une position libre devra contenir None. Autrement elle devrait avoir un objet Jeton à cette position.
     """
     TAILLE_CHEVALET = 7
@@ -32,9 +32,9 @@ class Joueur:
 
         self.nom = nom
         self.__points = 0
-        self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
+        self.chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
+        self.chevalet_a_jeter = [None for _ in range(Joueur.TAILLE_CHEVALET)]
         self.jeton_actif = None
-        self.jetons_jetes = []
 
 
     @property
@@ -44,7 +44,7 @@ class Joueur:
         Rappel: Un chevalet vide veut dire une liste contenant que des None.
         :return: (int) Le nombre de places vides dans le chevalet.
         """
-        return self.__chevalet.count(None)
+        return self.chevalet.count(None)
 
     @property
     def points(self):
@@ -53,14 +53,6 @@ class Joueur:
         :return: (int) Le nombre de points du joueur.
         """
         return self.__points
-
-    @property
-    def chevalet(self):
-        """
-        Méthode permettant d'obtenir le chevalet du joueur
-        :return: (List) Liste des jetons du joueur
-        """
-        return self.__chevalet
 
     @staticmethod
     def position_est_valide(pos):
@@ -84,7 +76,7 @@ class Joueur:
         if not Joueur.position_est_valide(pos):
             raise PositionChevaletException("La position du chevalet n'est pas valide")
 
-        return self.__chevalet[pos] is None
+        return self.chevalet[pos] is None
 
     def ajouter_jeton(self, jeton, pos=None):
         """
@@ -104,12 +96,12 @@ class Joueur:
         if pos is not None:
             if not self.position_est_vide(pos):
                 raise PositionChevaletException("La position du chevalet n'est pas vide")
-            self.__chevalet[pos] = jeton
+            self.chevalet[pos] = jeton
         # Sinon, on la place au premier index disponible. On lève une exception s'il n'y a pas de place disponible
         else:
-            if None not in self.__chevalet:
+            if None not in self.chevalet:
                 raise PositionChevaletException("Il n'y a pas de place vide dans le chevalet")
-            self.__chevalet[self.__chevalet.index(None)] = jeton
+            self.chevalet[self.chevalet.index(None)] = jeton
 
     def retirer_jeton(self, pos):
         """
@@ -122,8 +114,8 @@ class Joueur:
         """
         if self.position_est_vide(pos):
             raise PositionChevaletException("La position du chevalet indiquée est vide.")
-        jeton_retire = self.__chevalet[pos]
-        self.__chevalet[pos] = None
+        jeton_retire = self.chevalet[pos]
+        self.chevalet[pos] = None
         return jeton_retire
 
     def obtenir_jeton(self, pos):
@@ -137,7 +129,7 @@ class Joueur:
         """
         if self.position_est_vide(pos):
             raise PositionChevaletException("La position du chevalet indiquée est vide.")
-        return self.__chevalet[pos]
+        return self.chevalet[pos]
 
     def ajouter_points(self, points):
         """
@@ -154,7 +146,7 @@ class Joueur:
         Pensez à utiliser la fonction shuffle du module random.
         :return: Ne retourne rien.
         """
-        shuffle(self.__chevalet)
+        shuffle(self.chevalet)
 
 
 # Tests
