@@ -48,6 +48,8 @@ Fonctionnalités obligatoires (70%)
      Commentaires : Oui, dans le menu. Nous avons désactivé l'option lorsque la partie n'est pas démarrée, car il n'y a rien à sauvegarder.
      Cette option utilise le module filedialog. Notez que le module filedialog peut causer problème avec certaines versions de macOS high sierra.
      Si rien ne s'affiche, allez décommenter la version alternative fournie.
+     Il y a 2 boutons. Sauvegarder la partie et Enregistrer sous. Le but est d'avoir à entrer le nom du fichier de sauvegarde une seule fois.
+     Comme tous les éditeurs de texte de ce monde. Il est toutefois toujours possible d'enregistrer la partie sous un autre nom au besoin.
 
 /4 : On peut charger une partie via un bouton
      Commentaires : Oui dans le menu en tout temps et via un bouton sur la page d'accueil.

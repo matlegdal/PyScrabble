@@ -14,6 +14,9 @@ from exception import *
 from math import floor
 import os
 import inspect
+
+# attention avec ce module. la plupart des modules de ce genre interfèrent avec la mainloop de tkinter.
+# si jamais tu veux l'utiliser, vérifie bien avant et si ça bugge c'est probablement incompatible.
 from timeit import default_timer
 
 # todo: changer les variables d'instances aux variables de classes.
@@ -93,6 +96,7 @@ class Scrabble(Tk):
         self.joueur_actif = None
         self.joueurs = []
         self.jetons_libres = []
+        self.lettres_def = {}
         self.dictionnaire = None
         self.message = StringVar()
         self.nom_joueur = StringVar()
@@ -252,6 +256,7 @@ class Scrabble(Tk):
                     occurences = int(temp[1])
                     valeur = int(temp[2])
                     joker = temp[3]
+                    self.lettres_def[lettre] = valeur
                     for _ in range(occurences):
                         self.jetons_libres.append(Jeton(lettre, valeur, joker))
 
@@ -969,19 +974,46 @@ class Scrabble(Tk):
                     difficulte = pickle.load(f)
 
                     # Vérification de l'intégrité des données chargées.
-                    assert langue in Scrabble.LANGUES_DISPONIBLES
-                    assert isinstance(joueurs, list) and all([isinstance(joueur, Joueur) for joueur in joueurs])
-                    assert isinstance(position_joueur_actif, int) and position_joueur_actif in range(len(joueurs))
-                    assert isinstance(jetons_libres, list) and all(isinstance(jeton, Jeton) for jeton in jetons_libres)
-                    assert isinstance(cases, list) and all([isinstance(case, Case) for ligne in cases for case in ligne])
-                    assert isinstance(tour, int) and tour >= 0
-                    assert isinstance(difficulte, str) and difficulte in Scrabble.DIFFICULTES_DISPONIBLES
+                    if langue not in Scrabble.LANGUES_DISPONIBLES:
+                        raise FichierCorrompu
+                    if not isinstance(joueurs, list):
+                        raise FichierCorrompu
+                    if not all([isinstance(joueur, Joueur) for joueur in joueurs]):
+                        raise FichierCorrompu
+                    if not isinstance(position_joueur_actif, int):
+                        raise FichierCorrompu
+                    if not position_joueur_actif in range(len(joueurs)):
+                        raise FichierCorrompu
+                    if not isinstance(jetons_libres, list):
+                        raise FichierCorrompu
+                    if not all(isinstance(jeton, Jeton) for jeton in jetons_libres):
+                        raise FichierCorrompu
+                    if not isinstance(cases, list):
+                        raise FichierCorrompu
+                    if not all([isinstance(case, Case) for ligne in cases for case in ligne]):
+                        raise FichierCorrompu
+                    if not isinstance(tour, int):
+                        raise FichierCorrompu
+                    if tour < 1:
+                        raise FichierCorrompu
+                    if not isinstance(difficulte, str):
+                        raise FichierCorrompu
+                    if difficulte not in Scrabble.DIFFICULTES_DISPONIBLES:
+                        raise FichierCorrompu
+
+                    # assert langue in Scrabble.LANGUES_DISPONIBLES
+                    # assert isinstance(joueurs, list) and all([isinstance(joueur, Joueur) for joueur in joueurs])
+                    # assert isinstance(position_joueur_actif, int) and position_joueur_actif in range(len(joueurs))
+                    # assert isinstance(jetons_libres, list) and all(isinstance(jeton, Jeton) for jeton in jetons_libres)
+                    # assert isinstance(cases, list) and all([isinstance(case, Case) for ligne in cases for case in ligne])
+                    # assert isinstance(tour, int) and tour >= 0
+                    # assert isinstance(difficulte, str) and difficulte in Scrabble.DIFFICULTES_DISPONIBLES
 
             except pickle.UnpicklingError:
                 showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
                 return
 
-            except AssertionError:
+            except FichierCorrompu:
                 showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
                 return
 
@@ -1011,25 +1043,39 @@ class Scrabble(Tk):
         fonction qui va proposer des mots au joueur actif. En cours...
         :return:
         """
-        dico = self.dictionnaire
-        liste_jeton_courant = self.joueur_actif.chevalet
-        liste_suggestion = []
-        for mot in dico:
-            print(mot)
-            for lettre in mot:
-                print(lettre)
-                for index in range(len(liste_jeton_courant)):
-                    print(index)
-                    if liste_jeton_courant[index].lettre == lettre:
-                        print("Liste:", liste_jeton_courant[index].lettre)
-                        suggestion = True
-                    else:
-                        suggestion = False
-                        # dès que ceci arrive, il faut quitter la boucle du mot et passer à un autre mot dans le dico
-            if suggestion:
-                liste_suggestion.append(mot)
-        if len(liste_suggestion) == 0:
-            print("Aucune suggestion")
-        else:
-            print(liste_suggestion)
 
+        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
+        suggestions = []
+
+        for mot in self.dictionnaire:
+            lettres_a_verifier = lettres[:]
+            pas_trouve = False
+            if mot == '':
+                break
+            for letter in mot:
+                if letter not in lettres_a_verifier:
+                    pas_trouve = True
+                    break
+                else:
+                    lettres_a_verifier.remove(letter)
+            if not pas_trouve:
+                suggestions.append(self.calculer_points(mot))
+
+        suggestions.sort(key=lambda tup: tup[1], reverse=True)
+        print("Suggestions:")
+        for mot in suggestions:
+            print(mot)
+
+    def calculer_points(self, mot):
+        """
+        Permet de calculer les points d'un mot selon les valeurs des lettres du mot.
+        Ne tiens pas compte du placement sur le plateau.
+        :param mot: str, mot dont il faut calculer les points.
+        :return: tuple, constitué du mot et des points
+        """
+        points = 0
+
+        for lettre in mot:
+            points += self.lettres_def[lettre]
+
+        return mot, points

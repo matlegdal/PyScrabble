@@ -83,4 +83,7 @@ class SauvegardeEchouee(Exception):
 class ChargeException(Exception):
     pass
 
+class FichierCorrompu(Exception):
+    pass
+
 
