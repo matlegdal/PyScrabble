@@ -1011,25 +1011,38 @@ class Scrabble(Tk):
         fonction qui va proposer des mots au joueur actif. En cours...
         :return:
         """
-        dico = self.dictionnaire
-        liste_jeton_courant = self.joueur_actif.chevalet
+        dico = open("dic/{}.txt".format(self.langue))
+        liste_jeton = self.joueur_actif.chevalet
+        liste_jeton_courant = []
+        for index in range(len(liste_jeton)):
+            liste_jeton_courant.append(liste_jeton[index].lettre)
+
+
         liste_suggestion = []
+
+        print(liste_jeton_courant)
+        suggestion = True
+
         for mot in dico:
-            print(mot)
-            for lettre in mot:
-                print(lettre)
-                for index in range(len(liste_jeton_courant)):
-                    print(index)
-                    if liste_jeton_courant[index].lettre == lettre:
-                        print("Liste:", liste_jeton_courant[index].lettre)
-                        suggestion = True
-                    else:
-                        suggestion = False
-                        # dès que ceci arrive, il faut quitter la boucle du mot et passer à un autre mot dans le dico
+            mot_maj = mot.upper()
+            print(mot_maj)
+            for index in range(len(mot_maj)):
+                print(liste_jeton_courant)
+                if mot_maj[index] in liste_jeton_courant:
+                    print(mot_maj[index])
+                    print("une lettre du mot est dans le chevalet")
+                    suggestion = True
+                else:
+                    suggestion = False
+                    print(mot_maj[index])
+                    print("une lettre du mot n'est pas dans le chevalet")
+                    break
+            print(suggestion)
             if suggestion:
                 liste_suggestion.append(mot)
         if len(liste_suggestion) == 0:
             print("Aucune suggestion")
         else:
             print(liste_suggestion)
+        dico.close()
 
