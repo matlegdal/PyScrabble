@@ -122,7 +122,7 @@ class Jeu(Frame):
 
         root.log.config(yscrollcommand=scroll_log.set)
 
-        root.log.insert(END, "Début de la partie.\n")
+        root.log.insert(END, "Début de la partie.")
         root.log.config(state="disabled")
 
 

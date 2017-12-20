@@ -769,6 +769,9 @@ class Scrabble(Tk):
             if self.jobs['timer'] is not None:
                 self.timer_label.after_cancel(self.jobs['timer'])
 
+            # Désactive la sauvegarde
+
+
             return True
         else:
             return False
@@ -870,7 +873,6 @@ class Scrabble(Tk):
         if nom_fichier is not None and nom_fichier != '':
             try:
                 with open(nom_fichier, "wb") as f:
-                    # todo: add log
                     pickle.dump(self.langue, f)
                     pickle.dump(self.joueurs, f)
                     position_joueur_actif = self.joueurs.index(self.joueur_actif)
@@ -879,9 +881,11 @@ class Scrabble(Tk):
                     pickle.dump(self.plateau.cases, f)
                     pickle.dump(self.tour, f)
                     pickle.dump(self.difficulte, f)
+                    pickle.dump(self.log.get(1.0, "end-1c"), f)
 
-            except:
+            except Exception as e:
                 showwarning("Échec", "Échec de la sauvegarde")
+                print(e)
                 return
             else:
                 if not autosave:
@@ -910,6 +914,7 @@ class Scrabble(Tk):
                     cases = pickle.load(f)
                     tour = pickle.load(f)
                     difficulte = pickle.load(f)
+                    log = pickle.load(f)
 
                     # Vérification de l'intégrité des données chargées.
                     if langue not in Scrabble.LANGUES_DISPONIBLES:
@@ -938,6 +943,8 @@ class Scrabble(Tk):
                         raise FichierCorrompu
                     if difficulte not in Scrabble.DIFFICULTES_DISPONIBLES:
                         raise FichierCorrompu
+                    if not isinstance(log, str):
+                        raise FichierCorrompu
 
             except (pickle.UnpicklingError, FichierCorrompu):
                 showwarning(message="Le fichier que vous tentez de charger semble corrompu.")
@@ -962,6 +969,10 @@ class Scrabble(Tk):
             # On lance la partie
             self.jouer(cases)
             self.changer_joueur(charger=True, tour=tour)
+
+            # On écrit le log
+            self.log.delete(1.0, END)
+            self.ecrire_log(log)
 
     def assistance(self):
         """

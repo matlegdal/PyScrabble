@@ -30,7 +30,7 @@ Fonctionnalités obligatoires (70%)
      Commentaires :
 
 /6 : Le jeton sélectionné est facilement identifiable
-     Commentaires :
+     Commentaires : Le jeton disparait, donc c'est plutôt bien identifiable.
 
 /6 : Le tour des joueurs est alterné correctement
      Commentaires :
@@ -71,7 +71,9 @@ Fonctionnalités obligatoires (70%)
      Commentaires :
 
 /4 : Qualité du code
-     Commentaires :
+     Commentaires : Nous avons fait des efforts pour limiter la grosseur de la classe Scrabble et séparer le fond de la forme.
+     Ainsi, la forme (affichage de tkinter) est principalement dans les classes Accueil, Jeu et Reglements.
+     Alors que le fond, les fonctions qui permettent de jouer sont dans la classe traditionnelles tel qu'au tp3.
 
 Total: /70
 
@@ -90,7 +92,7 @@ IMPLANTÉE: oui
 /5 : Permettre de choisir la langue du jeu
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: non
 /15 :  Supporter au moins 15 langues
      Commentaires :
 
@@ -103,31 +105,31 @@ IMPLANTÉE: OUI
      Commentaires : Le joueur peut reprendre les jetons du plateau aisément pour les redéposer sur son chevalet.
      Il y a aussi un bouton annuler qui permet de reprendre tous les jetons placés sur le plateau et les remettre dans le chevalet.
 
-IMPLANTÉE:
+IMPLANTÉE: Partiellement
 /5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
-     Commentaires :	
+     Commentaires :	Nous avons implanté une historique des coups joués. Mais
 
 IMPLANTÉE:
 /10 :  Jouer contre l'ordinateur
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: non
 /5 : Permettre de changer le thème (couleurs, style, etc.)
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: non
 /5 : "Drag-and-drop" de jetons
      Commentaires :
 
-IMPLANTÉE: Partiellement todo: implémenter la version complète
+IMPLANTÉE: OUI
 /10 : Afficher un compteur de temps de jeu pour chaque joueur
-     Commentaires : Seulement en mode "difficile"
+     Commentaires : Il y a 2 versions qui peuvent être affichées. L'horloge normale et le minuteur pour la version "difficile"
 
 IMPLANTÉE: Oui todo: ajouter une option dans le menu pour afficher/cacher les suggestions
 /10 : Assister le joueur en lui proposant des mots
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: non
 /20 : Donner une dimension 3D à votre jeu
      Commentaires :
 
