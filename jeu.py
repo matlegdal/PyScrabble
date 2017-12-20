@@ -54,20 +54,22 @@ class Jeu(Frame):
         root.btn_abandonner.grid(row=2, column=2)
 
         # interface pour changer les jetons
-        jeter = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        jeter.grid(row=3, column=1, sticky=NSEW)
+        root.jeter = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        root.jeter.grid(row=3, column=1, sticky=NSEW)
 
-        Label(jeter, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        Label(root.jeter, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
 
-        root.sac_a_jetons = Chevalet(jeter, root.PIXELS_PAR_CASE)
+        root.sac_a_jetons = Chevalet(root.jeter, root.PIXELS_PAR_CASE)
         root.sac_a_jetons.grid(row=1, column=0, columnspan=2, sticky=NS)
 
-        Button(jeter, text="Confirmer", command=root.changer_jetons).grid(row=2, column=0, sticky=NSEW)
-        Button(jeter, text="Cancel", command=root.annuler_changer_jetons).grid(row=2, column=1, sticky=NSEW)
+        Button(root.jeter, text="Confirmer", command=root.changer_jetons).grid(row=2, column=0, sticky=NSEW)
+        Button(root.jeter, text="Cancel", command=root.annuler_changer_jetons).grid(row=2, column=1, sticky=NSEW)
 
-        # jeter.lower()
+        root.jeter.lower()
 
         # Interface d'assistance
+        # todo: corriger le bug de redimensionnement
+        # todo: insérer les bons mots.
         assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
 

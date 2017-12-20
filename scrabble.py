@@ -685,7 +685,7 @@ class Scrabble(Tk):
         bind_jeter(self)
 
         # Affichage de l'interface
-        self.bottom_right.grid()
+        self.jeter.lift()
 
         # Désactive les boutons d'actions
         self.desactiver_btn_actions()
@@ -742,7 +742,7 @@ class Scrabble(Tk):
 
         # Détruire l'interface pour changer les jetons
         bind_prendre(self)
-        self.bottom_right.grid_remove()
+        self.jeter.lower()
 
         # Réactive les boutons d'actions
         self.activer_btn_actions()
@@ -769,7 +769,7 @@ class Scrabble(Tk):
         # Détruire l'interface pour changer les jetons
         unbind_jeter(self)
         bind_prendre(self)
-        self.bottom_right.grid_remove()
+        self.jeter.lower()
 
         # Réactive les boutons d'actions
         self.activer_btn_actions()
