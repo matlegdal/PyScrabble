@@ -1,11 +1,12 @@
 from tkinter import *
 from chevalet import Chevalet
-from plateau import Plateau
 
 class Jeu(Frame):
 
     PADX = 10
     PADY = 10
+
+    H1 = ('Helvetica', 13, 'bold')
 
     def __init__(self, parent, root):
         super().__init__(parent)
@@ -16,11 +17,13 @@ class Jeu(Frame):
         pointage.grid(row=0, column=0, sticky=NSEW)
         pointage.grid_columnconfigure(0, weight=1)
         pointage.grid_columnconfigure(10, weight=1)
+        pointage.grid_rowconfigure(0, weight=1)
+        pointage.grid_rowconfigure(10, weight=1)
 
         for i in range(len(root.joueurs)):
-            Label(pointage, text="{}".format(root.joueurs[i].nom)).grid(row=0, column=i+1, sticky=NSEW)
+            Label(pointage, text="{}".format(root.joueurs[i].nom), font=self.H1).grid(row=1, column=i+1, sticky=NSEW)
             points = Label(pointage, text="{}".format(root.joueurs[i].points))
-            points.grid(row=1, column=i+1, sticky=NSEW)
+            points.grid(row=2, column=i+1, sticky=NSEW)
             root.labels_points.append(points)
 
 
@@ -29,16 +32,20 @@ class Jeu(Frame):
         message.grid(row=0, column=1, sticky=NSEW)
         message.grid_columnconfigure(0, weight=1)
         message.grid_columnconfigure(10, weight=1)
+        message.grid_rowconfigure(0, weight=1)
+        message.grid_rowconfigure(10, weight=1)
 
-        Label(message, textvariable=root.message).grid(row=0, column=1)
+        Label(message, textvariable=root.message).grid(row=1, column=1)
 
         # Compteur
         compteur = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         compteur.grid(row=1, column=1, sticky=NSEW)
         compteur.grid_columnconfigure(0, weight=1)
         compteur.grid_columnconfigure(10, weight=1)
+        compteur.grid_rowconfigure(0, weight=1)
+        compteur.grid_rowconfigure(10, weight=1)
 
-        Label(compteur, text="Compteur").grid(row=0, column=1)
+        Label(compteur, text="Compteur", font=self.H1).grid(row=1, column=1)
         root.temps_label = Label(compteur, text='0')
         root.temps_label.grid(row=2, column=1)
 
@@ -47,10 +54,12 @@ class Jeu(Frame):
         self.timer.grid(row=1, column=1, sticky=NSEW)
         self.timer.grid_columnconfigure(0, weight=1)
         self.timer.grid_columnconfigure(10, weight=1)
+        self.timer.grid_rowconfigure(0, weight=1)
+        self.timer.grid_rowconfigure(10, weight=1)
 
-        Label(self.timer, text="Minuteur").grid(row=0, column=1)
+        Label(self.timer, text="Minuteur", font=self.H1).grid(row=1, column=1)
         root.timer_label = Label(self.timer, text='')
-        root.timer_label.grid(row=1, column=1)
+        root.timer_label.grid(row=2, column=1)
 
         self.timer.lower()
 
@@ -60,8 +69,10 @@ class Jeu(Frame):
         joueur.grid_columnconfigure(0, weight=1)
         joueur.grid_columnconfigure(10, weight=1)
 
+        Label(joueur, textvariable=root.nom_joueur, font=self.H1).grid(row=0, column=1, columnspan=4, pady=self.PADY)
+
         root.chevalet_actif = Chevalet(joueur, root.PIXELS_PAR_CASE)
-        root.chevalet_actif.grid(row=0, column=1, columnspan=4, sticky=NS)
+        root.chevalet_actif.grid(row=1, column=1, columnspan=4, sticky=NS, pady=self.PADY)
 
             # Boutons d'actions
         root.btn_jouer = Button(joueur, text="Jouer le tour", command=root.jouer_un_tour)
@@ -70,11 +81,11 @@ class Jeu(Frame):
         root.btn_changer = Button(joueur, text="Changer les jetons", command=root.demander_jetons_a_changer)
         root.btn_abandonner = Button(joueur, text="Abandonner", command=root.abandonner)
 
-        root.btn_jouer.grid(row=1, column=1, columnspan=2, sticky=NSEW, pady=10)
-        root.btn_annuler.grid(row=1, column=3, sticky=NSEW, pady=10)
-        root.btn_passer.grid(row=2, column=1)
-        root.btn_changer.grid(row=2, column=2)
-        root.btn_abandonner.grid(row=2, column=3)
+        root.btn_jouer.grid(row=2, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+        root.btn_annuler.grid(row=2, column=3, sticky=NSEW, pady=self.PADY)
+        root.btn_passer.grid(row=3, column=1, sticky=NSEW)
+        root.btn_changer.grid(row=3, column=2, sticky=NSEW)
+        root.btn_abandonner.grid(row=3, column=3, sticky=NSEW)
 
         # Interface pour changer les jetons
         root.jeter = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
@@ -85,7 +96,7 @@ class Jeu(Frame):
         Label(root.jeter, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=1, columnspan=2)
 
         root.sac_a_jetons = Chevalet(root.jeter, root.PIXELS_PAR_CASE)
-        root.sac_a_jetons.grid(row=1, column=1, columnspan=2, sticky=NS)
+        root.sac_a_jetons.grid(row=1, column=1, columnspan=2, sticky=NS, pady=self.PADY)
 
         Button(root.jeter, text="Confirmer", command=root.changer_jetons).grid(row=2, column=1, sticky=NSEW)
         Button(root.jeter, text="Cancel", command=root.annuler_changer_jetons).grid(row=2, column=2, sticky=NSEW)
@@ -95,9 +106,13 @@ class Jeu(Frame):
         # Sac à jetons
         sac_a_jetons = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         sac_a_jetons.grid(row=4, column=1, sticky=NSEW)
+        sac_a_jetons.grid_columnconfigure(0, weight=1)
+        sac_a_jetons.grid_columnconfigure(10, weight=1)
+        sac_a_jetons.grid_rowconfigure(0, weight=1)
+        sac_a_jetons.grid_rowconfigure(10, weight=1)
 
         root.sac_a_jetons_label = Label(sac_a_jetons, text="")
-        root.sac_a_jetons_label.pack(side=RIGHT)
+        root.sac_a_jetons_label.grid(row=1, column=1)
 
         # Interface d'assistance
         # todo: corriger le bug de redimensionnement

@@ -101,7 +101,6 @@ class Scrabble(Tk):
         self.dictionnaire = None
         self.message = StringVar()
         self.nom_joueur = StringVar()
-        # self.pointage = StringVar()
         self.chevalet_actif = None
         self.affichage_joueur = None
         self.tour = 0
