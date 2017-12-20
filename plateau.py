@@ -18,14 +18,15 @@ class Plateau(Canvas):
     """
     DIMENSION = 15
 
-    def __init__(self, master, pixels_par_case, cases=None):
+    def __init__(self, root, parent, pixels_par_case, cases=None):
         """Constructeur d'un plateau.
-        :param master: Fenêtre principale, de type Tk
+        :param root: Fenêtre principale, de type Tk. Correspond à l'objet Scrabble.
+        :param parent: Frame, dans lequel se trouve le plateau. Correspond à Scrabble.content.
         :param pixels_par_case: Taille des cases en pixels
         :param cases: list, list, cases, Liste des cases du plateau. None par défaut, passé en argument si on charge une partie.
         """
-        super().__init__(master, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
-        self.master = master
+        super().__init__(parent, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
+        self.parent = parent
         self.pixels_par_case = pixels_par_case
 
         self.positions = []
@@ -292,7 +293,7 @@ class Plateau(Canvas):
 # Tests unitaires
 
 if __name__ == '__main__':
-    master = Tk()
-    plateau = Plateau(master, 60)
+    parent = Tk()
+    plateau = Plateau(parent, 60)
     plateau.grid(row=0, column=0, sticky=NSEW)
 

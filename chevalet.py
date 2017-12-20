@@ -10,8 +10,8 @@ class Chevalet(Canvas):
     TAILLE_CHEVALET = 7
     # todo: refactorer -> bouger taille_chevalet et pixels par case
 
-    def __init__(self, master, pixels_par_case):
-        super().__init__(master, height=pixels_par_case, width=pixels_par_case*Chevalet.TAILLE_CHEVALET, bg='#f5ebdc')
+    def __init__(self, parent, pixels_par_case):
+        super().__init__(parent, height=pixels_par_case, width=pixels_par_case*Chevalet.TAILLE_CHEVALET, bg='#f5ebdc')
         self.pixels_par_case = pixels_par_case
 
 
