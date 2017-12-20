@@ -986,6 +986,17 @@ class Scrabble(Tk):
         """
 
         lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
+        #print("avant", lettres)
+        #for i in range(len(self.plateau.cases)):
+#
+        #    for j in range(len(self.plateau.cases[i])):
+        #        if self.plateau.cases[i][j].jeton_occupant is not None:
+        #            lettres.append(self.plateau.cases[i][j].jeton_occupant.lettre)
+
+        print("après", lettres)
+
+
+
         suggestions = []
 
         for mot in self.dictionnaire:
@@ -1037,4 +1048,3 @@ class Scrabble(Tk):
         self.log.config(state="normal")
         self.log.insert(1.0, log)
         self.log.config(state="disabled")
-
