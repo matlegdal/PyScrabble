@@ -110,7 +110,7 @@ class Scrabble(Tk):
         self.log = None
         self.timer_label = None
         self.temps_label = None
-        self.job = {}
+        self.jobs = {'clock': None, 'timer': None}
         self.temps = 0
 
 
@@ -766,8 +766,8 @@ class Scrabble(Tk):
 
             # Cancel les horloges
             self.temps_label.after_cancel(self.jobs['clock'])
-            if self.job['timer'] is not None:
-                self.timer_label.after_cancel(self.job['timer'])
+            if self.jobs['timer'] is not None:
+                self.timer_label.after_cancel(self.jobs['timer'])
 
             return True
         else:
@@ -811,7 +811,7 @@ class Scrabble(Tk):
     def clock(self):
         self.temps += 1
         self.temps_label['text'] = self.temps
-        self.job['clock'] = self.temps_label.after(1000, self.clock)
+        self.jobs['clock'] = self.temps_label.after(1000, self.clock)
 
     def set_timer(self):
         """
@@ -829,7 +829,7 @@ class Scrabble(Tk):
         if self.timer == 0:
             self.temps_ecoule()
         self.timer_label['text'] = self.timer
-        self.job['timer'] = self.timer_label.after(1000, self.tick)
+        self.jobs['timer'] = self.timer_label.after(1000, self.tick)
 
     def temps_ecoule(self):
         """

@@ -44,7 +44,7 @@ class Jeu(Frame):
 
         # Timer
         self.timer = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        self.timer.grid(row=2, column=1, sticky=NSEW)
+        self.timer.grid(row=1, column=1, sticky=NSEW)
         self.timer.grid_columnconfigure(0, weight=1)
         self.timer.grid_columnconfigure(10, weight=1)
 
@@ -56,7 +56,7 @@ class Jeu(Frame):
 
         # joueur actif
         joueur = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        joueur.grid(row=3, column=1, sticky=NSEW)
+        joueur.grid(row=2, column=1, sticky=NSEW)
         joueur.grid_columnconfigure(0, weight=1)
         joueur.grid_columnconfigure(10, weight=1)
 
@@ -78,7 +78,7 @@ class Jeu(Frame):
 
         # interface pour changer les jetons
         root.jeter = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        root.jeter.grid(row=4, column=1, sticky=NSEW)
+        root.jeter.grid(row=3, column=1, sticky=NSEW)
         root.jeter.grid_columnconfigure(0, weight=1)
         root.jeter.grid_columnconfigure(10, weight=1)
 
@@ -95,7 +95,7 @@ class Jeu(Frame):
         # Interface d'assistance
         # todo: corriger le bug de redimensionnement
         assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        assist.grid(row=0, column=2, rowspan=3, sticky=NSEW)
+        assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
 
         Label(assist, text="Suggestion de mots").pack()
 
@@ -110,7 +110,7 @@ class Jeu(Frame):
         # Historique
         # todo: redimensionnement
         log = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        log.grid(row=3, column=2, rowspan=3, sticky=NSEW)
+        log.grid(row=2, column=2, rowspan=3, sticky=NSEW)
 
         Label(log, text="Historique des tours").pack()
 
