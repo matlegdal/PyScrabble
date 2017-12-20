@@ -75,7 +75,7 @@ class Jeu(Frame):
 
         Label(assist, text="Suggestion de mots").pack()
 
-        text = Text(assist, width=20, height=10)
+        text = Text(assist, width=40, height=10)
         text.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
 
         scroll = Scrollbar(assist, command=text.yview)

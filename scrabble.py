@@ -20,13 +20,6 @@ from chevalet import Chevalet
 from accueil import Accueil
 from jeu import Jeu
 
-# style = ttk.Style().configure('TButton', foreground="blue")
-# style.theme_settings('default',{
-#     'TButton': {
-#         'configure': {'padding': 50}
-#     }
-# })
-
 
 class Scrabble(Tk):
     """
@@ -89,27 +82,7 @@ class Scrabble(Tk):
 
         # On appelle la fenêtre principale
         self.config_content()
-
-        self.accueil = Accueil(self.content, self)
-        self.accueil.grid(row=0, column=0, sticky=NSEW)
-        self.accueil.tkraise()
-
-        # Def des frames
-        # self.frames = {}
-        # frame = Accueil(self.content, self)
-        # self.frames[Accueil] = frame
-        # frame.grid(row=0, column=0, sticky=NSEW)
-        #
-        # self.show_frame(Accueil)
-
-        # for f in (Accueil, Jeu):
-        #     frame = f(self.content, self)
-        #     self.frames[f] = frame
-        #     frame.grid(row=0, column=0, sticky=NSEW)
-        # self.accueil = Accueil(self.content, self)
-
-    # def show_frame(self, frame):
-    #     self.frames[frame].tkraise()
+        self.show_accueil()
 
     def reset_partie(self):
         """
@@ -152,49 +125,17 @@ class Scrabble(Tk):
     def afficher_reglements(self):
         Reglements(self)
 
-    # def accueil(self):
-    #     """
-    #     Affichage de l'écran d'accueil.
-    #     :return: Aucun
-    #     """
-    #     # Désactive les options nouvelle partie et sauvegarder partie du menu
-    #     self.fichier.entryconfig(0, state="disabled")
-    #     self.fichier.entryconfig(1, state="disabled")
-    #     self.fichier.entryconfig(2, state="disabled")
-    #
-    #     accueil = Frame(self.content)
-    #     accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
-    #
-    #     # message de bienvenue
-    #     Label(accueil, text="PyScrabble", font=("Times", 24)).grid(row=0, columnspan=5)
-    #     # label de la langue
-    #     Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-    #
-    #     # Choix des langues
-    #     langue = StringVar()
-    #     langue.set('fr')
-    #     Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(row=1, column=1, sticky=W, pady=self.PADY)
-    #     Radiobutton(accueil, text='English', variable=langue, value='en').grid(row=1, column=2, sticky=W, pady=self.PADY)
-    #
-    #     # Nombre des joueurs
-    #     Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=2, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-    #     nb_joueurs = IntVar()
-    #     nb_joueurs.set(2)
-    #     Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(row=2, column=1, sticky=W, pady=self.PADY)
-    #     Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(row=2, column=2, sticky=W, pady=self.PADY)
-    #     Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(row=2, column=3, sticky=W, pady=self.PADY)
-    #     Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2, column=4, sticky=W, pady=self.PADY)
-    #
-    #     # Difficulté
-    #     Label(accueil, text="Choisissez la difficulté:", font=("Times", 16)).grid(row=3, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-    #     difficulte = StringVar()
-    #     difficulte.set('facile')
-    #     Radiobutton(accueil, text='Facile', variable=difficulte, value='facile').grid(row=3, column=1, sticky=W)
-    #     Radiobutton(accueil, text='Règles officielles', variable=difficulte, value='difficile').grid(row=3, column=2, sticky=W)
-    #
-    #     # Débuter la partie
-    #     Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-    #     Button(accueil, text="Charger une partie existante", command=self.charger_partie).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+    def show_accueil(self):
+        """
+        Affichage de l'écran d'accueil.
+        :return: Aucun
+        """
+        # Désactive les options nouvelle partie et sauvegarder partie du menu
+        self.fichier.entryconfig(0, state="disabled")
+        self.fichier.entryconfig(1, state="disabled")
+        self.fichier.entryconfig(2, state="disabled")
+
+        self.accueil = Accueil(self.content, self)
 
     def nouvelle_partie(self):
         """
@@ -205,7 +146,7 @@ class Scrabble(Tk):
         self.content.destroy()
         self.reset_partie()
         self.config_content()
-        self.show_frame(Accueil)
+        self.show_accueil()
 
     def verifier_avant_de_quitter(self):
         """
@@ -230,19 +171,18 @@ class Scrabble(Tk):
         self.verifier_avant_de_quitter()
         self.quit()
 
-    def demarrer_partie(self, accueil, nb_joueurs, langue, difficulte):
+    def demarrer_partie(self, nb_joueurs, langue, difficulte):
         """
         Démarre une partie en détruisant la page d'accueil, initialisant la partie et passe le contrôle à jouer().
-        :param accueil: (Frame) Page d'accueil
         :param nb_joueurs: (int) Nombre de joueurs
         :param langue: (str) Code de langue à 2 lettres
         :param difficulte: str, option de difficulté de la partie, 'facile' ou 'difficile'
         :return: aucun return
         """
-        self.accueil.grid_remove()
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
+        self.accueil.grid_remove()
 
     def initialiser_partie(self, nb_joueurs, langue, difficulte, joueurs=None):
         """
@@ -314,69 +254,6 @@ class Scrabble(Tk):
         # Set le plateau
         self.plateau = Plateau(self, self.content, self.PIXELS_PAR_CASE, cases)
         self.plateau.grid(row=1, column=0, rowspan=5, sticky=NSEW)
-
-        # Set le tableau d'affichange
-        # self.tableau = Frame(self.content)
-        # self.tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
-        # Label(self.tableau, textvariable=self.message).grid(row=0, columnspan=2)
-        # Label(self.tableau, textvariable=self.pointage).grid(row=1, columnspan=2)
-
-        # Timer (version difficile uniquement)
-        # if self.difficulte == 'difficile':
-        #     Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
-        #     self.timer_label = Label(self.tableau, text='')
-        #     self.timer_label.grid(row=3, column=1, pady=self.PADY)
-        #     self.set_clock()
-        #     self.clock()
-
-        # # Set les joueurs
-        # self.affichage_joueur = Frame(self.content)
-        # self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        # Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
-        #
-        # # Initialise le chevalet
-        # self.chevalet_actif = Chevalet(self.affichage_joueur, self.PIXELS_PAR_CASE)
-        # self.chevalet_actif.grid(row=1, column=0, columnspan=3)
-        #
-        # # Set les boutons d'actions
-        # self.btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
-        # self.btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
-        # self.btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        # self.btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
-        # self.btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
-        #
-        # # Affichage des boutons d'actions
-        # self.btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
-        # self.btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
-        # self.btn_passer.grid(row=3, column=0)
-        # self.btn_changer.grid(row=3, column=1)
-        # self.btn_abandonner.grid(row=3, column=2)
-        #
-        # # Set interface pour changer les jetons
-        # self.bottom_right = Frame(self.content)
-        # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        # Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-        #
-        # self.sac_a_jetons = Chevalet(self.bottom_right, self.PIXELS_PAR_CASE)
-        # self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-        #
-        # Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
-        # Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
-        #
-        # self.bottom_right.grid_remove()
-
-
-
-    # def msg_points(self):
-    #     """
-    #     Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
-    #     :return: (str) Chaine de charactères formattée montrant les points de tous les joueurs
-    #     """
-    #     msg_points = ""
-    #     for joueur in self.joueurs:
-    #         msg_points += "{}:{} ".format(joueur.nom, joueur.points)
-    #
-    #     return msg_points
 
     def determiner_case(self, event):
         """
@@ -577,6 +454,8 @@ class Scrabble(Tk):
         except MotNonPermisException as e:
             showwarning(message=e)
             return
+
+        # todo: effacer suggestions
         # destruction du frame suggestion
         # self.frame_affichage_suggestion.destroy()
 
