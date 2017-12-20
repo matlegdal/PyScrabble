@@ -76,7 +76,7 @@ class Jeu(Frame):
         root.btn_changer.grid(row=2, column=2)
         root.btn_abandonner.grid(row=2, column=3)
 
-        # interface pour changer les jetons
+        # Interface pour changer les jetons
         root.jeter = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         root.jeter.grid(row=3, column=1, sticky=NSEW)
         root.jeter.grid_columnconfigure(0, weight=1)
@@ -91,6 +91,13 @@ class Jeu(Frame):
         Button(root.jeter, text="Cancel", command=root.annuler_changer_jetons).grid(row=2, column=2, sticky=NSEW)
 
         root.jeter.lower()
+
+        # Sac à jetons
+        sac_a_jetons = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        sac_a_jetons.grid(row=4, column=1, sticky=NSEW)
+
+        root.sac_a_jetons_label = Label(sac_a_jetons, text="")
+        root.sac_a_jetons_label.pack(side=RIGHT)
 
         # Interface d'assistance
         # todo: corriger le bug de redimensionnement

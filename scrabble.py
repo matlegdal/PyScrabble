@@ -110,6 +110,7 @@ class Scrabble(Tk):
         self.log = None
         self.timer_label = None
         self.temps_label = None
+        self.sac_a_jetons_label = None
         self.jobs = {'clock': None, 'timer': None}
         self.temps = 0
 
@@ -716,6 +717,8 @@ class Scrabble(Tk):
             msg = "Tour {}\nC'est le tour de {}".format(self.tour, self.joueur_actif.nom)
 
         # On pige les jetons
+        log = "{} pige {} jetons.\n".format(self.joueur_actif.nom, self.joueur_actif.nb_a_tirer)
+        self.ecrire_log(log)
         for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
             self.joueur_actif.ajouter_jeton(jeton)
 
@@ -724,12 +727,14 @@ class Scrabble(Tk):
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
         self.afficher_suggestions()
+        self.sac_a_jetons_label.config(text="Il reste {} jetons dans le sac.".format(len(self.jetons_libres)))
 
         # Horloges
         self.set_clock()
         if self.difficulte == "difficile":
             self.set_timer()
 
+        # Bindings
         bind_prendre(self)
 
         # Autosave
@@ -770,7 +775,8 @@ class Scrabble(Tk):
                 self.timer_label.after_cancel(self.jobs['timer'])
 
             # Désactive la sauvegarde
-
+            self.fichier.entryconfig(1, state="disabled")
+            self.fichier.entryconfig(2, state="disabled")
 
             return True
         else:
