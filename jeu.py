@@ -90,10 +90,28 @@ class Jeu(Frame):
         root.suggestions = Text(assist, width=40, height=10)
         root.suggestions.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
 
-        scroll = Scrollbar(assist, command=root.suggestions.yview)
-        scroll.pack(side=RIGHT, fill=Y)
+        scroll_suggestions = Scrollbar(assist, command=root.suggestions.yview)
+        scroll_suggestions.pack(side=RIGHT, fill=Y)
 
-        root.suggestions.config(yscrollcommand=scroll.set)
+        root.suggestions.config(yscrollcommand=scroll_suggestions.set)
+
+        # Historique
+        # todo: redimensionnement
+        log = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        log.grid(row=2, column=2, columnspan=2, sticky=NSEW)
+
+        Label(log, text="Historique des tours").pack()
+
+        root.log = Text(log, width=40, height=10)
+        root.log.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
+
+        scroll_log = Scrollbar(log, command=root.log.yview)
+        scroll_log.pack(side=RIGHT, fill=Y)
+
+        root.log.config(yscrollcommand=scroll_log.set)
+
+        root.log.insert(END, "Début de la partie.\n")
+        root.log.config(state="disabled")
 
 
 

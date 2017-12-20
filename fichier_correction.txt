@@ -94,9 +94,9 @@ IMPLANTÉE:
 /15 :  Supporter au moins 15 langues
      Commentaires :
 
-IMPLANTÉE:
+IMPLANTÉE: OUI
 /5 : Affichage de la liste des mots sur le plateau
-     Commentaires :
+     Commentaires : voir la fonction historique (log)
 
 IMPLANTÉE: OUI
 /5 : Permettre d'annuler le dernier mouvement
@@ -123,7 +123,7 @@ IMPLANTÉE: Partiellement todo: implémenter la version complète
 /10 : Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires : Seulement en mode "difficile"
 
-IMPLANTÉE:
+IMPLANTÉE: Oui todo: ajouter une option dans le menu pour afficher/cacher les suggestions
 /10 : Assister le joueur en lui proposant des mots
      Commentaires :
 

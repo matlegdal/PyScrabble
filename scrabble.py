@@ -107,7 +107,9 @@ class Scrabble(Tk):
         self.tour = 0
         self.labels_points = []
         self.suggestions = None
+        self.log = None
         self.timer_label = None
+
 
     def config_content(self):
         """
@@ -462,6 +464,15 @@ class Scrabble(Tk):
             showwarning(message=e)
             return
 
+        mots_str = mots[0]
+        mots.remove(mots[0])
+        if len(mots) > 1:
+            for mot in mots:
+                mots_str += ", {}".format(mot)
+
+        log = "Tour {}: {} a obtenu {} points.\n  Mots placés: {}.\n".format(self.tour, self.joueur_actif.nom, score, mots_str)
+        self.ecrire_log(log)
+
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
         self.plateau.jetons_places = []
@@ -521,6 +532,9 @@ class Scrabble(Tk):
             else:
                 return
 
+        log = "Tour {}: {} a passé son tour.\n".format(self.tour, self.joueur_actif.nom)
+        self.ecrire_log(log)
+
         self.changer_joueur()
 
     def abandonner(self):
@@ -532,6 +546,9 @@ class Scrabble(Tk):
         if rep:
             if self.verifier_jetons_sur_le_plateau():
                 self.reprendre_tous_les_jetons()
+
+            log = "Tour {}: {} a abandonné la partie.\n".format(self.tour, self.joueur_actif.nom)
+            self.ecrire_log(log)
 
             abandonner = self.joueur_actif
             self.changer_joueur()
@@ -628,6 +645,10 @@ class Scrabble(Tk):
 
         # Réactive les boutons d'actions
         self.activer_btn_actions()
+
+        # Set log
+        log = "Tour {}: {} a changé {} jetons.\n".format(self.tour, self.joueur_actif.nom, len(self.joueur_actif.jetons_jetes))
+        self.ecrire_log(log)
 
         # Passer un tour
         self.joueur_actif.jetons_jetes = []
@@ -731,8 +752,10 @@ class Scrabble(Tk):
         if len(self.jetons_libres) < 1 or len(self.joueurs) < 2:
             self.desactiver_btn_actions()
             unbind_prendre(self)
-            self.message.set("Partie terminée, {} est le gagant!".format(self.determiner_gagnant().nom))
-            showinfo('Partie terminée', '{} est le gagnant! Félicitations!'.format(self.determiner_gagnant().nom))
+            log = "Partie terminée, {} est le gagant!".format(self.determiner_gagnant().nom)
+            self.ecrire_log(log)
+            self.message.set(log)
+            showinfo(message=log)
             return True
         else:
             return False
@@ -973,4 +996,9 @@ class Scrabble(Tk):
             self.suggestions.insert(END, mot_str)
 
         self.suggestions.config(state="disabled")
+
+    def ecrire_log(self, log):
+        self.log.config(state="normal")
+        self.log.insert(1.0, log)
+        self.log.config(state="disabled")
 
