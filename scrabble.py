@@ -106,6 +106,7 @@ class Scrabble(Tk):
         self.affichage_joueur = None
         self.tour = 0
         self.labels_points = []
+        self.suggestions = None
 
     def config_content(self):
         """
@@ -455,10 +456,6 @@ class Scrabble(Tk):
             showwarning(message=e)
             return
 
-        # todo: effacer suggestions
-        # destruction du frame suggestion
-        # self.frame_affichage_suggestion.destroy()
-
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
         self.plateau.jetons_places = []
@@ -619,7 +616,7 @@ class Scrabble(Tk):
             self.joueur_actif.ajouter_jeton(jeton)
         self.jetons_libres = self.jetons_libres + self.joueur_actif.jetons_jetes
 
-        # Détruire l'interface pour changer les jetons
+        # Cacher l'interface pour changer les jetons
         bind_prendre(self)
         self.jeter.lower()
 
@@ -645,7 +642,7 @@ class Scrabble(Tk):
         self.chevalet_actif.dessiner(self.joueur_actif)
         self.joueur_actif.jetons_jetes = []
 
-        # Détruire l'interface pour changer les jetons
+        # Cacher l'interface pour changer les jetons
         unbind_jeter(self)
         bind_prendre(self)
         self.jeter.lower()
@@ -691,23 +688,15 @@ class Scrabble(Tk):
 
         # On update l'affichage
         self.message.set(msg)
-        # self.pointage.set(self.msg_points())
-
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
-        bind_prendre(self)
-
-        # self.assistance()
-
-
-        # # set un bouton pour afficher les suggestions
-        # self.btn_afficher_suggestion = Button(self.content, text="Afficher les suggestions de mots",
-        #                                       command=lambda: self.afficher_suggestion(self.suggestion_str))
-        # self.btn_afficher_suggestion.grid(row=3, column=1)
+        self.afficher_suggestions()
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
             self.set_clock()
+
+        bind_prendre(self)
 
         # Autosave
         self.sauvegarder_partie(autosave=True)
@@ -938,6 +927,7 @@ class Scrabble(Tk):
             if mot == '':
                 break
             for letter in mot:
+                #todo: vérifier quoi faire avec les jokers
                 #if 'Joker' in lettres_a_verifier:
                     #dire au programme de prendre n'importe quelle lettre?
 
@@ -951,14 +941,6 @@ class Scrabble(Tk):
 
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
 
-        # todo: réviser passer de variable d'instance à locale.
-        # self.suggestion_str = ''
-        #
-        # for mot in suggestions:
-        #     mot_str = '{}, {} points'.format(mot[0], mot[1])
-        #     self.suggestion_str += mot_str
-        #     self.suggestion_str += '\n'
-        # return self.suggestion_str
         return suggestions
 
     def calculer_points(self, mot):
@@ -974,29 +956,13 @@ class Scrabble(Tk):
             points += self.lettres_def[lettre]
 
         return mot, points
-    #
-    # def afficher_suggestion(self, mot):
-    #     """
-    #     Fonction qui va permettre d'afficher la/les suggestion(s) de mot(s) dans la fenêtre de jeu.
-    #     :param mot: str, consitué du mot suggéré et des points
-    #     :return: rien
-    #     """
-    #
-    #     # destruction du bouton d'affichage
-    #     self.btn_afficher_suggestion.destroy()
-    #     # affichage des suggestions de mots
-    #     self.frame_affichage_suggestion = Frame(self.content)
-    #     self.frame_affichage_suggestion.grid(row=3, column=1)
-    #     Label(self.frame_affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
-    #
-    #     text = Text(self.frame_affichage_suggestion, width=20, height=7)
-    #     text.pack(side=LEFT, fill=BOTH, expand=YES, padx=5, pady=5)
-    #
-    #     scroll = Scrollbar(self.frame_affichage_suggestion, command=text.yview)
-    #     scroll.pack(side=RIGHT, fill=Y)
-    #
-    #     text.config(yscrollcommand=scroll.set)
-    #
-    #     text.insert(END, mot)
-    #
-    #     text.config(state="disabled")
+
+    def afficher_suggestions(self):
+        self.suggestions.config(state="normal")
+        self.suggestions.delete(1.0, END)
+        for mot in self.assistance():
+            mot_str = "{}, {} points\n".format(mot[0], mot[1]).capitalize()
+            self.suggestions.insert(END, mot_str)
+
+        self.suggestions.config(state="disabled")
+
