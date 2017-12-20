@@ -1023,8 +1023,7 @@ class Scrabble(Tk):
         fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
         :return: str: suggestion des mots prêt à afficher
         """
-
-        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
+        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet if jeton is not None]
         suggestions = []
 
         if self.plateau.est_vide():
