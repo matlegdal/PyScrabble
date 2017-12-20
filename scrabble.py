@@ -17,6 +17,7 @@ from plateau import Plateau
 from reglements import Reglements
 from utils import *
 from chevalet import Chevalet
+from accueil import Accueil
 
 # style = ttk.Style().configure('TButton', foreground="blue")
 # style.theme_settings('default',{
@@ -85,9 +86,25 @@ class Scrabble(Tk):
 
         self.config(menu=self.barre_menu)
 
-        # On appelle la fenêtre principale et  l'écran d'accueil
+        # On appelle la fenêtre principale
         self.config_content()
-        self.accueil()
+
+        # Def des frames
+        self.frames = {}
+        frame = Accueil(self.content, self)
+        self.frames[Accueil] = frame
+        frame.grid(row=0, column=0, sticky=NSEW)
+
+        self.show_frame(Accueil)
+
+        # for f in (Accueil, Jeu):
+        #     frame = f(self.content, self)
+        #     self.frames[f] = frame
+        #     frame.grid(row=0, column=0, sticky=NSEW)
+        # self.accueil = Accueil(self.content, self)
+
+    def show_frame(self, frame):
+        self.frames[frame].tkraise()
 
     def reset_partie(self):
         """
@@ -127,49 +144,49 @@ class Scrabble(Tk):
     def afficher_reglements(self):
         Reglements(self)
 
-    def accueil(self):
-        """
-        Affichage de l'écran d'accueil.
-        :return: Aucun
-        """
-        # Désactive les options nouvelle partie et sauvegarder partie du menu
-        self.fichier.entryconfig(0, state="disabled")
-        self.fichier.entryconfig(1, state="disabled")
-        self.fichier.entryconfig(2, state="disabled")
-
-        accueil = Frame(self.content)
-        accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
-
-        # message de bienvenue
-        Label(accueil, text="PyScrabble", font=("Times", 24)).grid(row=0, columnspan=5)
-        # label de la langue
-        Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-
-        # Choix des langues
-        langue = StringVar()
-        langue.set('fr')
-        Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(row=1, column=1, sticky=W, pady=self.PADY)
-        Radiobutton(accueil, text='English', variable=langue, value='en').grid(row=1, column=2, sticky=W, pady=self.PADY)
-
-        # Nombre des joueurs
-        Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=2, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-        nb_joueurs = IntVar()
-        nb_joueurs.set(2)
-        Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(row=2, column=1, sticky=W, pady=self.PADY)
-        Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(row=2, column=2, sticky=W, pady=self.PADY)
-        Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(row=2, column=3, sticky=W, pady=self.PADY)
-        Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2, column=4, sticky=W, pady=self.PADY)
-
-        # Difficulté
-        Label(accueil, text="Choisissez la difficulté:", font=("Times", 16)).grid(row=3, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
-        difficulte = StringVar()
-        difficulte.set('facile')
-        Radiobutton(accueil, text='Facile', variable=difficulte, value='facile').grid(row=3, column=1, sticky=W)
-        Radiobutton(accueil, text='Règles officielles', variable=difficulte, value='difficile').grid(row=3, column=2, sticky=W)
-
-        # Débuter la partie
-        Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
-        Button(accueil, text="Charger une partie existante", command=self.charger_partie).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+    # def accueil(self):
+    #     """
+    #     Affichage de l'écran d'accueil.
+    #     :return: Aucun
+    #     """
+    #     # Désactive les options nouvelle partie et sauvegarder partie du menu
+    #     self.fichier.entryconfig(0, state="disabled")
+    #     self.fichier.entryconfig(1, state="disabled")
+    #     self.fichier.entryconfig(2, state="disabled")
+    #
+    #     accueil = Frame(self.content)
+    #     accueil.grid(row=0, column=0, rowspan=2, columnspan=2)
+    #
+    #     # message de bienvenue
+    #     Label(accueil, text="PyScrabble", font=("Times", 24)).grid(row=0, columnspan=5)
+    #     # label de la langue
+    #     Label(accueil, text="Choisissez la langue du jeu:", font=("Times", 16)).grid(row=1, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
+    #
+    #     # Choix des langues
+    #     langue = StringVar()
+    #     langue.set('fr')
+    #     Radiobutton(accueil, text='Français', variable=langue, value='fr').grid(row=1, column=1, sticky=W, pady=self.PADY)
+    #     Radiobutton(accueil, text='English', variable=langue, value='en').grid(row=1, column=2, sticky=W, pady=self.PADY)
+    #
+    #     # Nombre des joueurs
+    #     Label(accueil, text="Choisissez le nombre de joueurs:", font=("Times", 16)).grid(row=2, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
+    #     nb_joueurs = IntVar()
+    #     nb_joueurs.set(2)
+    #     Radiobutton(accueil, text='2 joueurs', variable=nb_joueurs, value=2).grid(row=2, column=1, sticky=W, pady=self.PADY)
+    #     Radiobutton(accueil, text='3 joueurs', variable=nb_joueurs, value=3).grid(row=2, column=2, sticky=W, pady=self.PADY)
+    #     Radiobutton(accueil, text='4 joueurs', variable=nb_joueurs, value=4).grid(row=2, column=3, sticky=W, pady=self.PADY)
+    #     Radiobutton(accueil, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2, column=4, sticky=W, pady=self.PADY)
+    #
+    #     # Difficulté
+    #     Label(accueil, text="Choisissez la difficulté:", font=("Times", 16)).grid(row=3, column=0, sticky=E, padx=self.PADX, pady=self.PADY)
+    #     difficulte = StringVar()
+    #     difficulte.set('facile')
+    #     Radiobutton(accueil, text='Facile', variable=difficulte, value='facile').grid(row=3, column=1, sticky=W)
+    #     Radiobutton(accueil, text='Règles officielles', variable=difficulte, value='difficile').grid(row=3, column=2, sticky=W)
+    #
+    #     # Débuter la partie
+    #     Button(accueil, text="Commencer une nouvelle partie", command=lambda: self.demarrer_partie(accueil, nb_joueurs.get(), langue.get(), difficulte.get())).grid(row=4, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
+    #     Button(accueil, text="Charger une partie existante", command=self.charger_partie).grid(row=5, column=1, columnspan=2, sticky=NSEW, pady=self.PADY)
 
     def nouvelle_partie(self):
         """
@@ -180,7 +197,7 @@ class Scrabble(Tk):
         self.content.destroy()
         self.reset_partie()
         self.config_content()
-        self.accueil()
+        # self.accueil() #todo: corriger
 
     def verifier_avant_de_quitter(self):
         """
@@ -214,7 +231,7 @@ class Scrabble(Tk):
         :param difficulte: str, option de difficulté de la partie, 'facile' ou 'difficile'
         :return: aucun return
         """
-        accueil.destroy()
+        # accueil.destroy()
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
