@@ -986,18 +986,34 @@ class Scrabble(Tk):
         """
 
         lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
-        #print("avant", lettres)
-        #for i in range(len(self.plateau.cases)):
-#
-        #    for j in range(len(self.plateau.cases[i])):
-        #        if self.plateau.cases[i][j].jeton_occupant is not None:
-        #            lettres.append(self.plateau.cases[i][j].jeton_occupant.lettre)
-
-        print("après", lettres)
-
-
-
         suggestions = []
+
+        if self.plateau.est_vide():
+            # fonction de chercher dans le dictionnaire selon la liste de lettres
+            self.chercher_dico(lettres, suggestions)
+
+        else:
+            for ligne in range(len(self.plateau.cases)):
+                for colonne in range(len(self.plateau.cases[ligne])):
+                    if self.plateau.cases[ligne][colonne].jeton_occupant is not None:
+                        lettres.append(self.plateau.cases[ligne][colonne].jeton_occupant.lettre)
+                        self.chercher_dico(lettres, suggestions)
+
+                        if len(lettres) > 7:
+                            del lettres[-1]
+        print(lettres)
+
+        suggestions.sort(key=lambda tup: tup[1], reverse=True)
+
+        return suggestions
+
+    def chercher_dico(self, lettres, suggestions):
+
+        """
+        Fonction qui cherche dans le dictionnaire des suggestions de mots selon une liste de lettres
+        :param lettres: list: liste de lettres provenant du chevalet et du plateau
+        :return: list: liste de mots suggérés.
+        """
 
         for mot in self.dictionnaire:
             lettres_a_verifier = lettres[:]
@@ -1005,17 +1021,17 @@ class Scrabble(Tk):
             if mot == '':
                 break
             for letter in mot:
-                #todo: vérifier quoi faire avec les jokers
-                #if 'Joker' in lettres_a_verifier:
-                    #dire au programme de prendre n'importe quelle lettre?
-
+                # todo: vérifier quoi faire avec les jokers
+                # if 'Joker' in lettres_a_verifier:
+                # dire au programme de prendre n'importe quelle lettre?
                 if letter not in lettres_a_verifier:
                     pas_trouve = True
                     break
                 else:
                     lettres_a_verifier.remove(letter)
             if not pas_trouve:
-                suggestions.append(self.calculer_points(mot))
+                if mot not in suggestions:
+                    suggestions.append(self.calculer_points(mot))
 
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
 
