@@ -109,6 +109,7 @@ class Scrabble(Tk):
         self.suggestions = None
         self.log = None
         self.timer_label = None
+        self.job = None
 
 
     def config_content(self):
@@ -257,8 +258,8 @@ class Scrabble(Tk):
 
         # Timer (version difficile uniquement)
         if self.difficulte == 'difficile':
-            self.set_clock()
-            self.clock()
+            self.set_timer()
+            self.tick()
 
         # Set le plateau
         self.plateau = Plateau(self, self.content, self.PIXELS_PAR_CASE, cases)
@@ -721,7 +722,7 @@ class Scrabble(Tk):
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
-            self.set_clock()
+            self.set_timer()
 
         bind_prendre(self)
 
@@ -756,6 +757,7 @@ class Scrabble(Tk):
             self.ecrire_log(log)
             self.message.set(log)
             showinfo(message=log)
+            self.timer_label.after_cancel(self.job)
             return True
         else:
             return False
@@ -791,31 +793,28 @@ class Scrabble(Tk):
         # On retourne les jetons tirés
         return jetons_tires
 
-    def set_clock(self):
+    def set_timer(self):
         """
         Fonction utilitaire simple qui reset le timer au temps permis (difficulté 'difficile' utilisant les règles officielles)
-        :return: Aucun
         """
         self.timer = 120
         self.timer_label['text'] = self.timer
 
-    def clock(self):
+    def tick(self):
         """
         Fonction responsable de faire fonctionner le timer pour limiter le temps alloué par tour dans la difficulté 'difficile' officielle.
         Est aussi responsable de l'affichage du timer dans l'interface
-        :return: Aucun
         """
         self.timer -= 1
         if self.timer == 0:
             self.temps_ecoule()
         self.timer_label['text'] = self.timer
-        self.timer_label.after(1000, self.clock)
+        self.job = self.timer_label.after(1000, self.tick)
 
     def temps_ecoule(self):
         """
         Fonction appelée lorsque le temps par tour alloué est écoulé dans la version 'difficile' utilisant les règles officielles.
         Reprend tous les jetons placés et les retourne dans le chevalet du joueur avant de changer de joueur.
-        :return: Aucun
         """
         showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis! Vous passez votre tour.')
         self.reprendre_tous_les_jetons()
@@ -851,6 +850,7 @@ class Scrabble(Tk):
         if nom_fichier is not None and nom_fichier != '':
             try:
                 with open(nom_fichier, "wb") as f:
+                    # todo: add log
                     pickle.dump(self.langue, f)
                     pickle.dump(self.joueurs, f)
                     position_joueur_actif = self.joueurs.index(self.joueur_actif)
