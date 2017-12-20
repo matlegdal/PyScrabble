@@ -476,7 +476,7 @@ class Scrabble(Tk):
             for mot in mots:
                 mots_str += ", {}".format(mot)
 
-        log = "Tour {}: {} a obtenu {} points.\n  Mots placés: {}.\n".format(self.tour, self.joueur_actif.nom, score, mots_str)
+        log = "Tour {}: {} a obtenu {} points.\n  Mots placés: {}.\n  Le tour a pris {} sec.\n".format(self.tour, self.joueur_actif.nom, score, mots_str, self.temps)
         self.ecrire_log(log)
 
         self.joueur_actif.ajouter_points(score)
@@ -538,7 +538,7 @@ class Scrabble(Tk):
             else:
                 return
 
-        log = "Tour {}: {} a passé son tour.\n".format(self.tour, self.joueur_actif.nom)
+        log = "Tour {}: {} a passé son tour.\n  Le tour a pris {} sec.\n".format(self.tour, self.joueur_actif.nom, self.temps)
         self.ecrire_log(log)
 
         self.changer_joueur()
@@ -553,7 +553,7 @@ class Scrabble(Tk):
             if self.verifier_jetons_sur_le_plateau():
                 self.reprendre_tous_les_jetons()
 
-            log = "Tour {}: {} a abandonné la partie.\n".format(self.tour, self.joueur_actif.nom)
+            log = "Tour {}: {} a abandonné la partie.\n  Le tour a pris {} sec.\n".format(self.tour, self.joueur_actif.nom, self.temps)
             self.ecrire_log(log)
 
             abandonner = self.joueur_actif
@@ -653,7 +653,7 @@ class Scrabble(Tk):
         self.activer_btn_actions()
 
         # Set log
-        log = "Tour {}: {} a changé {} jetons.\n".format(self.tour, self.joueur_actif.nom, len(self.joueur_actif.jetons_jetes))
+        log = "Tour {}: {} a changé {} jetons.\n  Le tour a pris {} sec.\n".format(self.tour, self.joueur_actif.nom, len(self.joueur_actif.jetons_jetes), self.temps)
         self.ecrire_log(log)
 
         # Passer un tour
