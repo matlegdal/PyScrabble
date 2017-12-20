@@ -1,5 +1,5 @@
 """
-Fichier python contenant les classes d'exeption. J'ai pensé à les mettres dans un fichier à part.
+Fichier python contenant les classes d'exception personnalisées.
 
 """
 

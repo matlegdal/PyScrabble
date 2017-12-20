@@ -1,6 +1,9 @@
 from tkinter import *
 
 class Reglements(Toplevel):
+    """
+    Cette classe génère une fenêtre popup dans lequel le joueur peut lire les règlements du Scrabble.
+    """
 
     GENERALITES = """
 

@@ -1,6 +1,6 @@
 from case import Case
 from utils import *
-from tkinter import Canvas, CENTER, Tk, NSEW
+from tkinter import Canvas, CENTER
 from exception import *
 
 
@@ -26,7 +26,7 @@ class Plateau(Canvas):
         :param cases: list, list, cases, Liste des cases du plateau. None par défaut, passé en argument si on charge une partie.
         """
         super().__init__(parent, height=pixels_par_case*Plateau.DIMENSION, width=pixels_par_case*Plateau.DIMENSION)
-        self.parent = parent
+        self.root = root
         self.pixels_par_case = pixels_par_case
 
         self.positions = []
@@ -288,12 +288,4 @@ class Plateau(Canvas):
 
         return mots, score_total
 
-
-
-# Tests unitaires
-
-if __name__ == '__main__':
-    parent = Tk()
-    plateau = Plateau(parent, 60)
-    plateau.grid(row=0, column=0, sticky=NSEW)
 
