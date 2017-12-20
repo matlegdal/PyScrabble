@@ -86,4 +86,7 @@ class ChargeException(Exception):
 class FichierCorrompu(Exception):
     pass
 
+class SacVideException(Exception):
+    pass
+
 
