@@ -45,7 +45,7 @@ class Jeu(Frame):
         compteur.grid_rowconfigure(0, weight=1)
         compteur.grid_rowconfigure(10, weight=1)
 
-        Label(compteur, text="Compteur", font=self.H1).grid(row=1, column=1)
+        Label(compteur, text="Horloge", font=self.H1).grid(row=1, column=1)
         root.temps_label = Label(compteur, text='0')
         root.temps_label.grid(row=2, column=1)
 

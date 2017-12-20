@@ -226,7 +226,6 @@ class Scrabble(Tk):
 
         if self.jetons_libres is None or self.jetons_libres == []:
             with open('data/{}.txt'.format(self.langue), 'r') as data:
-                self.jetons_libres = []
                 for line in data.read().splitlines():
                     temp = line.split(',')
                     lettre = str(temp[0])
@@ -595,28 +594,23 @@ class Scrabble(Tk):
         # Désactive les boutons d'actions
         self.desactiver_btn_actions()
 
-    def desactiver_btn_actions(self):
-        self.btn_jouer.config(state="disabled")
-        self.btn_annuler.config(state="disabled")
-        self.btn_passer.config(state="disabled")
-        self.btn_changer.config(state="disabled")
-        self.btn_abandonner.config(state="disabled")
-
-    def activer_btn_actions(self):
-        self.btn_jouer.config(state="normal")
-        self.btn_annuler.config(state="normal")
-        self.btn_passer.config(state="normal")
-        self.btn_changer.config(state="normal")
-        self.btn_abandonner.config(state="normal")
-
     def jeter_jeton(self, event):
         """
         Permet de retirer un jeton du chevalet du joueur et le placer dans le chevalet des jetons à jeter.
+        Utilisé dans l'interface pour changer les jetons.
         :param event: Le clic de souris ayant déclenché l'évènement
         :return: aucun
+        :exception: On arrête l'exécution si la position sur le chevalet est incorrecte ou qu'il ne reste plus de jetons disponibles.
         """
         pos = event.x // self.PIXELS_PAR_CASE
-        assert 0 <= pos <= self.chevalet_actif.TAILLE_CHEVALET
+
+        # Théoriquement les bindings font en sorte qu'il est impossible de déclencher l'événement avec une mauvaise position, mais juste au cas.
+        if 0 > pos > self.chevalet_actif.TAILLE_CHEVALET:
+            raise PositionChevaletException
+
+        if len(self.joueur_actif.jetons_jetes) >= len(self.jetons_libres):
+            showwarning(message="Il n'y a plus de jetons disponibles dans le sac à jetons.")
+            return
 
         jeton_retire = self.joueur_actif.retirer_jeton(pos)
 
@@ -628,12 +622,12 @@ class Scrabble(Tk):
 
     def changer_jetons(self):
         """
-        Change les jetons sélectionnés par le joueur.
+        Change les jetons sélectionnés par le joueur dans l'interface pour changer les jetons.
         - On tire de nouveaux jetons dans le sac à jetons
         - On ajoute les jetons tirés au chevalet du joueur
         - On retourne les jetons jetés par le joueur dans le sac à jetons
         - unbind jeter_jeton et rebind prendre jeton
-        - effacer le frame pour changer les jetons
+        - cacher le frame pour changer les jetons
         - On passe au joueur suivant
         :return: Aucun return
         """
@@ -663,10 +657,11 @@ class Scrabble(Tk):
 
     def annuler_changer_jetons(self):
         """
+        Fonction qui est déclenchée lorsque le joueur appuie sur le bouton annuler dans l'interface pour changer les jetons.
+        La fonction doit:
         - Remettre les jetons dans le chevalet du joueur.
         - unbind jeter_jeton et rebind prendre_jeton
-        - effacer le frame pour changer les jetons
-        :return:
+        - cacher le frame pour changer les jetons
         """
         # Remettre les jetons jetés dans le chevalet du joueur
         for jeton in self.joueur_actif.jetons_jetes:
@@ -675,13 +670,34 @@ class Scrabble(Tk):
         self.chevalet_actif.dessiner(self.joueur_actif)
         self.joueur_actif.jetons_jetes = []
 
-        # Cacher l'interface pour changer les jetons
+        # Cacher l'interface pour changer les jetons et ajuster les bindings
         unbind_jeter(self)
         bind_prendre(self)
         self.jeter.lower()
 
         # Réactive les boutons d'actions
         self.activer_btn_actions()
+
+    def desactiver_btn_actions(self):
+        """
+        Fonction utilitaire pour désactiver les boutons d'action de l'interface du joueur lorsqu'il est en mode "changer les jetons".
+        Permet d'éviter les erreurs si le joueur oublie qu'il est en mode changer les jetons.
+        """
+        self.btn_jouer.config(state="disabled")
+        self.btn_annuler.config(state="disabled")
+        self.btn_passer.config(state="disabled")
+        self.btn_changer.config(state="disabled")
+        self.btn_abandonner.config(state="disabled")
+
+    def activer_btn_actions(self):
+        """
+        Fonction utilitaire pour réactiver les boutons d'action du joueur lorsqu'il quitte le mode "changer les jetons".
+        """
+        self.btn_jouer.config(state="normal")
+        self.btn_annuler.config(state="normal")
+        self.btn_passer.config(state="normal")
+        self.btn_changer.config(state="normal")
+        self.btn_abandonner.config(state="normal")
 
 
     def changer_joueur(self, charger=False, tour=0):
@@ -716,10 +732,12 @@ class Scrabble(Tk):
             msg = "Tour {}\nC'est le tour de {}".format(self.tour, self.joueur_actif.nom)
 
         # On pige les jetons
-        log = "{} pige {} jetons.\n".format(self.joueur_actif.nom, self.joueur_actif.nb_a_tirer)
-        self.ecrire_log(log)
-        for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
-            self.joueur_actif.ajouter_jeton(jeton)
+
+        try:
+            for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
+                self.joueur_actif.ajouter_jeton(jeton)
+        except SacVideException as e:
+            showwarning(message=e)
 
         # On update l'affichage
         self.message.set(msg)
@@ -800,23 +818,43 @@ class Scrabble(Tk):
         Pensez à utiliser la fonction shuffle du module random.
         :param n: le nombre de jetons à tirer.
         :return: Jeton list, la liste des jetons tirés.
-        :exception: Levez une exception avec assert si n ne respecte pas la condition 0 <= n <= 7.
+        :exception: Levez une exception avec assert si n ne respecte pas la condition n>=0. Si le nombre à tirer excède le nombre de jetons libres dans le sac
+        à jetons, on ajuste n au nombre de jetons restants. S'il ne reste plus de jetons, on lève une exception de type SacVideException.
         """
-        assert 0 <= n <= len(self.jetons_libres), "n doit être compris entre 0 et le nombre total de jetons libres."
+        assert n >= 0, "n doit être supérieur à 0"
+
+        if len(self.jetons_libres) == 0:
+            raise SacVideException("Il n'y a plus de jetons libres dans le sac à jetons.")
+
+        if n > len(self.jetons_libres):
+            n = len(self.jetons_libres)
 
         # On mélange les jetons dans le sac
         shuffle(self.jetons_libres)
+
         # On prend n jetons et on les enlève du sac
         jetons_tires = self.jetons_libres[:n]
         self.jetons_libres = self.jetons_libres[n:]
-        # On retourne les jetons tirés
+
+        # Écriture du log
+        log = "{} pige {} jetons.\n".format(self.joueur_actif.nom, len(jetons_tires))
+        self.ecrire_log(log)
+
         return jetons_tires
 
     def set_clock(self):
+        """
+        Remet l'horloge à 0 et update l'affichage du temps dans l'interface.
+        :return:
+        """
         self.temps = 0
         self.temps_label['text'] = self.temps
 
     def clock(self):
+        """
+        Fonction qui sert d'horloge pour garder le compte du temps utilisé pour chaque tour.
+        :return:
+        """
         self.temps += 1
         self.temps_label['text'] = self.temps
         self.jobs['clock'] = self.temps_label.after(1000, self.clock)
@@ -856,6 +894,7 @@ class Scrabble(Tk):
         :param: nouvelle_sauvegarde: bool, True si on souhaite faire une nouvelle sauvegarde (Enregistrer sous).
         False, si on souhaite enregistrer sous le même nom que la précédante sauvegarde. Ce paramètre permet de sauvegarder plusieurs
         fois une partie sans avoir à écrire le nom du fichier à chaque fois.
+        :param: autosave: bool, True si c'est une sauvegarde automatique, False autrement.
         :return: Aucun
         """
         if self.verifier_jetons_sur_le_plateau():
@@ -1052,6 +1091,10 @@ class Scrabble(Tk):
         return mot, points
 
     def afficher_suggestions(self):
+        """
+        Update l'affichage des suggestions dans l'espace réservé à cette fin dans l'interface.
+        :return: aucun
+        """
         self.suggestions.config(state="normal")
         self.suggestions.delete(1.0, END)
         for mot in self.assistance():
@@ -1061,6 +1104,11 @@ class Scrabble(Tk):
         self.suggestions.config(state="disabled")
 
     def ecrire_log(self, log):
+        """
+        Permet d'écrire un message dans l'historique de la partie dans l'interface.
+        :param log: Str, Message à ajouter au log.
+        :return: aucun
+        """
         self.log.config(state="normal")
         self.log.insert(1.0, log)
         self.log.config(state="disabled")
