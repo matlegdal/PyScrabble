@@ -107,6 +107,7 @@ class Scrabble(Tk):
         self.tour = 0
         self.labels_points = []
         self.suggestions = None
+        self.timer_label = None
 
     def config_content(self):
         """
@@ -251,6 +252,11 @@ class Scrabble(Tk):
         self.fichier.entryconfig(2, state="normal")
 
         Jeu(self.content, self)
+
+        # Timer (version difficile uniquement)
+        if self.difficulte == 'difficile':
+            self.set_clock()
+            self.clock()
 
         # Set le plateau
         self.plateau = Plateau(self, self.content, self.PIXELS_PAR_CASE, cases)
@@ -768,6 +774,7 @@ class Scrabble(Tk):
         :return: Aucun
         """
         self.timer = 60
+        self.timer_label['text'] = self.timer
 
     def clock(self):
         """

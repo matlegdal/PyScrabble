@@ -39,6 +39,8 @@ class Jeu(Frame):
         compteur.grid_columnconfigure(10, weight=1)
 
         Label(compteur, text="Compteur").grid(row=0, column=1)
+        root.timer_label = Label(compteur, text='')
+        root.timer_label.grid(row=1, column=1)
 
         # joueur actif
         joueur = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
