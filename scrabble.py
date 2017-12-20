@@ -773,7 +773,7 @@ class Scrabble(Tk):
         Fonction utilitaire simple qui reset le timer au temps permis (difficulté 'difficile' utilisant les règles officielles)
         :return: Aucun
         """
-        self.timer = 60
+        self.timer = 120
         self.timer_label['text'] = self.timer
 
     def clock(self):
@@ -794,8 +794,9 @@ class Scrabble(Tk):
         Reprend tous les jetons placés et les retourne dans le chevalet du joueur avant de changer de joueur.
         :return: Aucun
         """
-        showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis!\nVous passez votre tour.')
+        showwarning('Temps écoulé', 'Vous avez épuisé tout le temps permis! Vous passez votre tour.')
         self.reprendre_tous_les_jetons()
+        self.annuler_changer_jetons()
         self.changer_joueur()
 
     def sauvegarder_partie(self, nouvelle_sauvegarde=True, autosave=False):
