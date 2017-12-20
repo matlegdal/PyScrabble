@@ -109,7 +109,9 @@ class Scrabble(Tk):
         self.suggestions = None
         self.log = None
         self.timer_label = None
-        self.job = None
+        self.temps_label = None
+        self.job = {}
+        self.temps = 0
 
 
     def config_content(self):
@@ -254,10 +256,13 @@ class Scrabble(Tk):
         self.fichier.entryconfig(1, state="normal")
         self.fichier.entryconfig(2, state="normal")
 
-        Jeu(self.content, self)
+        self.jeu = Jeu(self.content, self)
 
-        # Timer (version difficile uniquement)
+        # Horloges
+        self.set_clock()
+        self.clock()
         if self.difficulte == 'difficile':
+            self.jeu.timer.lift()
             self.set_timer()
             self.tick()
 
@@ -720,7 +725,8 @@ class Scrabble(Tk):
         self.chevalet_actif.dessiner(self.joueur_actif)
         self.afficher_suggestions()
 
-        # Si on utilises la version difficile des règles, on part le timer.
+        # Horloges
+        self.set_clock()
         if self.difficulte == "difficile":
             self.set_timer()
 
@@ -757,7 +763,12 @@ class Scrabble(Tk):
             self.ecrire_log(log)
             self.message.set(log)
             showinfo(message=log)
-            self.timer_label.after_cancel(self.job)
+
+            # Cancel les horloges
+            self.temps_label.after_cancel(self.jobs['clock'])
+            if self.job['timer'] is not None:
+                self.timer_label.after_cancel(self.job['timer'])
+
             return True
         else:
             return False
@@ -793,6 +804,15 @@ class Scrabble(Tk):
         # On retourne les jetons tirés
         return jetons_tires
 
+    def set_clock(self):
+        self.temps = 0
+        self.temps_label['text'] = self.temps
+
+    def clock(self):
+        self.temps += 1
+        self.temps_label['text'] = self.temps
+        self.job['clock'] = self.temps_label.after(1000, self.clock)
+
     def set_timer(self):
         """
         Fonction utilitaire simple qui reset le timer au temps permis (difficulté 'difficile' utilisant les règles officielles)
@@ -809,7 +829,7 @@ class Scrabble(Tk):
         if self.timer == 0:
             self.temps_ecoule()
         self.timer_label['text'] = self.timer
-        self.job = self.timer_label.after(1000, self.tick)
+        self.job['timer'] = self.timer_label.after(1000, self.tick)
 
     def temps_ecoule(self):
         """
