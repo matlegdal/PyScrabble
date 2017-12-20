@@ -819,7 +819,8 @@ class Scrabble(Tk):
         bind_prendre(self)
 
         # self.assistance()
-        #
+
+
         # # set un bouton pour afficher les suggestions
         # self.btn_afficher_suggestion = Button(self.content, text="Afficher les suggestions de mots",
         #                                       command=lambda: self.afficher_suggestion(self.suggestion_str))
@@ -1043,55 +1044,57 @@ class Scrabble(Tk):
             self.jouer(cases)
             self.changer_joueur(charger=True, tour=tour)
 
-    # def assistance(self):
-    #     """
-    #     fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
-    #     :return: str: suggestion des mots prêt à afficher
-    #     """
-    #
-    #     lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
-    #     suggestions = []
-    #
-    #     for mot in self.dictionnaire:
-    #         lettres_a_verifier = lettres[:]
-    #         pas_trouve = False
-    #         if mot == '':
-    #             break
-    #         for letter in mot:
-    #             #if 'Joker' in lettres_a_verifier:
-    #                 #dire au programme de prendre n'importe quelle lettre?
-    #
-    #             if letter not in lettres_a_verifier:
-    #                 pas_trouve = True
-    #                 break
-    #             else:
-    #                 lettres_a_verifier.remove(letter)
-    #         if not pas_trouve:
-    #             suggestions.append(self.calculer_points(mot))
-    #
-    #     suggestions.sort(key=lambda tup: tup[1], reverse=True)
-    #
-    #     self.suggestion_str = ''
-    #
-    #     for mot in suggestions:
-    #         mot_str = '{}, {} points'.format(mot[0], mot[1])
-    #         self.suggestion_str += mot_str
-    #         self.suggestion_str += '\n'
-    #     return self.suggestion_str
-    #
-    # def calculer_points(self, mot):
-    #     """
-    #     Permet de calculer les points d'un mot selon les valeurs des lettres du mot.
-    #     Ne tiens pas compte du placement sur le plateau.
-    #     :param mot: str, mot dont il faut calculer les points.
-    #     :return: tuple, constitué du mot et des points
-    #     """
-    #     points = 0
-    #
-    #     for lettre in mot:
-    #         points += self.lettres_def[lettre]
-    #
-    #     return mot, points
+    def assistance(self):
+        """
+        fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
+        :return: str: suggestion des mots prêt à afficher
+        """
+
+        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
+        suggestions = []
+
+        for mot in self.dictionnaire:
+            lettres_a_verifier = lettres[:]
+            pas_trouve = False
+            if mot == '':
+                break
+            for letter in mot:
+                #if 'Joker' in lettres_a_verifier:
+                    #dire au programme de prendre n'importe quelle lettre?
+
+                if letter not in lettres_a_verifier:
+                    pas_trouve = True
+                    break
+                else:
+                    lettres_a_verifier.remove(letter)
+            if not pas_trouve:
+                suggestions.append(self.calculer_points(mot))
+
+        suggestions.sort(key=lambda tup: tup[1], reverse=True)
+
+        # todo: réviser passer de variable d'instance à locale.
+        # self.suggestion_str = ''
+        #
+        # for mot in suggestions:
+        #     mot_str = '{}, {} points'.format(mot[0], mot[1])
+        #     self.suggestion_str += mot_str
+        #     self.suggestion_str += '\n'
+        # return self.suggestion_str
+        return suggestions
+
+    def calculer_points(self, mot):
+        """
+        Permet de calculer les points d'un mot selon les valeurs des lettres du mot.
+        Ne tiens pas compte du placement sur le plateau.
+        :param mot: str, mot dont il faut calculer les points.
+        :return: tuple, constitué du mot et des points
+        """
+        points = 0
+
+        for lettre in mot:
+            points += self.lettres_def[lettre]
+
+        return mot, points
     #
     # def afficher_suggestion(self, mot):
     #     """

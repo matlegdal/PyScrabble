@@ -67,5 +67,22 @@ class Jeu(Frame):
 
         # jeter.lower()
 
+        # Interface d'assistance
+        assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
+
+        Label(assist, text="Suggestion de mots").pack()
+
+        text = Text(assist, width=20, height=10)
+        text.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
+
+        scroll = Scrollbar(assist, command=text.yview)
+        scroll.pack(side=RIGHT, fill=Y)
+
+        text.config(yscrollcommand=scroll.set)
+
+        text.insert(END, "lorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum\nlorem\nipsum")
+
+        text.config(state="disabled")
 
 
