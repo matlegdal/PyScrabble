@@ -12,6 +12,8 @@ class Accueil(Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
 
+
+        #todo : à corriger -> faire 2 fonctions à part pour ça.
         # Désactive les options nouvelle partie et sauvegarder partie du menu
         root.fichier.entryconfig(0, state="disabled")
         root.fichier.entryconfig(1, state="disabled")

@@ -18,6 +18,7 @@ from reglements import Reglements
 from utils import *
 from chevalet import Chevalet
 from accueil import Accueil
+from jeu import Jeu
 
 # style = ttk.Style().configure('TButton', foreground="blue")
 # style.theme_settings('default',{
@@ -89,13 +90,17 @@ class Scrabble(Tk):
         # On appelle la fenêtre principale
         self.config_content()
 
-        # Def des frames
-        self.frames = {}
-        frame = Accueil(self.content, self)
-        self.frames[Accueil] = frame
-        frame.grid(row=0, column=0, sticky=NSEW)
+        self.accueil = Accueil(self.content, self)
+        self.accueil.grid(row=0, column=0, sticky=NSEW)
+        self.accueil.tkraise()
 
-        self.show_frame(Accueil)
+        # Def des frames
+        # self.frames = {}
+        # frame = Accueil(self.content, self)
+        # self.frames[Accueil] = frame
+        # frame.grid(row=0, column=0, sticky=NSEW)
+        #
+        # self.show_frame(Accueil)
 
         # for f in (Accueil, Jeu):
         #     frame = f(self.content, self)
@@ -103,8 +108,8 @@ class Scrabble(Tk):
         #     frame.grid(row=0, column=0, sticky=NSEW)
         # self.accueil = Accueil(self.content, self)
 
-    def show_frame(self, frame):
-        self.frames[frame].tkraise()
+    # def show_frame(self, frame):
+    #     self.frames[frame].tkraise()
 
     def reset_partie(self):
         """
@@ -123,10 +128,11 @@ class Scrabble(Tk):
         self.dictionnaire = None
         self.message = StringVar()
         self.nom_joueur = StringVar()
-        self.pointage = StringVar()
+        # self.pointage = StringVar()
         self.chevalet_actif = None
         self.affichage_joueur = None
         self.tour = 0
+        self.labels_points = []
 
     def config_content(self):
         """
@@ -134,12 +140,14 @@ class Scrabble(Tk):
         :return: Aucun
         """
         self.content = Frame(self)
-        self.content.grid(row=0, column=0, sticky=NSEW, padx=5, pady=5)
+        self.content.grid(row=0, column=0, sticky=NSEW)
         self.content.grid_columnconfigure(0, weight=2)
         self.content.grid_columnconfigure(1, weight=1)
         self.content.grid_rowconfigure(0, weight=1)
         self.content.grid_rowconfigure(1, weight=1)
         self.content.grid_rowconfigure(2, weight=1)
+        self.content.grid_rowconfigure(3, weight=1)
+        self.content.grid_rowconfigure(4, weight=1)
 
     def afficher_reglements(self):
         Reglements(self)
@@ -197,7 +205,7 @@ class Scrabble(Tk):
         self.content.destroy()
         self.reset_partie()
         self.config_content()
-        # self.accueil() #todo: corriger
+        self.show_frame(Accueil)
 
     def verifier_avant_de_quitter(self):
         """
@@ -231,7 +239,7 @@ class Scrabble(Tk):
         :param difficulte: str, option de difficulté de la partie, 'facile' ou 'difficile'
         :return: aucun return
         """
-        # accueil.destroy()
+        self.accueil.grid_remove()
         self.initialiser_partie(nb_joueurs, langue, difficulte)
         self.jouer()
         self.changer_joueur()
@@ -301,72 +309,74 @@ class Scrabble(Tk):
         self.fichier.entryconfig(1, state="normal")
         self.fichier.entryconfig(2, state="normal")
 
+        Jeu(self.content, self)
+
         # Set le plateau
-        self.plateau = Plateau(self.content, self.PIXELS_PAR_CASE, cases)
-        self.plateau.grid(row=0, column=0, rowspan=4, columnspan=1, sticky=NSEW)
+        self.plateau = Plateau(self, self.content, self.PIXELS_PAR_CASE, cases)
+        self.plateau.grid(row=1, column=0, rowspan=5, sticky=NSEW)
 
         # Set le tableau d'affichange
-        self.tableau = Frame(self.content)
-        self.tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
-        Label(self.tableau, textvariable=self.message).grid(row=0, columnspan=2)
-        Label(self.tableau, textvariable=self.pointage).grid(row=1, columnspan=2)
+        # self.tableau = Frame(self.content)
+        # self.tableau.grid(row=0, column=1, columnspan=3, sticky=NSEW)
+        # Label(self.tableau, textvariable=self.message).grid(row=0, columnspan=2)
+        # Label(self.tableau, textvariable=self.pointage).grid(row=1, columnspan=2)
 
         # Timer (version difficile uniquement)
-        if self.difficulte == 'difficile':
-            Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
-            self.timer_label = Label(self.tableau, text='')
-            self.timer_label.grid(row=3, column=1, pady=self.PADY)
-            self.set_clock()
-            self.clock()
+        # if self.difficulte == 'difficile':
+        #     Label(self.tableau, text='Temps restant au tour: ').grid(row=3, column=0, pady=self.PADY)
+        #     self.timer_label = Label(self.tableau, text='')
+        #     self.timer_label.grid(row=3, column=1, pady=self.PADY)
+        #     self.set_clock()
+        #     self.clock()
 
-        # Set les joueurs
-        self.affichage_joueur = Frame(self.content)
-        self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
+        # # Set les joueurs
+        # self.affichage_joueur = Frame(self.content)
+        # self.affichage_joueur.grid(row=1, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        # Label(self.affichage_joueur, textvariable=self.nom_joueur).grid(row=0, column=0, columnspan=3)
+        #
+        # # Initialise le chevalet
+        # self.chevalet_actif = Chevalet(self.affichage_joueur, self.PIXELS_PAR_CASE)
+        # self.chevalet_actif.grid(row=1, column=0, columnspan=3)
+        #
+        # # Set les boutons d'actions
+        # self.btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
+        # self.btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
+        # self.btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
+        # self.btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
+        # self.btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
+        #
+        # # Affichage des boutons d'actions
+        # self.btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
+        # self.btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
+        # self.btn_passer.grid(row=3, column=0)
+        # self.btn_changer.grid(row=3, column=1)
+        # self.btn_abandonner.grid(row=3, column=2)
+        #
+        # # Set interface pour changer les jetons
+        # self.bottom_right = Frame(self.content)
+        # self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
+        # Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
+        #
+        # self.sac_a_jetons = Chevalet(self.bottom_right, self.PIXELS_PAR_CASE)
+        # self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
+        #
+        # Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
+        # Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
+        #
+        # self.bottom_right.grid_remove()
 
-        # Initialise le chevalet
-        self.chevalet_actif = Chevalet(self.affichage_joueur, self.PIXELS_PAR_CASE)
-        self.chevalet_actif.grid(row=1, column=0, columnspan=3)
-
-        # Set les boutons d'actions
-        self.btn_jouer = Button(self.affichage_joueur, text="Jouer le tour", command=self.jouer_un_tour)
-        self.btn_annuler = Button(self.affichage_joueur, text="Annuler", command=self.reprendre_tous_les_jetons)
-        self.btn_passer = Button(self.affichage_joueur, text="Passer le tour", command=self.passer_un_tour)
-        self.btn_changer = Button(self.affichage_joueur, text="Changer les jetons", command=self.demander_jetons_a_changer)
-        self.btn_abandonner = Button(self.affichage_joueur, text="Abandonner", command=self.abandonner)
-
-        # Affichage des boutons d'actions
-        self.btn_jouer.grid(row=2, column=0, columnspan=2, sticky=NSEW, pady=30)
-        self.btn_annuler.grid(row=2, column=2, columnspan=2, sticky=NSEW, pady=30)
-        self.btn_passer.grid(row=3, column=0)
-        self.btn_changer.grid(row=3, column=1)
-        self.btn_abandonner.grid(row=3, column=2)
-
-        # Set interface pour changer les jetons
-        self.bottom_right = Frame(self.content)
-        self.bottom_right.grid(row=2, column=1, rowspan=1, columnspan=3, sticky=NSEW)
-        Label(self.bottom_right, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=0, columnspan=2)
-
-        self.sac_a_jetons = Chevalet(self.bottom_right, self.PIXELS_PAR_CASE)
-        self.sac_a_jetons.grid(row=1, column=0, columnspan=2)
-
-        Button(self.bottom_right, text="Confirmer", command=self.changer_jetons).grid(row=3, column=0)
-        Button(self.bottom_right, text="Cancel", command=self.annuler_changer_jetons).grid(row=3, column=1)
-
-        self.bottom_right.grid_remove()
 
 
-
-    def msg_points(self):
-        """
-        Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
-        :return: (str) Chaine de charactères formattée montrant les points de tous les joueurs
-        """
-        msg_points = ""
-        for joueur in self.joueurs:
-            msg_points += "{}:{} ".format(joueur.nom, joueur.points)
-
-        return msg_points
+    # def msg_points(self):
+    #     """
+    #     Cette fonction sert à formatter les points de tous les joueurs pour l'afficher dans le tableau
+    #     :return: (str) Chaine de charactères formattée montrant les points de tous les joueurs
+    #     """
+    #     msg_points = ""
+    #     for joueur in self.joueurs:
+    #         msg_points += "{}:{} ".format(joueur.nom, joueur.points)
+    #
+    #     return msg_points
 
     def determiner_case(self, event):
         """
@@ -568,7 +578,7 @@ class Scrabble(Tk):
             showwarning(message=e)
             return
         # destruction du frame suggestion
-        self.frame_affichage_suggestion.destroy()
+        # self.frame_affichage_suggestion.destroy()
 
         self.joueur_actif.ajouter_points(score)
         self.plateau.positions = []
@@ -776,11 +786,17 @@ class Scrabble(Tk):
         if self.partie_terminee():
             return
 
+        # update des points du joueur actif
+        if self.tour == 0:
+            pass
+        else:
+            i = self.joueurs.index(self.joueur_actif)
+            self.labels_points[i].config(text="{}".format(self.joueur_actif.points))
+
         # On passe au joueur suivant et on incrémente le tour de la partie, si on ne charge pas une partie
         if charger is False:
             self.joueur_suivant()
-        if tour == 0:
-            self.tour = 1
+            self.tour += 1
         else:
             self.tour = tour
 
@@ -796,17 +812,18 @@ class Scrabble(Tk):
 
         # On update l'affichage
         self.message.set(msg)
-        self.pointage.set(self.msg_points())
+        # self.pointage.set(self.msg_points())
+
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
         bind_prendre(self)
 
-        self.assistance()
-
-        # set un bouton pour afficher les suggestions
-        self.btn_afficher_suggestion = Button(self.content, text="Afficher les suggestions de mots",
-                                              command=lambda: self.afficher_suggestion(self.suggestion_str))
-        self.btn_afficher_suggestion.grid(row=3, column=1)
+        # self.assistance()
+        #
+        # # set un bouton pour afficher les suggestions
+        # self.btn_afficher_suggestion = Button(self.content, text="Afficher les suggestions de mots",
+        #                                       command=lambda: self.afficher_suggestion(self.suggestion_str))
+        # self.btn_afficher_suggestion.grid(row=3, column=1)
 
         # Si on utilises la version difficile des règles, on part le timer.
         if self.difficulte == "difficile":
@@ -1026,78 +1043,78 @@ class Scrabble(Tk):
             self.jouer(cases)
             self.changer_joueur(charger=True, tour=tour)
 
-    def assistance(self):
-        """
-        fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
-        :return: str: suggestion des mots prêt à afficher
-        """
-
-        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
-        suggestions = []
-
-        for mot in self.dictionnaire:
-            lettres_a_verifier = lettres[:]
-            pas_trouve = False
-            if mot == '':
-                break
-            for letter in mot:
-                #if 'Joker' in lettres_a_verifier:
-                    #dire au programme de prendre n'importe quelle lettre?
-
-                if letter not in lettres_a_verifier:
-                    pas_trouve = True
-                    break
-                else:
-                    lettres_a_verifier.remove(letter)
-            if not pas_trouve:
-                suggestions.append(self.calculer_points(mot))
-
-        suggestions.sort(key=lambda tup: tup[1], reverse=True)
-
-        self.suggestion_str = ''
-
-        for mot in suggestions:
-            mot_str = '{}, {} points'.format(mot[0], mot[1])
-            self.suggestion_str += mot_str
-            self.suggestion_str += '\n'
-        return self.suggestion_str
-
-    def calculer_points(self, mot):
-        """
-        Permet de calculer les points d'un mot selon les valeurs des lettres du mot.
-        Ne tiens pas compte du placement sur le plateau.
-        :param mot: str, mot dont il faut calculer les points.
-        :return: tuple, constitué du mot et des points
-        """
-        points = 0
-
-        for lettre in mot:
-            points += self.lettres_def[lettre]
-
-        return mot, points
-
-    def afficher_suggestion(self, mot):
-        """
-        Fonction qui va permettre d'afficher la/les suggestion(s) de mot(s) dans la fenêtre de jeu.
-        :param mot: str, consitué du mot suggéré et des points
-        :return: rien
-        """
-
-        # destruction du bouton d'affichage
-        self.btn_afficher_suggestion.destroy()
-        # affichage des suggestions de mots
-        self.frame_affichage_suggestion = Frame(self.content)
-        self.frame_affichage_suggestion.grid(row=3, column=1)
-        Label(self.frame_affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
-
-        text = Text(self.frame_affichage_suggestion, width=20, height=7)
-        text.pack(side=LEFT, fill=BOTH, expand=YES, padx=5, pady=5)
-
-        scroll = Scrollbar(self.frame_affichage_suggestion, command=text.yview)
-        scroll.pack(side=RIGHT, fill=Y)
-
-        text.config(yscrollcommand=scroll.set)
-
-        text.insert(END, mot)
-
-        text.config(state="disabled")
+    # def assistance(self):
+    #     """
+    #     fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
+    #     :return: str: suggestion des mots prêt à afficher
+    #     """
+    #
+    #     lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet]
+    #     suggestions = []
+    #
+    #     for mot in self.dictionnaire:
+    #         lettres_a_verifier = lettres[:]
+    #         pas_trouve = False
+    #         if mot == '':
+    #             break
+    #         for letter in mot:
+    #             #if 'Joker' in lettres_a_verifier:
+    #                 #dire au programme de prendre n'importe quelle lettre?
+    #
+    #             if letter not in lettres_a_verifier:
+    #                 pas_trouve = True
+    #                 break
+    #             else:
+    #                 lettres_a_verifier.remove(letter)
+    #         if not pas_trouve:
+    #             suggestions.append(self.calculer_points(mot))
+    #
+    #     suggestions.sort(key=lambda tup: tup[1], reverse=True)
+    #
+    #     self.suggestion_str = ''
+    #
+    #     for mot in suggestions:
+    #         mot_str = '{}, {} points'.format(mot[0], mot[1])
+    #         self.suggestion_str += mot_str
+    #         self.suggestion_str += '\n'
+    #     return self.suggestion_str
+    #
+    # def calculer_points(self, mot):
+    #     """
+    #     Permet de calculer les points d'un mot selon les valeurs des lettres du mot.
+    #     Ne tiens pas compte du placement sur le plateau.
+    #     :param mot: str, mot dont il faut calculer les points.
+    #     :return: tuple, constitué du mot et des points
+    #     """
+    #     points = 0
+    #
+    #     for lettre in mot:
+    #         points += self.lettres_def[lettre]
+    #
+    #     return mot, points
+    #
+    # def afficher_suggestion(self, mot):
+    #     """
+    #     Fonction qui va permettre d'afficher la/les suggestion(s) de mot(s) dans la fenêtre de jeu.
+    #     :param mot: str, consitué du mot suggéré et des points
+    #     :return: rien
+    #     """
+    #
+    #     # destruction du bouton d'affichage
+    #     self.btn_afficher_suggestion.destroy()
+    #     # affichage des suggestions de mots
+    #     self.frame_affichage_suggestion = Frame(self.content)
+    #     self.frame_affichage_suggestion.grid(row=3, column=1)
+    #     Label(self.frame_affichage_suggestion, text="Suggestions de mots:", padx=5, pady=5).pack()
+    #
+    #     text = Text(self.frame_affichage_suggestion, width=20, height=7)
+    #     text.pack(side=LEFT, fill=BOTH, expand=YES, padx=5, pady=5)
+    #
+    #     scroll = Scrollbar(self.frame_affichage_suggestion, command=text.yview)
+    #     scroll.pack(side=RIGHT, fill=Y)
+    #
+    #     text.config(yscrollcommand=scroll.set)
+    #
+    #     text.insert(END, mot)
+    #
+    #     text.config(state="disabled")
