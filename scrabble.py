@@ -732,8 +732,7 @@ class Scrabble(Tk):
             msg = "Tour {}\nC'est le tour de {}".format(self.tour, self.joueur_actif.nom)
 
         # On pige les jetons
-        log = "{} pige {} jetons.\n".format(self.joueur_actif.nom, self.joueur_actif.nb_a_tirer)
-        self.ecrire_log(log)
+
         try:
             for jeton in self.tirer_jetons(self.joueur_actif.nb_a_tirer):
                 self.joueur_actif.ajouter_jeton(jeton)
@@ -832,10 +831,15 @@ class Scrabble(Tk):
 
         # On mélange les jetons dans le sac
         shuffle(self.jetons_libres)
+
         # On prend n jetons et on les enlève du sac
         jetons_tires = self.jetons_libres[:n]
         self.jetons_libres = self.jetons_libres[n:]
-        # On retourne les jetons tirés
+
+        # Écriture du log
+        log = "{} pige {} jetons.\n".format(self.joueur_actif.nom, len(jetons_tires))
+        self.ecrire_log(log)
+
         return jetons_tires
 
     def set_clock(self):
