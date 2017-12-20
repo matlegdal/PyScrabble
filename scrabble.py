@@ -1,22 +1,15 @@
-import tkinter.ttk as ttk
 import pickle
-import os
 import inspect
 from random import randint, shuffle
-from tkinter import *
 from tkinter.messagebox import *
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import *
 from exception import *
-
-
 from case import Case
 from joueur import Joueur
-from jeton import Jeton
 from plateau import Plateau
 from reglements import Reglements
 from utils import *
-from chevalet import Chevalet
 from accueil import Accueil
 from jeu import Jeu
 
@@ -25,14 +18,40 @@ class Scrabble(Tk):
     """
     Classe Scrabble qui implémente aussi une partie de la logique de jeu.
 
-    Les attributs d'un scrabble sont:
-    - dictionnaire: set, contient tous les mots qui peuvent être joués sur dans cette partie.
-    En gros pour savoir si un mot est permis on va regarder dans le dictionnaire.
-    - plateau: Plateau, un objet de la classe Plateau on y place des jetons et il nous dit le nombre de points gagnés.
-    - jetons_libres: Jeton list, la liste de tous les jetons dans le sac, c'est là que chaque joueur
-                    peut prendre des jetons quand il en a besoin.
-    - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
-    - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
+    Les interfaces:
+        - content: tk.Frame, Frame conteneur principale. Parent de tous les autres frames.
+        - accueil: Accueil(tk.Frame), objet de la classe Accueil héritant de tk.Frame. C'est l'écran d'accueil avec les options
+        - jeu: Jeu(tk.Frame), objet de la classe Jeu héritant de tk.Frame. C'est l'écran de jeu principal.
+
+    Les attributs couramment utilisés d'un scrabble sont:
+        - plateau: Plateau(tk.Canvas), un objet de la classe Plateau héritant de tk.Canvas on y place des jetons et il nous dit le nombre de points gagnés.
+        - jetons_libres: Jeton list, la liste de tous les jetons dans le sac à jetons, c'est là que chaque joueur peut prendre des jetons quand il en a besoin.
+        - joueurs: Joueur list,  L'ensemble des joueurs de la partie.
+        - joueur_actif: Joueur, le joueur qui est entrain de jouer le tour en cours. Si aucun joueur alors None.
+        - langue: str, Abbréviation en 2 lettres de la langue utilisée
+        - difficulté: str, Difficulté utilisée dans la parte
+        - lettres_def: dict, Dictionnaire des lettres et de leur valeur en points. key:lettre, value:valeur
+        - dictionnaire: set, contient tous les mots qui peuvent être joués sur dans cette partie.
+        - chevalet_actif: Chevalet(tk.Canvas), un objet de la classe Chevalet héritant de tk.Canvas. Représente le chevalet du joueur actif représenté graphiquement.
+        - tour: int, Le numéro du tour en cours. Un tour représente le jeu d'un joueur et non de tous les joueurs.
+        - save: str, Chemin d'accès de la sauvegarde courante. Permet de sauvegarder sans entrer le chemin d'accès à chaque fois.
+
+    Les autres attributs:
+        - suggestions: tk.Text, Bloc de texte affiché dans le frame suggestions. Suggère des mots possibles au joueur.
+        - log: tk.Text, Bloc de texte affiché dans le frame log. C'est l'historique des tours.
+                        Contient le tour, l'action du joueur, les mots placés, les points récoltés et le temps du tour.
+        - barre_menu: tk.Menu, Barre des menus
+        - fichiers: tk.Menu, Le menu "fichiers" de la barre de menus
+        - aide: tk.Menu, Le menu "aide" de la barre de menus
+        - message: tk.StringVar, Message dynamique à afficher dans le frame "message" de l'interface.
+        - nom_joueur: tk.StringVar, Variable dynamique permettant d'afficher le nom du joueur actif dans l'interface graphique
+        - labels_points: tk.Label list, Liste des labels de pointage. Utilisé pour afficher dynamiquement les pointages des joueurs dans l'interface.
+        - temps_label: tk.Label, Label du temps écoulé pendant le tour. Utilisé pour afficher dynamiquement l'horloge
+        - timer_label: tk.Label, Label du minuteur du temps restant dans le tour. Utilisé pour afficher dynamiquement le minuteur dans la version "difficile".
+        - sac_a_jetons_label: tk.Label, Label du Nombre de jetons restants dans les jetons libres (aussi appelé parfois sac à jetons)
+        - jobs: dict, Dictionnaire des jobs pour garder la trace des fonctions qui s'appellent elle-mêmes à un intervalle fixe.
+                    Possède normalement 2 clés: 'clock' pour l'horloge normale et 'timer' pour le minuteur. La valeur est l'id de la job
+                    retourné par la fonction 'after' de clock et tick.
     """
     PIXELS_PAR_CASE = 40
     LANGUES_DISPONIBLES = ['fr', 'en']
@@ -72,7 +91,7 @@ class Scrabble(Tk):
 
         # Menu Aide
         self.aide = Menu(self.barre_menu, tearoff=0)
-        self.aide.add_command(label="Règlements", command=self.afficher_reglements)
+        self.aide.add_command(label="Règlements", command=lambda: Reglements(self))
 
         # Config du menu
         self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
@@ -87,9 +106,7 @@ class Scrabble(Tk):
     def reset_partie(self):
         """
         Set les variables d'instance à leur valeur initiales par défaut.
-        :return: Aucun
         """
-        # Declare parameters
         self.langue = None
         self.difficulte = None
         self.save = None
@@ -102,16 +119,19 @@ class Scrabble(Tk):
         self.message = StringVar()
         self.nom_joueur = StringVar()
         self.chevalet_actif = None
-        self.affichage_joueur = None
         self.tour = 0
-        self.labels_points = []
+        self.temps = 0
+        self.timer = None
         self.suggestions = None
         self.log = None
+        self.labels_points = []
         self.timer_label = None
         self.temps_label = None
         self.sac_a_jetons_label = None
         self.jobs = {'clock': None, 'timer': None}
-        self.temps = 0
+        self.content = None
+        self.accueil = None
+        self.jeu = None
 
 
     def config_content(self):
@@ -128,9 +148,6 @@ class Scrabble(Tk):
         self.content.grid_rowconfigure(2, weight=1)
         self.content.grid_rowconfigure(3, weight=1)
         self.content.grid_rowconfigure(4, weight=1)
-
-    def afficher_reglements(self):
-        Reglements(self)
 
     def show_accueil(self):
         """
@@ -244,10 +261,8 @@ class Scrabble(Tk):
         La fonction démarre une partie de scrabble.
         Pour une nouvelle partie de scrabble,
         - un nouvel objet Plateau est créé;
-        - Affiche le pointage
-        - Affiche le message du tour en cours
-        - Crée le Canvas du chevalet
-        - Affiche les boutons d'actions
+        - un nouvel objet Jeu est créé
+        - on part les horloges
         :param cases: Liste des cases, None par défaut, passé en argument quand on charge une partie.
         """
         # Active les options "nouvelle partie" et "sauvegarder partie du menu"
@@ -572,7 +587,6 @@ class Scrabble(Tk):
         - afficher le sac a jeton et les boutons
         - binder la fonction jeter
         :return: Aucun return
-        :exception: todo: Lever une exception si le nombre de jetons à changer est supérieur au nombre de jetons restants.
         """
         if self.verifier_jetons_sur_le_plateau():
             rep = askyesno(
