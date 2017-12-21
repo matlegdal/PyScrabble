@@ -798,7 +798,8 @@ class Scrabble(Tk):
         self.message.set(msg)
         self.nom_joueur.set(self.joueur_actif.nom)
         self.chevalet_actif.dessiner(self.joueur_actif)
-        self.afficher_suggestions()
+        if self.affichage_suggestions:
+            self.afficher_suggestions()
         self.sac_a_jetons_label.config(text="Il reste {} jetons dans le sac.".format(len(self.jetons_libres)))
 
         # Horloges

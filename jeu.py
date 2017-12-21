@@ -2,6 +2,18 @@ from tkinter import *
 from chevalet import Chevalet
 
 class Jeu(Frame):
+    """
+    Classe gérant l'affichage de l'interface de jeu principale.
+    Est responsable d'initialiser et afficher:
+        - les pointages
+        - le message
+        - l'horloge ou le minuteur
+        - le chevalet du joueur et les boutons d'action
+        - l'interface pour changer les jetons
+        - le sac à jetons
+        - les suggestions
+        - l'historique des tours
+    """
 
     PADX = 10
     PADY = 10
@@ -25,7 +37,6 @@ class Jeu(Frame):
             points = Label(pointage, text="{}".format(root.joueurs[i].points))
             points.grid(row=2, column=i+1, sticky=NSEW)
             root.labels_points.append(points)
-
 
         # Message
         message = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
