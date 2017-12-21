@@ -71,7 +71,7 @@ class Jeu(Frame):
 
         Label(joueur, textvariable=root.nom_joueur, font=self.H1).grid(row=0, column=1, columnspan=4, pady=self.PADY)
 
-        root.chevalet_actif = Chevalet(joueur, root.PIXELS_PAR_CASE)
+        root.chevalet_actif = Chevalet(self, joueur, root.PIXELS_PAR_CASE)
         root.chevalet_actif.grid(row=1, column=1, columnspan=4, sticky=NS, pady=self.PADY)
 
             # Boutons d'actions
