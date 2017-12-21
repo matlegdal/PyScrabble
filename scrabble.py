@@ -1117,7 +1117,10 @@ class Scrabble(Tk):
             if mot == '':
                 break
             for lettre in mot:
-                # todo: vérifier quoi faire avec les jokers
+                if 'Joker' in lettres_a_verifier:
+                    lettres_a_verifier.remove('Joker')
+                    break
+
                 if lettre not in lettres_a_verifier:
                     pas_trouve = True
                     break
