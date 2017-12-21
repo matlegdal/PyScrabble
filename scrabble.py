@@ -42,7 +42,10 @@ class Scrabble(Tk):
                         Contient le tour, l'action du joueur, les mots placés, les points récoltés et le temps du tour.
         - barre_menu: tk.Menu, Barre des menus
         - fichiers: tk.Menu, Le menu "fichiers" de la barre de menus
+        - presentation: tk.Menu, Le menu "présentation" de la barre de menus
         - aide: tk.Menu, Le menu "aide" de la barre de menus
+        - assist: tk.Frame, Le frame contenant les suggestions. Peut être affiché ou caché via le menu
+        - affichage_suggestions: bool, True pour afficher les suggestions, False pour les cacher.
         - message: tk.StringVar, Message dynamique à afficher dans le frame "message" de l'interface.
         - nom_joueur: tk.StringVar, Variable dynamique permettant d'afficher le nom du joueur actif dans l'interface graphique
         - labels_points: tk.Label list, Liste des labels de pointage. Utilisé pour afficher dynamiquement les pointages des joueurs dans l'interface.
@@ -89,12 +92,19 @@ class Scrabble(Tk):
         self.fichier.add_separator()
         self.fichier.add_command(label="Quitter", command=self.quitter)
 
+        # Menu Présentation
+        self.presentation = Menu(self.barre_menu, tearoff=0)
+
+        self.presentation.add_command(label="Afficher/cacher les suggestions de mots", command=self.toggle_suggestions)
+        self.presentation.add_command(label="Afficher/cacher l'historique des tours", command=self.toggle_log)
+
         # Menu Aide
         self.aide = Menu(self.barre_menu, tearoff=0)
         self.aide.add_command(label="Règlements", command=lambda: Reglements(self))
 
         # Config du menu
         self.barre_menu.add_cascade(label="Fichier", menu=self.fichier)
+        self.barre_menu.add_cascade(label="Présentation", menu=self.presentation)
         self.barre_menu.add_cascade(label="Aide", menu=self.aide)
 
         self.config(menu=self.barre_menu)
@@ -132,6 +142,10 @@ class Scrabble(Tk):
         self.content = None
         self.accueil = None
         self.jeu = None
+        self.affichage_suggestions = True
+        self.assist = None
+        self.affichage_log = True
+        self.log_frame = None
 
 
     def config_content(self):
@@ -159,6 +173,9 @@ class Scrabble(Tk):
         self.fichier.entryconfig(1, state="disabled")
         self.fichier.entryconfig(2, state="disabled")
 
+        self.presentation.entryconfig(0, state="disabled")
+        self.presentation.entryconfig(1, state="disabled")
+
         self.accueil = Accueil(self.content, self)
 
     def nouvelle_partie(self):
@@ -172,6 +189,29 @@ class Scrabble(Tk):
         self.config_content()
         self.show_accueil()
 
+    def toggle_suggestions(self):
+        """
+        Permet d'afficher ou de cacher les suggestions de mots pour le joueur.
+        """
+        if self.affichage_suggestions:
+            self.assist.grid_remove()
+            self.affichage_suggestions = False
+        else:
+            self.assist.grid()
+            self.affichage_suggestions = True
+
+    def toggle_log(self):
+        """
+        Permet d'afficher ou de cacher l'historique des tours.
+        """
+        if self.affichage_log:
+            self.log_frame.grid_remove()
+            self.affichage_log = False
+        else:
+            self.log_frame.grid()
+            self.affichage_log = True
+
+
     def verifier_avant_de_quitter(self):
         """
         Fonction qui demande au joueur s'il veut sauvegarder la partie avant de quitter. Appelée lors de l'utilisation
@@ -184,8 +224,6 @@ class Scrabble(Tk):
                 self.sauvegarder_partie()
             else:
                 return
-
-        # todo: on pourrait avoir une condition qui fait que si on n'a pas fait de coups depuis la dernière save, on ne demande pas de saver
 
     def quitter(self):
         """
@@ -269,6 +307,9 @@ class Scrabble(Tk):
         self.fichier.entryconfig(0, state="normal")
         self.fichier.entryconfig(1, state="normal")
         self.fichier.entryconfig(2, state="normal")
+
+        self.presentation.entryconfig(0, state="normal")
+        self.presentation.entryconfig(1, state="normal")
 
         self.jeu = Jeu(self.content, self)
 
