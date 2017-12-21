@@ -2,6 +2,12 @@ from tkinter import *
 from jeton import Jeton
 
 def coord_pos(pos, pixels_par_case):
+    """
+    Fonction utilitaire pour donner les coins du rectangle lorsqu'un jeton est dessiné sur le chevalet
+    :param pos: int, La position sur le chevalet
+    :param pixels_par_case: int, La taille des cases
+    :return: tuple, retourne les 4 coordonnées du rectangle et le delta utilisé pour le positionnement du texte.
+    """
     x1 = pos * pixels_par_case
     y1 = 0
     x2 = x1 + pixels_par_case
@@ -11,6 +17,13 @@ def coord_pos(pos, pixels_par_case):
     return x1, y1, x2, y2, delta
 
 def coord_case(ligne, col, pixels_par_case):
+    """
+    Fonction utilitaire pour donner les coins du rectangle à dessiner lorsqu'on dessine un jeton sur le plateau
+    :param ligne: int, l'index de la ligne
+    :param col: int, l'index de la colonne
+    :param pixels_par_case: int, la taille des cases
+    :return: tuple, retourne les 4 coordonnées du rectangle et le delta utilisé pour le positionnement du texte.
+    """
     x1 = col * pixels_par_case
     y1 = ligne * pixels_par_case
     x2 = x1 + pixels_par_case
@@ -19,12 +32,24 @@ def coord_case(ligne, col, pixels_par_case):
 
     return x1, y1, x2, y2, delta
 
-def dessiner_jeton(master, x1, y1, x2, y2, delta, jeton, tags):
-    assert isinstance(master, Canvas)
+def dessiner_jeton(parent, x1, y1, x2, y2, delta, jeton, tags):
+    """
+    Fonction qui dessine un jeton sur un canvas étant donné les coordonnées et le jeton fourni
+    :param parent: Obj héritant de tk.Canvas, Peut être Plateau ou Chevalet
+    :param x1: int, la coordonnée x1 du rectangle
+    :param y1: int, la coordonnée y1 du rectangle
+    :param x2: int, la coordonnée x2 du rectangle
+    :param y2: int, la coordonnée y2 du rectangle
+    :param delta: int, utilisé pour le placement du texte
+    :param jeton: Jeton, Le jeton à dessiner
+    :param tags: tuple ou str, les tags à ajouter au rectangle dessiné. Peut être de type str, s'il y en a juste 1. Si plusieurs, doit être un tuple.
+    :return: Rien
+    """
+    assert isinstance(parent, Canvas)
     assert isinstance(jeton, Jeton)
 
-    master.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tags)
-    master.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tags)
+    parent.create_rectangle(x1, y1, x2, y2, fill="ivory", tags=tags)
+    parent.create_text(x1 + delta, y1 + delta, justify=CENTER, text=str(jeton), font=("Times", int(delta)), tags=tags)
 
 def mot_permis(mot, dictionnaire):
     """
