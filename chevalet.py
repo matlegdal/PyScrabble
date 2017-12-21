@@ -14,7 +14,7 @@ class Chevalet(Canvas):
         super().__init__(parent, height=pixels_par_case, width=pixels_par_case*Chevalet.TAILLE_CHEVALET, bg='#f5ebdc')
         self.pixels_par_case = pixels_par_case
         self.root = root
-        self.bind('<Configure>', self.redimensionner_chevalet)
+        #self.bind('<Configure>', self.redimensionner_chevalet)
 
 
     def dessiner(self, joueur):
