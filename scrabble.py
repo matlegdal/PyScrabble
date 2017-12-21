@@ -1078,53 +1078,56 @@ class Scrabble(Tk):
         fonction qui propose des mots au joueur actif selon les jetons dans son chevalet.
         :return: str: suggestion des mots prêt à afficher
         """
-        lettres = [jeton.lettre for jeton in self.joueur_actif.chevalet if jeton is not None]
-        suggestions = []
+        lettres_chevalet = [jeton.lettre for jeton in self.joueur_actif.chevalet if jeton is not None]
+        suggestions = set()
 
         if self.plateau.est_vide():
             # fonction de chercher dans le dictionnaire selon la liste de lettres
-            self.chercher_dico(lettres, suggestions)
+            suggestions = self.chercher_dico(lettres_chevalet, suggestions)
 
         else:
+            lettres_plateau = []
             for ligne in range(len(self.plateau.cases)):
                 for colonne in range(len(self.plateau.cases[ligne])):
                     if self.plateau.cases[ligne][colonne].jeton_occupant is not None:
-                        lettres.append(self.plateau.cases[ligne][colonne].jeton_occupant.lettre)
-                        self.chercher_dico(lettres, suggestions)
-                        if len(lettres) > 7:
-                            del lettres[-1]
+                        if self.plateau.cases[ligne][colonne].jeton_occupant.lettre not in lettres_plateau:
+                            lettres_plateau.append(self.plateau.cases[ligne][colonne].jeton_occupant.lettre)
 
+            for lettre in lettres_plateau:
+                lettres_chevalet.append(lettre)
+                suggestions = self.chercher_dico(lettres_chevalet, suggestions)
+                del lettres_chevalet[-1]
+
+        suggestions = list(suggestions)
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
-
         return suggestions
 
     def chercher_dico(self, lettres, suggestions):
-
         """
         Fonction qui cherche dans le dictionnaire des suggestions de mots selon une liste de lettres
-        :param lettres: list: liste de lettres provenant du chevalet et du plateau
-        :return: list: liste de mots suggérés.
+        :param: lettres: list, liste de lettres provenant du chevalet et du plateau
+        :param: suggestions: list, liste des mots suggérés à date.
+        :return: list: suggestions est la liste de mots suggérés.
         """
-
+        suggestions = suggestions[:]
         for mot in self.dictionnaire:
             lettres_a_verifier = lettres[:]
             pas_trouve = False
             if mot == '':
                 break
-            for letter in mot:
+            for lettre in mot:
                 # todo: vérifier quoi faire avec les jokers
                 # if 'Joker' in lettres_a_verifier:
                 # dire au programme de prendre n'importe quelle lettre?
-                if letter not in lettres_a_verifier:
+                if lettre not in lettres_a_verifier:
                     pas_trouve = True
                     break
                 else:
-                    lettres_a_verifier.remove(letter)
-            if not pas_trouve:
-                if mot not in suggestions[:]:
-                    suggestions.append(self.calculer_points(mot))
+                    lettres_a_verifier.remove(lettre)
+            if not pas_trouve and mot not in suggestions:
+                suggestions.append(self.calculer_points(mot))
 
-        suggestions.sort(key=lambda tup: tup[1], reverse=True)
+        # suggestions.sort(key=lambda tup: tup[1], reverse=True)
 
         return suggestions
 

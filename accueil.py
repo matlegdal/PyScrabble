@@ -32,7 +32,7 @@ class Accueil(Frame):
         Radiobutton(self, text='2 joueurs', variable=nb_joueurs, value=2).grid(row=2, column=1, sticky=W, pady=self.PADY)
         Radiobutton(self, text='3 joueurs', variable=nb_joueurs, value=3).grid(row=2, column=2, sticky=W, pady=self.PADY)
         Radiobutton(self, text='4 joueurs', variable=nb_joueurs, value=4).grid(row=2, column=3, sticky=W, pady=self.PADY)
-        Radiobutton(self, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2,column=4,sticky=W,pady=self.PADY)
+        # Radiobutton(self, text='Jouer contre l\'ordinateur', variable=nb_joueurs, value=1, state=DISABLED).grid(row=2,column=4,sticky=W,pady=self.PADY)
 
         # Difficulté
         Label(self, text="Choisissez la difficulté:", font=("Times", 16)).grid(row=3, column=0, sticky=E, padx=self.PADX,pady=self.PADY)
