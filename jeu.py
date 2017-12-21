@@ -116,30 +116,30 @@ class Jeu(Frame):
 
         # Interface d'assistance
         # todo: corriger le bug de redimensionnement
-        assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
+        root.assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        root.assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
 
-        Label(assist, text="Suggestion de mots").pack()
+        Label(root.assist, text="Suggestion de mots").pack()
 
-        root.suggestions = Text(assist, width=40, height=10)
+        root.suggestions = Text(root.assist, width=40, height=10)
         root.suggestions.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
 
-        scroll_suggestions = Scrollbar(assist, command=root.suggestions.yview)
+        scroll_suggestions = Scrollbar(root.assist, command=root.suggestions.yview)
         scroll_suggestions.pack(side=RIGHT, fill=Y)
 
         root.suggestions.config(yscrollcommand=scroll_suggestions.set)
 
         # Historique
         # todo: redimensionnement
-        log = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
-        log.grid(row=2, column=2, rowspan=3, sticky=NSEW)
+        root.log_frame = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
+        root.log_frame.grid(row=2, column=2, rowspan=3, sticky=NSEW)
 
-        Label(log, text="Historique des tours").pack()
+        Label(root.log_frame, text="Historique des tours").pack()
 
-        root.log = Text(log, width=40, height=10)
+        root.log = Text(root.log_frame, width=40, height=10)
         root.log.pack(side=LEFT, fill=BOTH, expand=YES, padx=self.PADX, pady=self.PADY)
 
-        scroll_log = Scrollbar(log, command=root.log.yview)
+        scroll_log = Scrollbar(root.log_frame, command=root.log.yview)
         scroll_log.pack(side=RIGHT, fill=Y)
 
         root.log.config(yscrollcommand=scroll_log.set)
