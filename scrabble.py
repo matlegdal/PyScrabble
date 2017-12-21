@@ -1050,10 +1050,8 @@ class Scrabble(Tk):
                     if self.plateau.cases[ligne][colonne].jeton_occupant is not None:
                         lettres.append(self.plateau.cases[ligne][colonne].jeton_occupant.lettre)
                         self.chercher_dico(lettres, suggestions)
-
                         if len(lettres) > 7:
                             del lettres[-1]
-        print(lettres)
 
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
 
@@ -1082,7 +1080,7 @@ class Scrabble(Tk):
                 else:
                     lettres_a_verifier.remove(letter)
             if not pas_trouve:
-                if mot not in suggestions:
+                if mot not in suggestions[:]:
                     suggestions.append(self.calculer_points(mot))
 
         suggestions.sort(key=lambda tup: tup[1], reverse=True)
