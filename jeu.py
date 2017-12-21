@@ -1,6 +1,7 @@
 from tkinter import *
 from chevalet import Chevalet
 
+
 class Jeu(Frame):
     """
     Classe gérant l'affichage de l'interface de jeu principale.

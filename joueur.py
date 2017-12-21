@@ -2,6 +2,7 @@ from random import shuffle
 from exception import *
 from jeton import Jeton
 
+
 class Joueur:
     """
     Cette classe permet de représenter un joueur.
@@ -36,7 +37,6 @@ class Joueur:
         self.__chevalet = [None for _ in range(Joueur.TAILLE_CHEVALET)]
         self.jeton_actif = None
         self.jetons_jetes = []
-
 
     @property
     def nb_a_tirer(self):

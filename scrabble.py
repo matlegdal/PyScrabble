@@ -147,7 +147,6 @@ class Scrabble(Tk):
         self.affichage_log = True
         self.log_frame = None
 
-
     def config_content(self):
         """
         Configure la fenêtre principale. Consiste en un Frame qui contient tous les autres éléments.
@@ -210,7 +209,6 @@ class Scrabble(Tk):
         else:
             self.log_frame.grid()
             self.affichage_log = True
-
 
     def verifier_avant_de_quitter(self):
         """
@@ -418,7 +416,6 @@ class Scrabble(Tk):
             except (PositionChevaletException, AssertionError) as e:
                 print(e)
 
-
     def reprendre_jeton(self, event):
         """
         Permet de reprendre un jeton déposé sur le plateau par le joueur.
@@ -450,7 +447,6 @@ class Scrabble(Tk):
                 bind_poser(self)
             except CaseVideException as e:
                 print(e)
-
 
     def jouer_un_tour(self):
         """
@@ -709,7 +705,6 @@ class Scrabble(Tk):
         self.joueur_actif.jetons_jetes = []
         self.changer_joueur()
 
-
     def annuler_changer_jetons(self):
         """
         Fonction qui est déclenchée lorsque le joueur appuie sur le bouton annuler dans l'interface pour changer les jetons.
@@ -753,7 +748,6 @@ class Scrabble(Tk):
         self.btn_passer.config(state="normal")
         self.btn_changer.config(state="normal")
         self.btn_abandonner.config(state="normal")
-
 
     def changer_joueur(self, charger=False, tour=0):
         """
@@ -866,7 +860,6 @@ class Scrabble(Tk):
             self.joueur_actif = self.joueurs[randint(0, len(self.joueurs)-1)]
         else:
             self.joueur_actif = self.joueurs[(self.joueurs.index(self.joueur_actif)+1) % len(self.joueurs)]
-
 
     def tirer_jetons(self, n):
         """

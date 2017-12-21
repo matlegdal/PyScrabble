@@ -86,7 +86,6 @@ class Plateau(Canvas):
 
                     dessiner_jeton(self, x1, y1, x2, y2, delta, self.cases[ligne][col].jeton_occupant, tags=tuple(tags))
 
-
     def redimensionner(self, event):
         """
         Fonction qui calcule la nouvelle dimension des cases et redessine le plateau lors d'un redimenstionnement de la fenêtre.
