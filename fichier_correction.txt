@@ -99,15 +99,17 @@ IMPLANTÉE: non
 IMPLANTÉE: OUI
 /5 : Affichage de la liste des mots sur le plateau
      Commentaires : voir la fonction historique (log)
+     Nous avons ajouter une option dans le menu "Présentation" pour afficher/cacher l'historique des tours.
 
 IMPLANTÉE: OUI
 /5 : Permettre d'annuler le dernier mouvement
      Commentaires : Le joueur peut reprendre les jetons du plateau aisément pour les redéposer sur son chevalet.
      Il y a aussi un bouton annuler qui permet de reprendre tous les jetons placés sur le plateau et les remettre dans le chevalet.
 
-IMPLANTÉE: Partiellement
+IMPLANTÉE: Partiellement?
 /5 :  Sauvegarde et possibilité de "revoir" une partie enregistrée
-     Commentaires :	Nous avons implanté une historique des coups joués. Mais
+     Commentaires :	Nous avons implanté une historique des coups joués.
+     Mais si vous entendez par "revoir", réellement que l'ordinateur joue réellement les coups qu'on a fait, alors non.
 
 IMPLANTÉE:
 /10 :  Jouer contre l'ordinateur
@@ -125,9 +127,10 @@ IMPLANTÉE: OUI
 /10 : Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires : Il y a 2 versions qui peuvent être affichées. L'horloge normale et le minuteur pour la version "difficile"
 
-IMPLANTÉE: Oui todo: ajouter une option dans le menu pour afficher/cacher les suggestions
+IMPLANTÉE: Oui
 /10 : Assister le joueur en lui proposant des mots
-     Commentaires :
+     Commentaires : Nous avons également inclus une option dans le menu pour afficher/cacher les suggestions.
+     En fin de partie, cette fonction peut créer un certain ralentissement. Il peut alors être préférable de la cacher si on ne l'utilise pas.
 
 IMPLANTÉE: non
 /20 : Donner une dimension 3D à votre jeu

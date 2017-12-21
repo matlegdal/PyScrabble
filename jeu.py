@@ -127,7 +127,6 @@ class Jeu(Frame):
         root.sac_a_jetons_label.grid(row=1, column=1)
 
         # Interface d'assistance
-        # todo: corriger le bug de redimensionnement
         root.assist = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         root.assist.grid(row=0, column=2, rowspan=2, sticky=NSEW)
 
@@ -142,7 +141,6 @@ class Jeu(Frame):
         root.suggestions.config(yscrollcommand=scroll_suggestions.set)
 
         # Historique
-        # todo: redimensionnement
         root.log_frame = Frame(parent, bd=1, relief="groove", padx=self.PADX, pady=self.PADY)
         root.log_frame.grid(row=2, column=2, rowspan=3, sticky=NSEW)
 

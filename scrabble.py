@@ -60,8 +60,6 @@ class Scrabble(Tk):
     LANGUES_DISPONIBLES = ['fr', 'en']
     DIFFICULTES_DISPONIBLES = ['facile', 'difficile']
     TAILLE_CHEVALET = 7
-    # todo: refactorer -> bouger taille_chevalet et pixels par case
-
     PADX = 10
     PADY = 10
 
@@ -361,9 +359,9 @@ class Scrabble(Tk):
             unbind_poser(self)
             self.after(500, lambda : bind_reprendre(self))
 
+        # En raison, des bindings, il est peu probable que cette exception survienne, mais au cas.
         except (CaseOccupeeException, AssertionError) as e:
             showwarning(message=e)
-            print(e) # TODO: améliorer la gestion des erreurs!
 
     def redeposer_jeton(self, event):
         """
