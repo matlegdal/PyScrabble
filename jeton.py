@@ -1,5 +1,6 @@
 from exception import *
 
+
 class Jeton:
     """
     Cette classe représente un jeton.

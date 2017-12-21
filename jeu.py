@@ -1,6 +1,7 @@
 from tkinter import *
 from chevalet import Chevalet
 
+
 class Jeu(Frame):
 
     PADX = 10
