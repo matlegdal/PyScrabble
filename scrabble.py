@@ -1083,7 +1083,7 @@ class Scrabble(Tk):
 
         if self.plateau.est_vide():
             # fonction de chercher dans le dictionnaire selon la liste de lettres
-            suggestions = self.chercher_dico(lettres_chevalet, suggestions)
+            suggestions.update(self.chercher_dico(lettres_chevalet, suggestions))
 
         else:
             lettres_plateau = []
@@ -1095,12 +1095,14 @@ class Scrabble(Tk):
 
             for lettre in lettres_plateau:
                 lettres_chevalet.append(lettre)
-                suggestions = self.chercher_dico(lettres_chevalet, suggestions)
+                suggestions.update(self.chercher_dico(lettres_chevalet, suggestions))
                 del lettres_chevalet[-1]
 
-        suggestions = list(suggestions)
-        suggestions.sort(key=lambda tup: tup[1], reverse=True)
-        return suggestions
+        suggestions_tries = []
+        for mot in suggestions:
+            suggestions_tries.append(self.calculer_points(mot))
+        suggestions_tries.sort(key=lambda tup: tup[1], reverse=True)
+        return suggestions_tries
 
     def chercher_dico(self, lettres, suggestions):
         """
@@ -1109,7 +1111,6 @@ class Scrabble(Tk):
         :param: suggestions: list, liste des mots suggérés à date.
         :return: list: suggestions est la liste de mots suggérés.
         """
-        suggestions = suggestions[:]
         for mot in self.dictionnaire:
             lettres_a_verifier = lettres[:]
             pas_trouve = False
@@ -1124,8 +1125,8 @@ class Scrabble(Tk):
                     break
                 else:
                     lettres_a_verifier.remove(lettre)
-            if not pas_trouve and mot not in suggestions:
-                suggestions.append(self.calculer_points(mot))
+            if not pas_trouve:
+                suggestions.update(mot)
 
         # suggestions.sort(key=lambda tup: tup[1], reverse=True)
 
