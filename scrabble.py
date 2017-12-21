@@ -1082,7 +1082,6 @@ class Scrabble(Tk):
         suggestions = set()
 
         if self.plateau.est_vide():
-            # fonction de chercher dans le dictionnaire selon la liste de lettres
             suggestions.update(self.chercher_dico(lettres_chevalet, suggestions))
 
         else:
@@ -1118,17 +1117,14 @@ class Scrabble(Tk):
                 break
             for lettre in mot:
                 # todo: vérifier quoi faire avec les jokers
-                # if 'Joker' in lettres_a_verifier:
-                # dire au programme de prendre n'importe quelle lettre?
                 if lettre not in lettres_a_verifier:
                     pas_trouve = True
                     break
                 else:
                     lettres_a_verifier.remove(lettre)
-            if not pas_trouve:
-                suggestions.update(mot)
 
-        # suggestions.sort(key=lambda tup: tup[1], reverse=True)
+            if not pas_trouve:
+                suggestions.add(mot)
 
         return suggestions
 
