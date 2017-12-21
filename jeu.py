@@ -95,7 +95,7 @@ class Jeu(Frame):
 
         Label(root.jeter, text="Sélectionner les jetons à changer\net appuyez sur Confirmer").grid(row=0, column=1, columnspan=2)
 
-        root.sac_a_jetons = Chevalet(root.jeter, root.PIXELS_PAR_CASE)
+        root.sac_a_jetons = Chevalet(self, root.jeter, root.PIXELS_PAR_CASE)
         root.sac_a_jetons.grid(row=1, column=1, columnspan=2, sticky=NS, pady=self.PADY)
 
         Button(root.jeter, text="Confirmer", command=root.changer_jetons).grid(row=2, column=1, sticky=NSEW)

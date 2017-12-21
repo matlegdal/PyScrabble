@@ -125,7 +125,7 @@ IMPLANTÉE: OUI
 /10 : Afficher un compteur de temps de jeu pour chaque joueur
      Commentaires : Il y a 2 versions qui peuvent être affichées. L'horloge normale et le minuteur pour la version "difficile"
 
-IMPLANTÉE: Oui todo: ajouter une option dans le menu pour afficher/cacher les suggestions
+IMPLANTÉE: Oui
 /10 : Assister le joueur en lui proposant des mots
      Commentaires :
 
@@ -153,7 +153,7 @@ IMPLANTÉE: OUI
      - Un joueur qui se trompe dans un mot reprend ses lettres et passe son tour -> difficile seulement (dans la version facile le joueur est averti des mots erronés, mais peut continuer son tour)
 
 
-IMPLANTÉE:
+IMPLANTÉE: non
 /30 : Jouer contre l'ordinateur en implémentant une intelligence artificielle
      (l'ordinateur intelligent devra toujours jouer les meilleurs coups et gagner chaque partie)
      Commentaires :
